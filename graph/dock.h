@@ -33,7 +33,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 #endif
 
                 // 1. Initialize memory pools
-                this->init_memory_pools(graph_vertices, graph_edges);
+                Dock::init_memory_pools(graph_vertices, graph_edges);
 
                 // 2. Create an empty vertex sequence
                 using VertexStruct = std::pair<types::Vertex, VertexEntry>;
@@ -73,12 +73,96 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 #endif
             }
 
+            /**
+             * Number of vertices in a graph.
+             *
+             * @return the number of vertices in a graph
+             */
+            auto number_of_vertices() const
+            {
+                size_t n = this->graph_tree.size();
+                auto last_vertex = this->graph_tree.select(n - 1);
+
+                return n > 0 ? last_vertex.value.first + 1 : 0;
+            }
+
+            /**
+             * Number of edges in a graph.
+             *
+             * @return the number of edges in a graph
+             */
+            auto number_of_edges() const
+            {
+                return this->graph_tree.aug_val();
+            }
+
+            /**
+             * Flattens vertex tree to an array of vertex entries.
+             *
+             * @return the sequence of pointers to graph vertex entries
+             */
+            auto flatten_vertex_tree() const
+            {
+                #ifdef DOCK_TIMER
+                    timer timer("Dock::FlattenVertexTree");
+                #endif
+
+                size_t n_vertices = this->number_of_vertices();
+                auto flat_snapshot = pbbs::sequence<VertexEntry>(n_vertices);
+
+                auto map_func = [&] (const Graph::E& entry, size_t ind)
+                {
+                    const uintV& key = entry.first;
+                    const auto& value = entry.second;
+                    flat_snapshot[key] = value;
+                };
+
+                this->map_vertices(map_func);
+
+                #ifdef DOCK_TIMER
+                    timer.reportTotal("time(seconds)");
+
+                    std::cout << "Wharf::FlattenVertexTree: snapshot size (MB): "
+                              << utility::ConvertToMB(flat_snapshot.size() * sizeof(flat_snapshot[0]))
+                              << std::endl;
+                #endif
+
+                return flat_snapshot;
+            }
+
+            /**
+             * Traverses vertices and applies mapping function.
+             *
+             * @tparam F
+             *
+             * @param map_f
+             * @param run_seq
+             * @param granularity
+             */
+            template<class Function>
+            void map_vertices(Function map_function, bool run_seq = false, size_t granularity = utils::node_limit) const
+            {
+                this->graph_tree.map_elms(map_function, run_seq, granularity);
+            }
+
+            /**
+             * Destroys dock
+             */
+            void destroy()
+            {
+                this->graph_tree.~Graph();
+                this->graph_tree.root = nullptr;
+            }
+
         private:
             Graph graph_tree;
 
-            void init_memory_pools(size_t graph_vertices, size_t graph_edges)
+            static void init_memory_pools(size_t graph_vertices, size_t graph_edges)
             {
+                types::CompressedEdgesLists::init();
+                compressed_lists::init(graph_vertices);
 
+                Graph::init();
             }
     };
 }

@@ -63,57 +63,56 @@ set(GTEST_LIBRARIES libgtest libgtest_main libgmock)
 
 # ---------------------------------------------------- TEST DATA -------------------------------------------------------
 
-# copy data directory
-#file(COPY ../experiments/data DESTINATION .)
-#file(COPY ../experiments/scripts/SNAPtoAdj DESTINATION .)
+file(COPY ../experiments/data DESTINATION .)
+file(COPY ../experiments/scripts/SNAPtoAdj DESTINATION .)
 
 # -------------------------------------------------- COMPILE FLAGS -----------------------------------------------------
 
 # build options
-#option(CLANG        "???"               OFF)
-#option(CILK         "???"               OFF)
-#option(OPENMP       "???"               OFF)
-#option(HOMEGROWN    "???"               OFF)
-#option(WHARF_DEBUG  "Wharf debug mode"  OFF)
-#option(SERIAL       "???"               OFF)
-#
-#set(SERIAL ON)
-#set(WHARF_DEBUG ON)
-#
-## build variables
-#set(OMPFLAGS     "-DOPENMP -fopenmp")
-#set(CILKFLAGS    "-DCILK -fcilkplus")
-#set(HGFLAGS      "-DHOMEGROWN -pthread")
-#set(OPTIMIZATION "-O3 -g")
-#set(CFLAGS       "-DEDGELONG -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC -DNDEBUG")
-#set(WDFLAGS       "-DEDGELONG -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC")
-#
-#if(CLANG)
-#    set(CMAKE_CXX_COMPILER "clang++")
-#    set(PFLAGS ${CILKFLAGS})
-#elseif(CILK)
-#    set(CMAKE_CXX_COMPILER "g++")
-#    set(PFLAGS ${CILKFLAGS})
-#elseif(OPENMP)
-#    set(CMAKE_CXX_COMPILER "g++")
-#    set(PFLAGS ${OMPFLAGS})
-#elseif(HOMEGROWN)
-#    set(CMAKE_CXX_COMPILER "g++")
-#    set(PFLAGS ${HGFLAGS})
-#elseif(SERIAL)
-#    set(CMAKE_CXX_COMPILER "g++")
-#    set(PFLAGS "")
-#else()
-#    set(CMAKE_CXX_COMPILER "g++")
-#    set(PFLAGS ${HGFLAGS})
-#endif()
+option(CLANG        "???"               OFF)
+option(CILK         "???"               OFF)
+option(OPENMP       "???"               OFF)
+option(HOMEGROWN    "???"               OFF)
+option(DOCK_DEBUG   "Dock debug mode"   OFF)
+option(SERIAL       "???"               OFF)
+
+set(SERIAL ON)
+set(DOCK_DEBUG ON)
+
+# build variables
+set(OMPFLAGS         "-DOPENMP -fopenmp")
+set(CILKFLAGS        "-DCILK -fcilkplus")
+set(HGFLAGS          "-DHOMEGROWN -pthread")
+set(OPTIMIZATION     "-O3 -g")
+set(CFLAGS           "-DEDGELONG -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC -DNDEBUG")
+set(DOCK_DEBUG_FLAGS "-DEDGELONG -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC")
+
+if(CLANG)
+    set(CMAKE_CXX_COMPILER "clang++")
+    set(PFLAGS ${CILKFLAGS})
+elseif(CILK)
+    set(CMAKE_CXX_COMPILER "g++")
+    set(PFLAGS ${CILKFLAGS})
+elseif(OPENMP)
+    set(CMAKE_CXX_COMPILER "g++")
+    set(PFLAGS ${OMPFLAGS})
+elseif(HOMEGROWN)
+    set(CMAKE_CXX_COMPILER "g++")
+    set(PFLAGS ${HGFLAGS})
+elseif(SERIAL)
+    set(CMAKE_CXX_COMPILER "g++")
+    set(PFLAGS "")
+else()
+    set(CMAKE_CXX_COMPILER "g++")
+    set(PFLAGS ${HGFLAGS})
+endif()
 
 # set compile flags
-#if (WHARF_DEBUG)
-#    set(CMAKE_CXX_FLAGS "${WDFLAGS} ${PFLAGS} -DWHARF_DEBUG") # CHECK_CORRECTNESS
-#else()
-#    set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS}")
-#endif()
+if (DOCK_DEBUG)
+    set(CMAKE_CXX_FLAGS "${DOCK_DEBUG_FLAGS} ${PFLAGS} -DOCK_TIME")
+else()
+    set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS}")
+endif()
 
 # ------------------------------------------------------ TESTS ---------------------------------------------------------
 
