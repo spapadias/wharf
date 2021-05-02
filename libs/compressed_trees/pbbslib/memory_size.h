@@ -23,8 +23,7 @@
 #endif
 
 
-#ifndef MEMORY_SIZE_PARLAY_PBBS
-#define MEMORY_SIZE_PARLAY_PBBS
+
 /**
  * Returns the size of physical memory (RAM) in bytes.
  */
@@ -98,4 +97,3 @@ static size_t getMemorySize( )
   return 0L;/* Unknown OS. */
   #endif
 }
-#endif

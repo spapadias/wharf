@@ -197,8 +197,7 @@ struct versioned_graph {
     const auto& G = S.graph;
 
     // 1. Insert the new graph (not yet visible) into the live versions set
-    snapshot_graph G_next = G.DeleteEdgesBatch(m, edges, sorted, remove_dups,
-                                               nn, run_seq);
+    snapshot_graph G_next = G.delete_edges_batch(m, edges, sorted, remove_dups, nn, run_seq);
     live_versions.insert(make_tuple(current_timestamp,
                                     make_tuple(refct_utils::make_refct(current_timestamp, 1),
                                                G_next.get_root())));

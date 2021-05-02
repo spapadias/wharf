@@ -89,7 +89,7 @@ auto read_unweighted_graph(const char* fname, bool is_symmetric, bool mmap=false
   size_t n = atol(tokens[1]);
   size_t m = atol(tokens[2]);
 
-  cout << "\t" << "Vertices(n) = " << n << " Edges(m) = " << m << endl;
+  cout << "n = " << n << " m = " << m << endl;
   assert(len == n + m + 2);
 
   uintE* offsets = pbbs::new_array_no_init<uintE>(n);

@@ -92,6 +92,8 @@ TEST_F(DockTest, DockConstructor)
             ASSERT_EQ(flag, true);
         }
     });
+
+    dock.print_memory_pool_stats();
 }
 
 TEST_F(DockTest, DockDestructor)

@@ -7,37 +7,24 @@
 // size_t head_frequency = 8;
 // size_t head_mask = (1 << head_frequency) - 1;
 
-namespace compressed_lists
-{
+namespace compressed_lists {
 
-    using uchar = unsigned char;
-    using array_type = uchar;
+  using uchar = unsigned char;
+  using array_type = uchar;
 
-    using namespace compression;
+  using namespace compression;
 
-    using read_iter = compressed_iter::read_iter;
+  using read_iter = compressed_iter::read_iter;
 
-    // select a head with probability 1/2^{head_frequency}
-    // expected list size is equal to 2^{head_frequency}
+  // select a head with probability 1/2^{head_frequency}
+  // expected list size is equal to 2^{head_frequency}
 
-    static constexpr const size_t head_frequency = 8;
-    static constexpr const size_t head_mask = (1 << head_frequency) - 1;
+  static constexpr const size_t head_frequency = 8;
+  static constexpr const size_t head_mask = (1 << head_frequency) - 1;
 
-//  static bool is_head(const uintV& vtx_id) {
-//    return (pbbs::hash32_2(vtx_id) & head_mask) == 0;
-//  }
-
-    #if defined(VERTEXLONG)
-        static bool is_head(const uintV& vtx_id)
-        {
-            return (pbbs::hash64(vtx_id) & head_mask) == 0;
-        }
-    #else
-        static bool is_head(const uintV& vtx_id)
-        {
-            return (pbbs::hash32_2(vtx_id) & head_mask) == 0;
-        }
-    #endif
+  static bool is_head(const uintV& vtx_id) {
+    return (pbbs::hash32_2(vtx_id) & head_mask) == 0;
+  }
 
 
   template <class F>
@@ -96,19 +83,16 @@ namespace compressed_lists
     return false;
   }
 
-    template <class F>
-    inline void iter_elms(uchar* node, const uintV& src, const F& f)
-    {
-        if (node)
-        {
-            auto read_iter = compressed_iter::read_iter(node, src);
-            size_t deg = read_iter.deg;
-            for (size_t i=0; i<deg; i++)
-            {
-                f(read_iter.next());
-            }
-        }
+  template <class F>
+  inline void iter_elms(uchar* node, const uintV& src, const F& f) {
+    if (node) {
+      auto read_iter = compressed_iter::read_iter(node, src);
+      size_t deg = read_iter.deg;
+      for (size_t i=0; i<deg; i++) {
+        f(read_iter.next());
+      }
     }
+  }
 
 
   template <class SQ>
@@ -135,17 +119,14 @@ namespace compressed_lists
     return write_iter.finish();
   }
 
-  inline tuple<uintV, uintV> first_and_last_keys(uchar* node, const uintV& src)
-  {
-      uintV first_key = UINT_V_MAX; uintV last_key = UINT_V_MAX;
-      if (node)
-      {
-          auto read_iter = compressed_iter::read_iter(node, src);
-          first_key = read_iter.next();
-          last_key = read_iter.last_key();
-      }
-
-      return make_tuple(first_key, last_key);
+  inline tuple<uintV, uintV> first_and_last_keys(uchar* node, const uintV& src) {
+    uintV first_key = UINT_V_MAX; uintV last_key = UINT_V_MAX;
+    if (node) {
+      auto read_iter = compressed_iter::read_iter(node, src);
+      first_key = read_iter.next();
+      last_key = read_iter.last_key();
+    }
+    return make_tuple(first_key, last_key);
   }
 
   void print_node(uchar* node, uintV src) {

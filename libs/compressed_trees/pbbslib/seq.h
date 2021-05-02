@@ -201,14 +201,8 @@ namespace pbbs {
     }
 
     size_t size() const { return n;}
-    value_type* begin() const
-    {
-        return s;
-    }
-    value_type* end() const
-    {
-        return s + n;
-    }
+    value_type* begin() const {return s;}
+    value_type* end() const {return s + n;}
 
     // gives up ownership of space
     value_type* to_array() {

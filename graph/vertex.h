@@ -1,11 +1,14 @@
 #ifndef DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_VERTEX_H
 #define DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_VERTEX_H
 
+#include <compressed_walks.h>
+
 namespace dynamic_graph_representation_learning_with_metropolis_hastings
 {
     struct VertexEntry
     {
         types::CompressedEdges compressed_edges;
+        dygrl::CompressedWalks compressed_walks;
 
         /**
          * VertexEntry default constructor
@@ -13,15 +16,17 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
         VertexEntry()
         {
             this->compressed_edges = types::CompressedEdges();
+            this->compressed_walks = dygrl::CompressedWalks();
         }
 
         /**
          * VertexEntry constructor
          *
          * @param compressed_edges
+         * @param compressed_walks
          */
-        VertexEntry(const types::CompressedEdges& compressed_edges)
-            : compressed_edges(compressed_edges) {};
+        VertexEntry(const types::CompressedEdges& compressed_edges, const dygrl::CompressedWalks& compressed_walks)
+            : compressed_edges(compressed_edges), compressed_walks(compressed_walks) {};
     };
 
     struct Vertex
@@ -62,10 +67,13 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             auto ce_plus = lists::copy_node(entry.second.compressed_edges.plus);         // ce plus part; bumps ref-cnt
             auto ce_root = tree_plus::Tree_GC::inc(entry.second.compressed_edges.root);  // ce root part; bumps ref-cnt
 
-//            auto cw_plus = lists::copy_node(entry.second.compressed_walks.plus);         // cw plus part; bumps ref-cnt
-//            auto cw_root = tree_plus::Tree_GC::inc(entry.second.compressed_walks.root);  // cw root part; bumps ref-cnt
+            auto cw_plus = lists::copy_node(entry.second.compressed_walks.plus);         // cw plus part; bumps ref-cnt
+            auto cw_root = tree_plus::Tree_GC::inc(entry.second.compressed_walks.root);  // cw root part; bumps ref-cnt
 
-            return std::make_pair(entry.first, VertexEntry(types::CompressedEdges(ce_plus, ce_root)));
+            return std::make_pair(
+                entry.first,
+                VertexEntry(types::CompressedEdges(ce_plus, ce_root), dygrl::CompressedWalks(cw_plus, cw_root))
+            );
         }
 
         // Delete an entry
@@ -85,19 +93,19 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 entry.second.compressed_edges.root = nullptr;
             }
 
-//            if (entry.second.compressed_walks.plus)
-//            {
-//                lists::deallocate(entry.second.compressed_walks.plus);
-//                entry.second.compressed_walks.plus = nullptr;
-//            }
-//
-//            if (entry.second.compressed_walks.root)
-//            {
-//                auto T = tree_plus::edge_list();
-//
-//                T.root = entry.second.compressed_walks.root;
-//                entry.second.compressed_walks.root = nullptr;
-//            }
+            if (entry.second.compressed_walks.plus)
+            {
+                lists::deallocate(entry.second.compressed_walks.plus);
+                entry.second.compressed_walks.plus = nullptr;
+            }
+
+            if (entry.second.compressed_walks.root)
+            {
+                auto T = tree_plus::edge_list();
+
+                T.root = entry.second.compressed_walks.root;
+                entry.second.compressed_walks.root = nullptr;
+            }
         }
     };
 }

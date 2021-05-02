@@ -126,7 +126,7 @@ namespace compressed_lists {
   using allocator_16384 = typename node_16384::node::allocator;
 
   void print_stats() {
-    cout <<"compressed lists 2 printing stats" << endl;
+//    cout <<"compressed lists 2 printing stats" << endl;
 
     cout << "lists8: "; allocator_8::print_stats();
     cout << "lists16: "; allocator_16::print_stats();

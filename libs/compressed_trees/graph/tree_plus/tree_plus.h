@@ -18,16 +18,9 @@ namespace tree_plus {
     using val_t = AT*; // the set of edges stored in this node.
     static bool comp(const key_t& a, const key_t& b) { return a < b; }
     using aug_t = uintV; // num. edges in this subtree
-//    using aut_t =
-    // augmented information of a head node
-    // alength = 1 + lists::node_size(v);
-    // [nxt_head, nxt_tail_1, nxt_tail_2,...,nxt_tail_alength]
-    // and do DE in this array
-
     static aug_t get_empty() { return 0; }
     static aug_t from_entry(const key_t& k, const val_t& v) { return 1 + lists::node_size(v); }
     static aug_t combine(const aug_t& a, const aug_t& b) { return a + b; }
-
     using entry_t = std::pair<key_t,val_t>;
     static entry_t copy_entry(const entry_t& e) {
       // TODO: Instead of copying, bump a ref-ct (note that copy_node and
@@ -118,7 +111,6 @@ namespace tree_plus {
       T.root = nullptr;
     }
 
-    // Returns a true/false depending if f(a cw-tree node) = true
     template <class F>
     bool iter_elms_cond(uintV src, F f) const {
       bool res = false;
@@ -141,29 +133,22 @@ namespace tree_plus {
 
 
     template <class F>
-    void iter_elms(uintV src, F f) const
-    {
-        bool res = false;
-
-        if (plus)
-        {
-            lists::iter_elms(plus, src, f);
-        }
-
-        if (!res && root)
-        {
-            auto iter_f = [&] (const Entry& entry) {
-                uintV key = entry.first;
-                f(key);
-                AT* arr = entry.second;
-                lists::iter_elms(arr, src, f);
-            };
-
-            auto T = edge_list(); T.root = root;
-
-            T.iter_elms(iter_f);
-            T.root = nullptr;
-        }
+    void iter_elms(uintV src, F f) const {
+      bool res = false;
+      if (plus) {
+        lists::iter_elms(plus, src, f);
+      }
+      if (!res && root) {
+        auto iter_f = [&] (const Entry& entry) {
+          uintV key = entry.first;
+          f(key);
+          AT* arr = entry.second;
+          lists::iter_elms(arr, src, f);
+        };
+        auto T = edge_list(); T.root = root;
+        T.iter_elms(iter_f);
+        T.root = nullptr;
+      }
     }
 
     // f: (src, ngh) -> void
@@ -378,7 +363,8 @@ namespace tree_plus {
       }
     }
 
-    treeplus(AT* _plus, Node* _root) : plus(_plus), root(_root) {}
+    treeplus(AT* _plus, Node* _root) : plus(_plus), root(_root) {
+    }
     treeplus() : plus(nullptr), root(nullptr) {}
 
 
@@ -543,10 +529,9 @@ namespace tree_plus {
       auto T = edge_list(); T.root = root;
     }
 
-    static uintV get_last_key(AT* node, uintV src)
-    {
-        auto first_and_last = lists::first_and_last_keys(node, src);
-        return get<1>(first_and_last);
+    static uintV get_last_key(AT* node, uintV src) {
+      auto first_and_last = lists::first_and_last_keys(node, src);
+      return get<1>(first_and_last);
     }
 
     void check_consistency(uintV src) const {

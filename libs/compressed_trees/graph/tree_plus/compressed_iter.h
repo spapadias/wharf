@@ -33,15 +33,13 @@ namespace compressed_iter {
     // uint16_t size (bytes)
     // uint32_t refct
     // (new): uint32_t last neighbor
-    read_iter(uchar const* node, uintV src) : node(node), src(src), deg(0), ngh(0), proc(0)
-    {
-        is_valid = (node != nullptr);
-        if (is_valid)
-        {
-            deg = *((uint16_t*)node);
-            assert(deg > 0);
-            start = node + 2*sizeof(uint16_t) + sizeof(uint32_t) + sizeof(uint32_t);
-        }
+    read_iter(uchar const* node, uintV src) : node(node), src(src), deg(0), ngh(0), proc(0) {
+      is_valid = (node != nullptr);
+      if (is_valid) {
+        deg = *((uint16_t*)node);
+        assert(deg > 0);
+        start = node + 2*sizeof(uint16_t) + sizeof(uint32_t) + sizeof(uint32_t);
+      }
     }
 
     bool valid() {

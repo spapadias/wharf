@@ -127,8 +127,6 @@ public:
   using Map::finish;
   using Map::clear;
   using Map::find;
-  //todo: m@kis added this here
-  using Map::find_ref; //@Makis: this should be inherited from map.h
   using Map::map_elms;
   using Map::map_elms_no_index;
   using Map::map_elms_entry;

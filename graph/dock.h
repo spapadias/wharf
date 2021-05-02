@@ -3,6 +3,7 @@
 
 #include <graph/api.h>
 
+#include <utility.h>
 #include <config.h>
 #include <vertex.h>
 
@@ -47,9 +48,9 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     auto S = pbbs::delayed_seq<uintV>(deg, [&](size_t j) { return edges[off + j]; });
 
                     if (deg > 0)
-                        vertices[index] = std::make_pair(index, VertexEntry(types::CompressedEdges(S, index)));
+                        vertices[index] = std::make_pair(index, VertexEntry(types::CompressedEdges(S, index), dygrl::CompressedWalks()));
                     else
-                        vertices[index] = std::make_pair(index, VertexEntry(types::CompressedEdges()));
+                        vertices[index] = std::make_pair(index, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks()));
                 });
 
                 // 4. Construct the graph
@@ -121,10 +122,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                 #ifdef DOCK_TIMER
                     timer.reportTotal("time(seconds)");
-
-                    std::cout << "Wharf::FlattenVertexTree: snapshot size (MB): "
-                              << utility::ConvertToMB(flat_snapshot.size() * sizeof(flat_snapshot[0]))
-                              << std::endl;
                 #endif
 
                 return flat_snapshot;
@@ -154,12 +151,52 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 this->graph_tree.root = nullptr;
             }
 
+            /**
+             * Prints memory pool stats for the underlying lists.
+             */
+            void print_memory_pool_stats() const
+            {
+                // vertices memory pool stats
+                std::cout << std::endl;
+                std::cout << "Vertices tree memory pool stats: " << std::endl;
+                Graph::print_stats();
+                std::cout << std::endl;
+
+                // edges memory pool stats
+                std::cout << "Edges trees memory pool stats: " << std::endl;
+                types::CompressedEdgesLists::print_stats();
+                std::cout << std::endl;
+
+                // walks memory pool stats
+                std::cout << "Walks trees memory pool stats: " << std::endl;
+                dygrl::CompressedWalksLists::print_stats();
+                std::cout << std::endl;
+
+                // compressed lists
+                std::cout << "Compressed lists memory pool stats: " << std::endl;
+                compressed_lists::print_stats();
+                std::cout << std::endl;
+            }
+
         private:
             Graph graph_tree;
 
+            /**
+            * Initializes memory pools for underlying lists.
+            *
+            * uses default sizeinit() s: 1 000 000 blocks, each block is put into a list of size 65 536 blocks
+            * total allocated blocks = list_size(=65 5336) * (thread_count(=1..n) + ceil(allocated_blocks(=1M) / list_size(=65 536))
+            * maximum blocks = ((3*RAM)/4)/size of one block.
+            * @see list_allocator.h
+            *
+            * @param graph_vertices
+            * @param graph_edges
+            */
             static void init_memory_pools(size_t graph_vertices, size_t graph_edges)
             {
                 types::CompressedEdgesLists::init();
+                dygrl::CompressedWalksLists::init();
+
                 compressed_lists::init(graph_vertices);
 
                 Graph::init();

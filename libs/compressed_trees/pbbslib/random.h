@@ -31,8 +31,7 @@
 
 #include "utilities.h"
 
-namespace pbbs
-{
+namespace pbbs {
 
   // A cheap version of an inteface that should be improved
   // Allows forking a state into multiple states
@@ -43,17 +42,12 @@ namespace pbbs
     random fork(uint64_t i) const {
       return random(hash64(hash64(i+state))); }
     random next() const { return fork(0);}
-    size_t ith_rand(uint64_t i) const
-    {
-      return hash64(i+state);
-    }
-
+    size_t ith_rand(uint64_t i) const {
+      return hash64(i+state);}
     size_t operator[] (size_t i) const {return ith_rand(i);}
-
     size_t rand() { return ith_rand(0);}
-
-    private:
-        uint64_t state = 0;
+  private:
+    uint64_t state = 0;
   };
 
 };

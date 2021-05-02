@@ -305,17 +305,9 @@ public:
     return x;
   }
 
-    // basic search routines
-    maybe_V find(const K& key) const
-    {
-        return node_to_val(Tree::find(root, key));
-    }
-
-//  // Finds a wharf node and returns a pointer to it
-//  auto find_ref(const K& key) const
-//  {
-//      return Tree::find(root, key);
-//  }
+  // basic search routines
+  maybe_V find(const K& key) const {
+    return node_to_val(Tree::find(root, key));}
 
   template <class Func>
   maybe_V update(const K& key, const Func& f) const {
@@ -490,12 +482,6 @@ public:
   maybe_E node_to_entry(node* a) const {
     if (a != NULL) return maybe_E(Tree::get_entry(a));
     else return maybe_E();
-  }
-
-  // Finds a wharf node and returns a pointer to it
-  auto find_ref(const K& key) const
-  {
-      return Tree::find(root, key); //   ::find(root, key);
   }
 
 };
