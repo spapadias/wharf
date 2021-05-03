@@ -128,18 +128,18 @@ namespace compressed_lists {
   void print_stats() {
 //    cout <<"compressed lists 2 printing stats" << endl;
 
-    cout << "lists8: "; allocator_8::print_stats();
-    cout << "lists16: "; allocator_16::print_stats();
-    cout << "lists32: "; allocator_32::print_stats();
-    cout << "lists64: "; allocator_64::print_stats();
-    cout << "lists128: "; allocator_128::print_stats();
-    cout << "lists256: "; allocator_256::print_stats();
-    cout << "lists512: "; allocator_512::print_stats();
-    cout << "lists1024: "; allocator_1024::print_stats();
-    cout << "lists2048: "; allocator_2048::print_stats();
-    cout << "lists4096: "; allocator_4096::print_stats();
-    cout << "lists8192: "; allocator_8192::print_stats();
-    cout << "lists16384: "; allocator_16384::print_stats();
+    cout << "\tlists8: "; allocator_8::print_stats();
+    cout << "\tlists16: "; allocator_16::print_stats();
+    cout << "\tlists32: "; allocator_32::print_stats();
+    cout << "\tlists64: "; allocator_64::print_stats();
+    cout << "\tlists128: "; allocator_128::print_stats();
+    cout << "\tlists256: "; allocator_256::print_stats();
+    cout << "\tlists512: "; allocator_512::print_stats();
+    cout << "\tlists1024: "; allocator_1024::print_stats();
+    cout << "\tlists2048: "; allocator_2048::print_stats();
+    cout << "\tlists4096: "; allocator_4096::print_stats();
+    cout << "\tlists8192: "; allocator_8192::print_stats();
+    cout << "\tlists16384: "; allocator_16384::print_stats();
     size_t total_bytes = allocator_8::num_used_bytes() +
       allocator_16::num_used_bytes() +
       allocator_32::num_used_bytes() +
@@ -152,7 +152,7 @@ namespace compressed_lists {
       allocator_4096::num_used_bytes() +
       allocator_8192::num_used_bytes() +
       allocator_16384::num_used_bytes();
-    cout << "Total bytes for node allocators: " << total_bytes << endl;
+    cout << "\tTotal bytes for node allocators: " << total_bytes << endl;
   }
 
   size_t get_used_bytes() {

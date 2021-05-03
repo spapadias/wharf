@@ -80,7 +80,7 @@ namespace compressed_iter {
     // uint16_t: total size in bytes
     write_iter(uintV src, size_t deg_ub) : src(src), deg_ub(deg_ub) {
       proc = 0;
-      std::tie(node_ptr, node_size) = compressed_lists::alloc_node(deg_ub*5 + 2 + 2 + 4 + 4); // 2 uint16_t's and 2 uint32_t
+      std::tie(node_ptr, node_size) = compressed_lists::alloc_node(deg_ub*7 + 2 + 2 + 4 + 4); // 2 uint16_t's and 2 uint32_t
       offset += sizeof(uint16_t) + sizeof(uint16_t) + 2*sizeof(uint32_t);
     }
 

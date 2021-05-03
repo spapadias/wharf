@@ -2,9 +2,11 @@
 cmake_minimum_required(VERSION 3.16)
 project(dynamic_graph_representation_learning_with_metropolis_hastings)
 
-# dependencies
+# libraries
 include_directories(libs/parlay)
 include_directories(libs/compressed_trees)
+include_directories(libs/libcuckoo)
+include_directories(libs/parlay)
 
 # internal includes
 include_directories(graph)

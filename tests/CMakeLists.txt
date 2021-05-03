@@ -109,7 +109,7 @@ endif()
 
 # set compile flags
 if (DOCK_DEBUG)
-    set(CMAKE_CXX_FLAGS "${DOCK_DEBUG_FLAGS} ${PFLAGS} -DDOCK_TIMER")
+    set(CMAKE_CXX_FLAGS "${DOCK_DEBUG_FLAGS} ${PFLAGS} -DDOCK_DEBUG -DDOCK_TIMER -DVERTEXLONG")
 else()
     set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS}")
 endif()
@@ -121,10 +121,10 @@ add_executable(dock dock.cpp)
 target_link_libraries(dock ${GTEST_LIBRARIES})
 add_test(NAME wharf COMMAND dock)
 
-## Pairing function unit tests
-#add_executable(pairings unit/pairings.cpp)
-#target_link_libraries(pairings ${GTEST_LIBRARIES})
-#add_test(NAME pairings COMMAND pairings)
+# Pairing function unit tests
+add_executable(pairings pairings.cpp)
+target_link_libraries(pairings ${GTEST_LIBRARIES})
+add_test(NAME pairings COMMAND pairings)
 
 # -------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING WITH METROPOLIS HASTINGS ----------------------------
 

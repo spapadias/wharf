@@ -15,7 +15,7 @@ class DockTest : public testing::Test
         uintE* offsets;
         bool mmap = false;          // TODO @Djordjije: do we need this?
         bool is_symmetric = true;   // TODO @Djordjije: do we need this?
-        std::string default_file_path = "data/aspen-paper-graph";
+        std::string default_file_path = "data/email-graph";
 };
 
 void DockTest::SetUp()
@@ -74,8 +74,8 @@ TEST_F(DockTest, DockConstructor)
         ASSERT_EQ(flat_snapshot[i].compressed_edges.degree(), degree);
 
         // assert that compressed_walks_tree is empty
-//        ASSERT_EQ(flat_snapshot[i].compressed_walks.root, nullptr);
-//        ASSERT_EQ(flat_snapshot[i].compressed_walks.size(), 0);
+        ASSERT_EQ(flat_snapshot[i].compressed_walks.root, nullptr);
+        ASSERT_EQ(flat_snapshot[i].compressed_walks.size(), 0);
 
         auto edges = flat_snapshot[i].compressed_edges.get_edges(i);
 
@@ -92,14 +92,15 @@ TEST_F(DockTest, DockConstructor)
             ASSERT_EQ(flag, true);
         }
     });
-
-    dock.print_memory_pool_stats();
 }
 
 TEST_F(DockTest, DockDestructor)
 {
     dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+
+    dock.print_memory_pool_stats();
     dock.destroy();
+    dock.print_memory_pool_stats();
 
     // assert vertices and edges
     ASSERT_EQ(dock.number_of_vertices(), 0);
@@ -110,5 +111,19 @@ TEST_F(DockTest, DockDestructor)
 
     // assert that flat snapshot does not exits
     ASSERT_EQ(flat_snapshot.size(), 0);
+}
+
+TEST_F(DockTest, DockCreateRandomWalks)
+{
+    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+
+    dock.print_memory_pool_stats();
+
+    timer timer("MyTimer");
+    dock.create_random_walks();
+    timer.reportTotal("");
+
+    dock.print_memory_pool_stats();
+    dock.memory_footprint();
 }
 

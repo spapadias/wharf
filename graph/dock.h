@@ -3,9 +3,12 @@
 
 #include <graph/api.h>
 
-#include <utility.h>
 #include <config.h>
 #include <vertex.h>
+#include <cuckoohash_map.hh>
+
+#include <utility.h>
+#include <pairings.h>
 
 namespace dynamic_graph_representation_learning_with_metropolis_hastings
 {
@@ -143,12 +146,179 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-             * Destroys dock
+             * Destroys dock instance.
              */
             void destroy()
             {
                 this->graph_tree.~Graph();
                 this->graph_tree.root = nullptr;
+            }
+
+            // TODO: TBD
+            void create_random_walks()
+            {
+                auto flat_graph     = this->flatten_vertex_tree();
+                auto graph_vertices = this->number_of_vertices();
+
+                auto walks  = graph_vertices * config::walks_per_vertex;
+                auto cuckoo = libcuckoo::cuckoohash_map<types::Vertex, std::vector<types::Vertex>>();
+                srand(time(nullptr));
+
+                parallel_for(0, walks, [&](types::WalkID walk_id)
+                {
+                    auto current_vertex = walk_id % graph_vertices;
+                    if (flat_graph[current_vertex].compressed_edges.degree() == 0) return;
+
+                    for(types::Position position = 1; position <= config::walk_length; position++)
+                    {
+                        auto degree      = flat_graph[current_vertex].compressed_edges.degree();
+                        auto neighbours  = flat_graph[current_vertex].compressed_edges.get_edges(current_vertex);
+                        auto next_vertex = neighbours[rand() % degree];
+
+                        cuckoo.upsert(current_vertex, [&](std::vector<types::Vertex>& walk_triplets)
+                        {
+                            types::PairedTriplet hash = pairings::Szudzik<types::Vertex>::pair({walk_id*config::walk_length + position, next_vertex});
+                            walk_triplets.push_back(hash);
+                        });
+
+                        current_vertex = next_vertex;
+                        pbbs::free_array(neighbours);
+                    }
+                });
+
+                using VertexStruct = std::pair<types::Vertex, VertexEntry>;
+                auto vertices = pbbs::sequence<VertexStruct>(graph_vertices);
+
+                parallel_for(0, graph_vertices, [&](types::Vertex vertex)
+                {
+                    if (cuckoo.contains(vertex))
+                    {
+                        auto walk_parts = cuckoo.find(vertex);
+                        auto sequence = pbbs::sequence<types::Vertex>(walk_parts.size());
+                        for(auto i = 0; i < walk_parts.size(); i++)
+                        {
+                            sequence[i] = walk_parts[i];
+                        }
+
+                        sequence = pbbs::sample_sort(sequence, std::less<>());
+                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(sequence, vertex)));
+                    }
+                    else
+                    {
+                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks()));
+                    }
+                });
+
+                auto replace = [&] (const uintV src, const VertexEntry& x, const VertexEntry& y)
+                {
+                    auto tree_plus = tree_plus::uniont(x.compressed_walks, y.compressed_walks, src);
+
+                    // deallocate the memory
+                    lists::deallocate(x.compressed_walks.plus);
+                    tree_plus::Tree_GC::decrement_recursive(x.compressed_walks.root);
+                    lists::deallocate(y.compressed_walks.plus);
+                    tree_plus::Tree_GC::decrement_recursive(y.compressed_walks.root);
+
+                    return VertexEntry(x.compressed_edges, CompressedWalks(tree_plus.plus, tree_plus.root));
+                };
+
+                this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, vertices.begin(), vertices.size(), replace, true);
+            }
+
+            /**
+             * Print memory footprint details.
+             */
+            void memory_footprint() const
+            {
+                std::cout << "----------------------------------------------------------------------------------"
+                          << std::endl;
+
+                size_t graph_vertices = this->number_of_vertices();
+                size_t graph_edges    = this->number_of_edges();
+
+                size_t vertex_node_size = Graph::node_size();
+                size_t c_tree_node_size = types::CompressedTreesLists::node_size();
+
+                size_t edges_heads = 0;
+                size_t walks_heads = 0;
+                size_t edges_bytes = 0;
+                size_t walks_bytes = 0;
+                size_t flat_graph_bytes = 0;
+                auto flat_graph = this->flatten_vertex_tree();
+
+                for (auto i = 0; i < flat_graph.size(); i++)
+                {
+                    flat_graph_bytes += sizeof(flat_graph[i]);
+
+                    edges_heads += flat_graph[i].compressed_edges.edge_tree_nodes();
+                    walks_heads += flat_graph[i].compressed_walks.edge_tree_nodes();
+
+                    edges_bytes += flat_graph[i].compressed_edges.size_in_bytes(i);
+                    walks_bytes += flat_graph[i].compressed_walks.size_in_bytes(i);
+                }
+
+                std::cout << "Total number of vertices: "
+                          << graph_vertices
+                          << " | Total number of edges: "
+                          << graph_edges
+                          << std::endl;
+
+                std::cout << "Vertex tree: used nodes = "
+                          << Graph::used_node()
+                          << " -> node size = "
+                          << vertex_node_size
+                          << " -> memory used = "
+                          << utility::MB(Graph::get_used_bytes())
+                          << " MB"
+                          << " = "
+                          << utility::GB(Graph::get_used_bytes())
+                          << " GB"
+                          << std::endl;
+
+                std::cout << "Edge compressed trees: heads = "
+                          << edges_heads
+                          << " -> node size = "
+                          << c_tree_node_size
+                          << " -> memory used = "
+                          << utility::MB(edges_bytes + edges_heads*c_tree_node_size)
+                          << " MB"
+                          << " = "
+                          << utility::GB(edges_bytes + edges_heads*c_tree_node_size)
+                          << " GB"
+                          << std::endl;
+
+                std::cout << "Walk compressed trees: heads = "
+                          << walks_heads
+                          << " -> node size = "
+                          << c_tree_node_size
+                          << " -> memory used = "
+                          << utility::MB(walks_bytes + walks_heads*c_tree_node_size)
+                          << " MB"
+                          << " = "
+                          << utility::GB(walks_bytes + walks_heads*c_tree_node_size)
+                          << " GB"
+                          << std::endl;
+
+                std::cout << "Flat snapshot size = "
+                          << utility::MB(flat_graph_bytes)
+                          << " MB = "
+                          << utility::GB(flat_graph_bytes)
+                          << " GB"
+                          << std::endl << std::endl;
+
+                size_t total_memory = Graph::get_used_bytes()
+                        + walks_bytes + walks_heads*c_tree_node_size
+                        + edges_bytes + edges_heads*c_tree_node_size;
+
+                std::cout << "Total memory used: "
+                          << utility::MB(total_memory)
+                          << " MB = "
+                          << utility::GB(total_memory)
+                          << " GB"
+                          << std::endl;
+
+                std::cout << "----------------------------------------------------------------------------------"
+                          << std::endl;
             }
 
             /**
@@ -157,25 +327,20 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             void print_memory_pool_stats() const
             {
                 // vertices memory pool stats
-                std::cout << std::endl;
-                std::cout << "Vertices tree memory pool stats: " << std::endl;
-                Graph::print_stats();
-                std::cout << std::endl;
+                std::cout << "----------------------------------------------------------------------------------"
+                          << std::endl;
+                std::cout << "Vertices tree memory lists: " << std::endl;
+                std::cout << "\t"; Graph::print_stats();
 
-                // edges memory pool stats
-                std::cout << "Edges trees memory pool stats: " << std::endl;
-                types::CompressedEdgesLists::print_stats();
-                std::cout << std::endl;
-
-                // walks memory pool stats
-                std::cout << "Walks trees memory pool stats: " << std::endl;
-                dygrl::CompressedWalksLists::print_stats();
-                std::cout << std::endl;
+                // edges and walks memory pool stats
+                std::cout << "Edges & Walks trees memory lists: " << std::endl;
+                std::cout << "\t"; types::CompressedTreesLists::print_stats();
 
                 // compressed lists
-                std::cout << "Compressed lists memory pool stats: " << std::endl;
+                std::cout << "Pluses & Tails memory lists: " << std::endl;
                 compressed_lists::print_stats();
-                std::cout << std::endl;
+                std::cout << "----------------------------------------------------------------------------------"
+                          << std::endl;
             }
 
         private:
@@ -194,11 +359,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             */
             static void init_memory_pools(size_t graph_vertices, size_t graph_edges)
             {
-                types::CompressedEdgesLists::init();
-                dygrl::CompressedWalksLists::init();
-
+                types::CompressedTreesLists::init();
                 compressed_lists::init(graph_vertices);
-
                 Graph::init();
             }
     };

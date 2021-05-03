@@ -3,14 +3,15 @@
 
 namespace types
 {
-    // graph vertex type
-    using Vertex = uintV;
+    using Vertex               = uintV;
 
-    // class that stored edges in a compressed purely functional balanced binary tree
-    using CompressedEdges = tree_plus::treeplus;
+    using WalkID               = uintV;
+    using Position             = unsigned char;
+    using NextVertex           = uintV;
+    using PairedTriplet        = uintV;
 
-    // 
-    using CompressedEdgesLists = tree_plus::edge_list;
+    using CompressedEdges      = tree_plus::treeplus;
+    using CompressedTreesLists = tree_plus::edge_list;
 }
 
 #endif // DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_TYPES_H
