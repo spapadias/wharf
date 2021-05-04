@@ -6,11 +6,13 @@ namespace types
     using Vertex               = uintV;
 
     using WalkID               = uintV;
+
     using Position             = unsigned char;
-    using NextVertex           = uintV;
+
     using PairedTriplet        = uintV;
 
     using CompressedEdges      = tree_plus::treeplus;
+
     using CompressedTreesLists = tree_plus::edge_list;
 }
 

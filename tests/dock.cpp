@@ -118,12 +118,9 @@ TEST_F(DockTest, DockCreateRandomWalks)
     dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
 
     dock.print_memory_pool_stats();
-
-    timer timer("MyTimer");
     dock.create_random_walks();
-    timer.reportTotal("");
-
     dock.print_memory_pool_stats();
+
     dock.memory_footprint();
 }
 

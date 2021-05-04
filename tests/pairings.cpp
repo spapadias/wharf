@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <pairings.h>
 #include <pbbslib/parallel.h>
 #include <pbbslib/get_time.h>
-#include <pairings.h>
 
 class PairingsUnitTest : public testing::Test
 {

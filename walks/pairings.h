@@ -33,10 +33,16 @@ namespace pairings
 
                         if (decoded_value.first != pair.first || decoded_value.second != pair.second)
                         {
-                            std::cerr << "(1) Overflow detected in Szudzik's pairing function ( x = "
-                                      << pair.first << ", y = "
+                            std::cerr << "(1) Overflow detected in Szudzik's pairing function. Paired (x="
+                                      << pair.first
+                                      << ",y="
                                       << pair.second
-                                      << ")" << std::endl;
+                                      << ") decoded as (x="
+                                      << decoded_value.first
+                                      << ",y="
+                                      << decoded_value.second
+                                      << ")"
+                                      << std::endl;
 
                             std::exit(1);
                         }
@@ -52,10 +58,16 @@ namespace pairings
 
                         if (decoded_value.first != pair.first || decoded_value.second != pair.second)
                         {
-                            std::cerr << "(2) Overflow detected in Szudzik's pairing function (x = "
-                                      << pair.first << ", y = "
+                            std::cerr << "(2) Overflow detected in Szudzik's pairing function. Paired (x="
+                                      << pair.first
+                                      << ",y="
                                       << pair.second
-                                      << ")" << std::endl;
+                                      << ") decoded as (x="
+                                      << decoded_value.first
+                                      << ",y="
+                                      << decoded_value.second
+                                      << ")"
+                                      << std::endl;
 
                             std::exit(1);
                         }
@@ -103,7 +115,7 @@ namespace pairings
             * Converts a unique number to a unique tuple of numbers.
             *
             * @param encoded_value
-             *
+            *
             * @return unique tuple of numbers
             */
             static std::tuple<Type, Type, Type> unpair_triplet(const Type& encoded_value)

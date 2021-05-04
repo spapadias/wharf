@@ -7,6 +7,7 @@ namespace utility
      * Converts B to GB
      *
      * @param bytes
+     *
      * @return object size in GB
      */
     double GB(size_t bytes)
@@ -23,6 +24,7 @@ namespace utility
      * Converts B to MB
      *
      * @param bytes
+     *
      * @return object size in MB
      */
     double MB(size_t bytes)

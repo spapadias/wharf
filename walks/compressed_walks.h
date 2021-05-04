@@ -28,7 +28,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 : tree_plus::treeplus(plus, root) {};
 
             /**
-            * CompressedWalks constructor
+            * CompressedWalks constructor.
             *
             * @tparam Sequence
             *

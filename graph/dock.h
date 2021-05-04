@@ -230,8 +230,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
              */
             void memory_footprint() const
             {
-                std::cout << "----------------------------------------------------------------------------------"
-                          << std::endl;
+                std::cout << std::endl;
 
                 size_t graph_vertices = this->number_of_vertices();
                 size_t graph_edges    = this->number_of_edges();
@@ -257,68 +256,45 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     walks_bytes += flat_graph[i].compressed_walks.size_in_bytes(i);
                 }
 
-                std::cout << "Total number of vertices: "
-                          << graph_vertices
-                          << " | Total number of edges: "
-                          << graph_edges
-                          << std::endl;
+                std::cout << "Graph: \n\t" << "Vertices: " << graph_vertices << ", Edges: " << graph_edges << std::endl;
 
-                std::cout << "Vertex tree: used nodes = "
-                          << Graph::used_node()
-                          << " -> node size = "
-                          << vertex_node_size
-                          << " -> memory used = "
-                          << utility::MB(Graph::get_used_bytes())
-                          << " MB"
-                          << " = "
-                          << utility::GB(Graph::get_used_bytes())
-                          << " GB"
-                          << std::endl;
+                std::cout << "Vertex Tree: \n\t"
+                          << "Heads: " << Graph::used_node()
+                          << ", Head size: " << vertex_node_size
+                          << ", Memory usage: " << utility::MB(Graph::get_used_bytes()) << " MB"
+                          << " = " << utility::GB(Graph::get_used_bytes()) << " GB" << std::endl;
 
-                std::cout << "Edge compressed trees: heads = "
-                          << edges_heads
-                          << " -> node size = "
-                          << c_tree_node_size
-                          << " -> memory used = "
-                          << utility::MB(edges_bytes + edges_heads*c_tree_node_size)
-                          << " MB"
-                          << " = "
-                          << utility::GB(edges_bytes + edges_heads*c_tree_node_size)
-                          << " GB"
-                          << std::endl;
+                std::cout << "Edge Trees: \n\t"
+                          << "Heads: " << edges_heads
+                          << ", Head size: " << c_tree_node_size
+                          << ", Lists memory: " << utility::MB(edges_bytes) << " MB"
+                          << " = " << utility::GB(edges_bytes) << " GB"
+                          << ", Total memory usage: " << utility::MB(edges_bytes + edges_heads*c_tree_node_size)
+                          << " MB = " << utility::GB(edges_bytes + edges_heads*c_tree_node_size)
+                          << " GB" << std::endl;
 
-                std::cout << "Walk compressed trees: heads = "
-                          << walks_heads
-                          << " -> node size = "
-                          << c_tree_node_size
-                          << " -> memory used = "
-                          << utility::MB(walks_bytes + walks_heads*c_tree_node_size)
-                          << " MB"
-                          << " = "
-                          << utility::GB(walks_bytes + walks_heads*c_tree_node_size)
-                          << " GB"
-                          << std::endl;
+                std::cout << "Walks Trees: \n\t"
+                          << "Heads: " << walks_heads
+                          << ", Head size: " << c_tree_node_size
+                          << ", Lists memory: " << utility::MB(walks_bytes) << " MB"
+                          << " = " << utility::GB(walks_bytes) << " GB"
+                          << ", Total memory usage: " << utility::MB(walks_bytes + walks_heads*c_tree_node_size)
+                          << " MB = " << utility::GB(walks_bytes + walks_heads*c_tree_node_size)
+                          << " GB" << std::endl;
 
-                std::cout << "Flat snapshot size = "
-                          << utility::MB(flat_graph_bytes)
-                          << " MB = "
-                          << utility::GB(flat_graph_bytes)
-                          << " GB"
-                          << std::endl << std::endl;
+                std::cout << "Flat graph: \n\t"
+                          << "Total memory usage: " << utility::MB(flat_graph_bytes)
+                          << " MB = " << utility::GB(flat_graph_bytes)
+                          << " GB" << std::endl;
 
                 size_t total_memory = Graph::get_used_bytes()
                         + walks_bytes + walks_heads*c_tree_node_size
                         + edges_bytes + edges_heads*c_tree_node_size;
 
-                std::cout << "Total memory used: "
-                          << utility::MB(total_memory)
-                          << " MB = "
-                          << utility::GB(total_memory)
-                          << " GB"
-                          << std::endl;
+                std::cout << "Total memory used: \n\t" << utility::MB(total_memory) << " MB = "
+                          << utility::GB(total_memory) << " GB" << std::endl;
 
-                std::cout << "----------------------------------------------------------------------------------"
-                          << std::endl;
+                std::cout << std::endl;
             }
 
             /**
@@ -326,21 +302,21 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
              */
             void print_memory_pool_stats() const
             {
+                std::cout << std::endl;
+
                 // vertices memory pool stats
-                std::cout << "----------------------------------------------------------------------------------"
-                          << std::endl;
-                std::cout << "Vertices tree memory lists: " << std::endl;
-                std::cout << "\t"; Graph::print_stats();
+                std::cout << "Vertices tree memory lists: \n\t";
+                Graph::print_stats();
 
                 // edges and walks memory pool stats
-                std::cout << "Edges & Walks trees memory lists: " << std::endl;
-                std::cout << "\t"; types::CompressedTreesLists::print_stats();
+                std::cout << "Edges & Walks trees memory lists: \n\t";
+                types::CompressedTreesLists::print_stats();
 
                 // compressed lists
-                std::cout << "Pluses & Tails memory lists: " << std::endl;
+                std::cout << "Pluses & Tails memory lists: \n";
                 compressed_lists::print_stats();
-                std::cout << "----------------------------------------------------------------------------------"
-                          << std::endl;
+
+                std::cout << std::endl;
             }
 
         private:
@@ -349,7 +325,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             /**
             * Initializes memory pools for underlying lists.
             *
-            * uses default sizeinit() s: 1 000 000 blocks, each block is put into a list of size 65 536 blocks
+            * uses default size init(): 1 000 000 blocks, each block is put into a list of size 65 536 blocks
             * total allocated blocks = list_size(=65 5336) * (thread_count(=1..n) + ceil(allocated_blocks(=1M) / list_size(=65 536))
             * maximum blocks = ((3*RAM)/4)/size of one block.
             * @see list_allocator.h
