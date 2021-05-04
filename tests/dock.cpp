@@ -116,11 +116,11 @@ TEST_F(DockTest, DockDestructor)
 TEST_F(DockTest, DockCreateRandomWalks)
 {
     dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
-
-    dock.print_memory_pool_stats();
     dock.create_random_walks();
-    dock.print_memory_pool_stats();
 
-    dock.memory_footprint();
+    for(auto i = 0; i < dock.number_of_vertices()*config::walks_per_vertex; i++)
+    {
+        std::cout << dock.rewalk(i) << std::endl;
+    }
 }
 

@@ -3,12 +3,11 @@
 
 #include <graph/api.h>
 
+#include <utility.h>
+#include <pairings.h>
 #include <config.h>
 #include <vertex.h>
 #include <cuckoohash_map.hh>
-
-#include <utility.h>
-#include <pairings.h>
 
 namespace dynamic_graph_representation_learning_with_metropolis_hastings
 {
@@ -124,6 +123,11 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 this->map_vertices(map_func);
 
                 #ifdef DOCK_TIMER
+                    std::cout << "Flat graph memory usage:"
+                              << utility::MB(flat_snapshot.size() * sizeof(flat_snapshot[0]))
+                              << " MB = " << utility::GB(flat_snapshot.size() * sizeof(flat_snapshot[0]))
+                              << " GB" << std::endl;
+
                     timer.reportTotal("time(seconds)");
                 #endif
 
@@ -154,31 +158,33 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 this->graph_tree.root = nullptr;
             }
 
-            // TODO: TBD
+            // TODO: CHAOS
             void create_random_walks()
             {
                 auto flat_graph     = this->flatten_vertex_tree();
                 auto graph_vertices = this->number_of_vertices();
 
                 auto walks  = graph_vertices * config::walks_per_vertex;
-                auto cuckoo = libcuckoo::cuckoohash_map<types::Vertex, std::vector<types::Vertex>>();
-                srand(time(nullptr));
+                auto cuckoo = libcuckoo::cuckoohash_map<types::Vertex, std::vector<types::Vertex>>(graph_vertices);
+//                srand(time(nullptr));
 
                 parallel_for(0, walks, [&](types::WalkID walk_id)
                 {
                     auto current_vertex = walk_id % graph_vertices;
                     if (flat_graph[current_vertex].compressed_edges.degree() == 0) return;
 
-                    for(types::Position position = 1; position <= config::walk_length; position++)
+                    for(types::Position position = 0; position < config::walk_length; position++)
                     {
                         auto degree      = flat_graph[current_vertex].compressed_edges.degree();
                         auto neighbours  = flat_graph[current_vertex].compressed_edges.get_edges(current_vertex);
                         auto next_vertex = neighbours[rand() % degree];
 
-                        cuckoo.upsert(current_vertex, [&](std::vector<types::Vertex>& walk_triplets)
+                        if (!cuckoo.contains(current_vertex)) cuckoo.insert(current_vertex, std::vector<types::Vertex>());
+
+                        cuckoo.update_fn(current_vertex, [&](auto& vector)
                         {
                             types::PairedTriplet hash = pairings::Szudzik<types::Vertex>::pair({walk_id*config::walk_length + position, next_vertex});
-                            walk_triplets.push_back(hash);
+                            vector.push_back(hash);
                         });
 
                         current_vertex = next_vertex;
@@ -188,6 +194,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                 using VertexStruct = std::pair<types::Vertex, VertexEntry>;
                 auto vertices = pbbs::sequence<VertexStruct>(graph_vertices);
+                auto debug = pbbs::sequence<types::Vertex>();
 
                 parallel_for(0, graph_vertices, [&](types::Vertex vertex)
                 {
@@ -201,6 +208,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         }
 
                         sequence = pbbs::sample_sort(sequence, std::less<>());
+                        if (vertex == 338) debug = sequence;
+
                         vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(sequence, vertex)));
                     }
                     else
@@ -208,6 +217,15 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks()));
                     }
                 });
+
+                auto tree = vertices[338].second.compressed_walks;
+                auto e = tree.get_edges(338);
+
+                for(auto i = 0; i < tree.degree(); i++)
+                {
+                    if (e[i] != debug[i]) std::cout << e[i] << " " << debug[i] << std::endl;
+                }
+                std::cout << std::endl;
 
                 auto replace = [&] (const uintV src, const VertexEntry& x, const VertexEntry& y)
                 {
@@ -226,7 +244,47 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-             * Print memory footprint details.
+             * Walks through the walk given walk id.
+             *
+             * @param walk_id
+             *
+             * @return walk string representation
+             */
+            std::string rewalk(types::WalkID walk_id)
+            {
+                // 1. Grab the first vertex in the walk
+                types::Vertex current_vertex = walk_id % this->number_of_vertices();
+
+                std::stringstream string_stream;
+                string_stream << "WalkID: " << walk_id << " | ";
+
+                // 2. Rewalk
+                for (types::Position position = 0; position < config::walk_length; position++)
+                {
+                    position + 1 == config::walk_length ? string_stream << current_vertex : string_stream << current_vertex << ", ";
+
+                    auto tree_node = this->graph_tree.find(current_vertex);
+
+                    #ifdef DOCK_DEBUG
+                        if (!tree_node.valid)
+                        {
+                            std::cerr << "Dock debug error! Dock::Rewalk::Vertex="
+                                      << current_vertex << " is not found in the vertex tree!"
+                                      << std::endl;
+
+                            std::exit(1);
+                        }
+                    #endif
+
+                    if (tree_node.value.compressed_edges.degree() == 0) break;
+                    current_vertex = tree_node.value.compressed_walks.find_next(walk_id, position, current_vertex);
+                }
+
+                return string_stream.str();
+            }
+
+            /**
+             * Prints memory footprint details.
              */
             void memory_footprint() const
             {
