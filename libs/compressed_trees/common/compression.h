@@ -17,7 +17,7 @@ namespace compression {
       int shiftAmount = 6;
       while (1) {
         uchar b = *start;
-        edgeRead |= ((b & 0x7f) << shiftAmount);
+        edgeRead |= ((uintV)(b & 0x7f) << shiftAmount);
         start++;
         if (LAST_BIT_SET(b))
           shiftAmount += EDGE_SIZE_PER_BYTE;
@@ -34,7 +34,7 @@ namespace compression {
 
     while (1) {
       uchar b = *start++;
-      edgeRead += ((b & 0x7f) << shiftAmount);
+      edgeRead += ((uintV)(b & 0x7f) << shiftAmount);
       if (LAST_BIT_SET(b))
         shiftAmount += EDGE_SIZE_PER_BYTE;
       else

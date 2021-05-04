@@ -15,7 +15,7 @@ class DockTest : public testing::Test
         uintE* offsets;
         bool mmap = false;          // TODO @Djordjije: do we need this?
         bool is_symmetric = true;   // TODO @Djordjije: do we need this?
-        std::string default_file_path = "data/email-graph";
+        std::string default_file_path = "data/google-web-graph";
 };
 
 void DockTest::SetUp()
@@ -118,9 +118,11 @@ TEST_F(DockTest, DockCreateRandomWalks)
     dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
     dock.create_random_walks();
 
+    std::cout << dock.number_of_vertices()*config::walks_per_vertex << std::endl;
+
     for(auto i = 0; i < dock.number_of_vertices()*config::walks_per_vertex; i++)
     {
-        std::cout << dock.rewalk(i) << std::endl;
+//        std::cout << i << std::endl;
     }
 }
 
