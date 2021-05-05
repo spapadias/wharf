@@ -117,12 +117,14 @@ TEST_F(DockTest, DockCreateRandomWalks)
 {
     dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
     dock.create_random_walks();
+    dock.memory_footprint();
+
 
     std::cout << dock.number_of_vertices()*config::walks_per_vertex << std::endl;
 
     for(auto i = 0; i < dock.number_of_vertices()*config::walks_per_vertex; i++)
     {
-//        std::cout << i << std::endl;
+        dock.rewalk(i);
     }
 }
 

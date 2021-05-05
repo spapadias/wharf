@@ -2,12 +2,13 @@
 #define DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_DOCK_H
 
 #include <graph/api.h>
+#include <cuckoohash_map.hh>
 
 #include <utility.h>
 #include <pairings.h>
 #include <config.h>
 #include <vertex.h>
-#include <cuckoohash_map.hh>
+#include <snapshot.h>
 
 namespace dynamic_graph_representation_learning_with_metropolis_hastings
 {
@@ -110,7 +111,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     timer timer("Dock::FlattenVertexTree");
                 #endif
 
-                size_t n_vertices = this->number_of_vertices();
+                types::Vertex n_vertices = this->number_of_vertices();
                 auto flat_snapshot = pbbs::sequence<VertexEntry>(n_vertices);
 
                 auto map_func = [&] (const Graph::E& entry, size_t ind)
@@ -132,6 +133,21 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 #endif
 
                 return flat_snapshot;
+            }
+
+            FlatSnapshot& create_flat_snapshot() const
+            {
+                size_t n_vertices = this->number_of_vertices();
+                auto snapshot = new FlatSnapshot(n_vertices);
+
+                auto map_func = [&] (const Graph::E& entry, size_t ind)
+                {
+                    const uintV& key = entry.first;
+                    const auto& value = entry.second;
+                    snapshot[key] = value;
+                };
+
+
             }
 
             /**
@@ -217,15 +233,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks()));
                     }
                 });
-
-                auto tree = vertices[338].second.compressed_walks;
-                auto e = tree.get_edges(338);
-
-                for(auto i = 0; i < tree.degree(); i++)
-                {
-                    if (e[i] != debug[i]) std::cout << e[i] << " " << debug[i] << std::endl;
-                }
-                std::cout << std::endl;
 
                 auto replace = [&] (const uintV src, const VertexEntry& x, const VertexEntry& y)
                 {
@@ -348,6 +355,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 size_t total_memory = Graph::get_used_bytes()
                         + walks_bytes + walks_heads*c_tree_node_size
                         + edges_bytes + edges_heads*c_tree_node_size;
+
+                std::cout << edges_bytes << " " << walks_bytes << " " << edges_bytes + walks_bytes  << std::endl;
 
                 std::cout << "Total memory used: \n\t" << utility::MB(total_memory) << " MB = "
                           << utility::GB(total_memory) << " GB" << std::endl;
