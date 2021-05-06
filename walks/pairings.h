@@ -17,9 +17,9 @@ namespace pairings
             /**
              * Maps pair of numbers to a unique number.
              *
-             * @param pair
+             * @param pair - pair of n bit numbers
              *
-             * @return uniquely paired number
+             * @return - uniquely paired number
              */
             static Type pair(const std::pair<Type, Type>& pair)
             {
@@ -78,9 +78,9 @@ namespace pairings
             /**
             * Maps tuple of 3 numbers to a unique number.
             *
-            * @param tuple
+            * @param tuple - tuple of 3 n bit numbers
              *
-            * @return uniquely paired number
+            * @return - uniquely paired number
             */
             static Type pair_triplet(const std::tuple<Type, Type, Type>& tuple)
             {
@@ -90,9 +90,9 @@ namespace pairings
             /**
              * Converts a unique number to a unique pair of numbers.
              *
-             * @param encoded_value
+             * @param encoded_value - encoded number
              *
-             * @return unique pair of numbers
+             * @return - unique pair of numbers
              */
             static std::pair<Type, Type> unpair(const Type& encoded_value)
             {
@@ -112,9 +112,9 @@ namespace pairings
             /**
             * Converts a unique number to a unique tuple of numbers.
             *
-            * @param encoded_value
+            * @param encoded_value - encoded number
             *
-            * @return unique tuple of numbers
+            * @return - unique tuple of numbers
             */
             static std::tuple<Type, Type, Type> unpair_triplet(const Type& encoded_value)
             {

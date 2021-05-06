@@ -4,11 +4,13 @@
 #include <graph/api.h>
 #include <cuckoohash_map.hh>
 
+#include <config.h>
 #include <utility.h>
 #include <pairings.h>
-#include <config.h>
 #include <vertex.h>
 #include <snapshot.h>
+
+#include <models/deepwalk.h>
 
 namespace dynamic_graph_representation_learning_with_metropolis_hastings
 {
@@ -24,11 +26,11 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             /**
              * Dock constructor.
              *
-             * @param graph_vertices
-             * @param graph_edges
-             * @param offsets
-             * @param edges
-             * @param free_memory
+             * @param graph_vertices - total vertices in a graph
+             * @param graph_edges    - total edges in a graph
+             * @param offsets        - vertex offsets for its neighbors
+             * @param edges          - edges
+             * @param free_memory    - free memory excess after graph is loaded
              */
             Dock(long graph_vertices, long graph_edges, uintE* offsets, uintV* edges, bool free_memory = true)
             {
@@ -51,19 +53,16 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     auto S = pbbs::delayed_seq<uintV>(deg, [&](size_t j) { return edges[off + j]; });
 
                     if (deg > 0)
-                        vertices[index] = std::make_pair(index, VertexEntry(types::CompressedEdges(S, index), dygrl::CompressedWalks()));
+                        vertices[index] = std::make_pair(index, VertexEntry(types::CompressedEdges(S, index), dygrl::CompressedWalks(), SamplerManager()));
                     else
-                        vertices[index] = std::make_pair(index, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks()));
+                        vertices[index] = std::make_pair(index, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(), SamplerManager()));
                 });
 
                 // 4. Construct the graph
                 auto replace = [](const VertexEntry& x, const VertexEntry& y) { return y; };
                 this->graph_tree = Graph::Tree::multi_insert_sorted(nullptr, vertices.begin(), vertices.size(), replace, true);
 
-                // 5. Determine random walk model
-                // ...
-
-                // 6. Memory cleanup
+                // 5. Memory cleanup
                 if (free_memory)
                 {
                     pbbs::free_array(offsets);
@@ -80,9 +79,9 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             /**
              * Number of vertices in a graph.
              *
-             * @return the number of vertices in a graph
+             * @return - the number of vertices in a graph
              */
-            auto number_of_vertices() const
+            [[nodiscard]] auto number_of_vertices() const
             {
                 size_t n = this->graph_tree.size();
                 auto last_vertex = this->graph_tree.select(n - 1);
@@ -93,9 +92,9 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             /**
              * Number of edges in a graph.
              *
-             * @return the number of edges in a graph
+             * @return - the number of edges in a graph
              */
-            auto number_of_edges() const
+            [[nodiscard]] auto number_of_edges() const
             {
                 return this->graph_tree.aug_val();
             }
@@ -105,7 +104,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
              *
              * @return - the sequence of pointers to graph vertex entries
              */
-            FlatVertexTree flatten_vertex_tree() const
+            [[nodiscard]] FlatVertexTree flatten_vertex_tree() const
             {
                 #ifdef DOCK_TIMER
                     timer timer("Dock::FlattenVertexTree");
@@ -140,7 +139,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             *
             * @return - the sequence of vertices, their degrees, neighbors, and sampler managers
             */
-            FlatGraph flatten_graph() const
+            [[nodiscard]] FlatGraph flatten_graph() const
             {
                 #ifdef DOCK_TIMER
                     timer timer("Dock::FlattenGraph");
@@ -151,7 +150,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                 auto map_func = [&] (const Graph::E& entry, size_t ind)
                 {
-                    const uintV& key = entry.first;
+                    const uintV& key  = entry.first;
                     const auto& value = entry.second;
 
                     flat_graph[key].neighbors = entry.second.compressed_edges.get_edges(key);
@@ -164,7 +163,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     timer.reportTotal("time(seconds)");
 
                     auto size = flat_graph.size_in_bytes();
-
                     std::cout << "Flat vertex tree memory footprint: "
                               << utility::MB(size)
                               << " MB = " << utility::GB(size)
@@ -244,11 +242,11 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                             sequence[index] = triplets[index];
 
                         pbbs::sample_sort_inplace(pbbs::make_range(sequence.begin(), sequence.end()), std::less<>());
-                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(sequence, vertex)));
+                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(sequence, vertex), SamplerManager()));
                     }
                     else
                     {
-                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks()));
+                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(), SamplerManager()));
                     }
                 });
 
@@ -262,7 +260,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     lists::deallocate(y.compressed_walks.plus);
                     tree_plus::Tree_GC::decrement_recursive(y.compressed_walks.root);
 
-                    return VertexEntry(x.compressed_edges, CompressedWalks(tree_plus.plus, tree_plus.root));
+                    return VertexEntry(x.compressed_edges, CompressedWalks(tree_plus.plus, tree_plus.root), x.sampler_manager);
                 };
 
                 this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, vertices.begin(), vertices.size(), replace, true);

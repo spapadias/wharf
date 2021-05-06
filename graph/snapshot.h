@@ -6,21 +6,10 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
     /**
      * Snapshot is an interface that should be implemented by all types of snapshots
      * (e.g FlatVertexTree, FlatGraph, etc.).
-     *
-     * @tparam Type - snapshot input data type
      */
-    template <class Type>
     class Snapshot
     {
         public:
-            /**
-             * Snapshot subscript operator overloading.
-             *
-             * @param vertex - graph vertex
-             * @return - snapshot entry for a given vertex
-             */
-            virtual Type& operator[](types::Vertex vertex) = 0;
-
             /**
              * Snapshot size.
              *
@@ -40,7 +29,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
      * FlatVertexTree stores vertex entries in a flatten array.
      * This allows for O(1) access to vertex content and promises improved cache locality.
      */
-    class FlatVertexTree : public Snapshot<VertexEntry>
+    class FlatVertexTree : public Snapshot
     {
         public:
             /**
@@ -59,7 +48,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             * @param vertex - graph vertex
             * @return - snapshot entry for a given vertex
             */
-            VertexEntry& operator[](types::Vertex vertex) final
+            VertexEntry& operator[](types::Vertex vertex)
             {
                 return this->snapshot[vertex];
             }
@@ -102,7 +91,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
      * This allows for O(1) access to the vertex, its edges and sampler manager and promises improved cache locality
      * at the expense of memory.
      */
-    class FlatGraph : public Snapshot<FlatGraphEntry>
+    class FlatGraph : public Snapshot
     {
         public:
             /**
@@ -131,7 +120,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             * @param vertex - graph vertex
             * @return - snapshot entry for a given vertex
             */
-            FlatGraphEntry& operator[](types::Vertex vertex) final
+            FlatGraphEntry& operator[](types::Vertex vertex)
             {
                 return this->snapshot[vertex];
             }
