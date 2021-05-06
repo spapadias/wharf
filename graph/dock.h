@@ -101,53 +101,77 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-             * Flattens vertex tree to an array of vertex entries.
+             * Flattens the vertex tree to an array of vertex entries.
              *
-             * @return the sequence of pointers to graph vertex entries
+             * @return - the sequence of pointers to graph vertex entries
              */
-            auto flatten_vertex_tree() const
+            FlatVertexTree flatten_vertex_tree() const
             {
                 #ifdef DOCK_TIMER
                     timer timer("Dock::FlattenVertexTree");
                 #endif
 
                 types::Vertex n_vertices = this->number_of_vertices();
-                auto flat_snapshot = pbbs::sequence<VertexEntry>(n_vertices);
+                auto flat_vertex_tree    = FlatVertexTree(n_vertices);
 
                 auto map_func = [&] (const Graph::E& entry, size_t ind)
                 {
-                    const uintV& key = entry.first;
+                    const types::Vertex& key = entry.first;
                     const auto& value = entry.second;
-                    flat_snapshot[key] = value;
+                    flat_vertex_tree[key] = value;
                 };
 
                 this->map_vertices(map_func);
 
                 #ifdef DOCK_TIMER
-                    std::cout << "Flat graph memory usage:"
-                              << utility::MB(flat_snapshot.size() * sizeof(flat_snapshot[0]))
-                              << " MB = " << utility::GB(flat_snapshot.size() * sizeof(flat_snapshot[0]))
-                              << " GB" << std::endl;
-
                     timer.reportTotal("time(seconds)");
+
+                    std::cout << "Flat vertex tree memory footprint: "
+                              << utility::MB(flat_vertex_tree.size_in_bytes())
+                              << " MB = " << utility::GB(flat_vertex_tree.size_in_bytes())
+                              << " GB" << std::endl;
                 #endif
 
-                return flat_snapshot;
+                return flat_vertex_tree;
             }
 
-            FlatSnapshot& create_flat_snapshot() const
+            /**
+            * Flattens the graph to an array of vertices, their degrees, neighbors, and sampler managers.
+            *
+            * @return - the sequence of vertices, their degrees, neighbors, and sampler managers
+            */
+            FlatGraph flatten_graph() const
             {
+                #ifdef DOCK_TIMER
+                    timer timer("Dock::FlattenGraph");
+                #endif
+
                 size_t n_vertices = this->number_of_vertices();
-                auto snapshot = new FlatSnapshot(n_vertices);
+                auto flat_graph   = FlatGraph(n_vertices);
 
                 auto map_func = [&] (const Graph::E& entry, size_t ind)
                 {
                     const uintV& key = entry.first;
                     const auto& value = entry.second;
-                    snapshot[key] = value;
+
+                    flat_graph[key].neighbors = entry.second.compressed_edges.get_edges(key);
+                    flat_graph[key].degrees   = entry.second.compressed_edges.degree();
                 };
 
+                this->map_vertices(map_func);
 
+                #ifdef DOCK_TIMER
+                    timer.reportTotal("time(seconds)");
+
+                    auto size = flat_graph.size_in_bytes();
+
+                    std::cout << "Flat vertex tree memory footprint: "
+                              << utility::MB(size)
+                              << " MB = " << utility::GB(size)
+                              << " GB" << std::endl;
+                #endif
+
+                return flat_graph;
             }
 
             /**
@@ -174,28 +198,30 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 this->graph_tree.root = nullptr;
             }
 
-            // TODO: CHAOS
+            // TODO : working on it
             void create_random_walks()
             {
-                auto flat_graph     = this->flatten_vertex_tree();
-                auto graph_vertices = this->number_of_vertices();
+                using VertexStruct  = std::pair<types::Vertex, VertexEntry>;
 
-                auto walks  = graph_vertices * config::walks_per_vertex;
-                auto cuckoo = libcuckoo::cuckoohash_map<types::Vertex, std::vector<types::Vertex>>(graph_vertices);
-//                srand(time(nullptr));
+                auto graph          = this->flatten_graph();
+                auto total_vertices = this->number_of_vertices();
+
+                auto vertices = pbbs::sequence<VertexStruct>(total_vertices);
+                auto walks    = total_vertices * config::walks_per_vertex;
+                auto cuckoo   = libcuckoo::cuckoohash_map<types::Vertex, std::vector<types::Vertex>>(total_vertices);
+                srand(time(nullptr));
 
                 parallel_for(0, walks, [&](types::WalkID walk_id)
                 {
-                    auto current_vertex = walk_id % graph_vertices;
-                    if (flat_graph[current_vertex].compressed_edges.degree() == 0) return;
+                    auto current_vertex = walk_id % total_vertices;
+                    if (graph[current_vertex].degrees == 0) return;
 
                     for(types::Position position = 0; position < config::walk_length; position++)
                     {
-                        auto degree      = flat_graph[current_vertex].compressed_edges.degree();
-                        auto neighbours  = flat_graph[current_vertex].compressed_edges.get_edges(current_vertex);
-                        auto next_vertex = neighbours[rand() % degree];
+                        auto next_vertex = graph[current_vertex].neighbors[rand() % graph[current_vertex].degrees];
 
-                        if (!cuckoo.contains(current_vertex)) cuckoo.insert(current_vertex, std::vector<types::Vertex>());
+                        if (!cuckoo.contains(current_vertex))
+                            cuckoo.insert(current_vertex, std::vector<types::Vertex>());
 
                         cuckoo.update_fn(current_vertex, [&](auto& vector)
                         {
@@ -204,28 +230,20 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         });
 
                         current_vertex = next_vertex;
-                        pbbs::free_array(neighbours);
                     }
                 });
 
-                using VertexStruct = std::pair<types::Vertex, VertexEntry>;
-                auto vertices = pbbs::sequence<VertexStruct>(graph_vertices);
-                auto debug = pbbs::sequence<types::Vertex>();
-
-                parallel_for(0, graph_vertices, [&](types::Vertex vertex)
+                parallel_for(0, total_vertices, [&](types::Vertex vertex)
                 {
                     if (cuckoo.contains(vertex))
                     {
-                        auto walk_parts = cuckoo.find(vertex);
-                        auto sequence = pbbs::sequence<types::Vertex>(walk_parts.size());
-                        for(auto i = 0; i < walk_parts.size(); i++)
-                        {
-                            sequence[i] = walk_parts[i];
-                        }
+                        auto triplets = cuckoo.find(vertex);
+                        auto sequence = pbbs::sequence<types::Vertex>(triplets.size());
 
-                        sequence = pbbs::sample_sort(sequence, std::less<>());
-                        if (vertex == 338) debug = sequence;
+                        for(auto index = 0; index < triplets.size(); index++)
+                            sequence[index] = triplets[index];
 
+                        pbbs::sample_sort_inplace(pbbs::make_range(sequence.begin(), sequence.end()), std::less<>());
                         vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(sequence, vertex)));
                     }
                     else

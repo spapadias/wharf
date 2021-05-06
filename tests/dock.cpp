@@ -21,7 +21,9 @@ class DockTest : public testing::Test
 void DockTest::SetUp()
 {
     std::cout << "-----------------------------------------------------------------------------------------------------"
+              << "------------------------------------------------"
               << std::endl;
+
     std::cout << "Dock running with " << num_workers() << " threads" << std::endl;
 
     // transform an input graph file into an adjacency graph format
@@ -49,6 +51,7 @@ void DockTest::TearDown()
     }
 
     std::cout << "-----------------------------------------------------------------------------------------------------"
+              << "------------------------------------------------"
               << std::endl;
 }
 
@@ -116,15 +119,9 @@ TEST_F(DockTest, DockDestructor)
 TEST_F(DockTest, DockCreateRandomWalks)
 {
     dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+
+    timer timer("Timer");
     dock.create_random_walks();
-    dock.memory_footprint();
-
-
-    std::cout << dock.number_of_vertices()*config::walks_per_vertex << std::endl;
-
-    for(auto i = 0; i < dock.number_of_vertices()*config::walks_per_vertex; i++)
-    {
-        dock.rewalk(i);
-    }
+    timer.reportTotal(":time(seconds)");
 }
 
