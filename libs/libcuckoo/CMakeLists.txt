@@ -42,10 +42,10 @@ install(FILES libcuckoo-config.cmake
               DESTINATION ${libcuckoo_pkgloc})
 install(
 FILES
-    cuckoohash_config.hh
-    cuckoohash_map.hh
-    cuckoohash_util.hh
-    bucket_container.hh
+        cuckoohash_config.hh
+        cuckoohash_map.hh
+        cuckoohash_util.hh
+        bucket_container.hh
 DESTINATION
     ${CMAKE_INSTALL_PREFIX}/include/libcuckoo
 )

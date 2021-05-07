@@ -15,16 +15,16 @@
 namespace dynamic_graph_representation_learning_with_metropolis_hastings
 {
     /**
-     * Dock represents a structure that stores a graph as an augmented parallel balanced binary tree.
+     * @brief Dock represents a structure that stores a graph as an augmented parallel balanced binary tree.
      * Keys in this tree are graph vertices and values are compressed edges, compressed walks, and metropolis hastings samplers.
      */
     class Dock
     {
         public:
-            using Graph = aug_map<Vertex>;
+            using Graph = aug_map<dygrl::Vertex>;
 
             /**
-             * Dock constructor.
+             * @brief Dock constructor.
              *
              * @param graph_vertices - total vertices in a graph
              * @param graph_edges    - total edges in a graph
@@ -53,9 +53,9 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     auto S = pbbs::delayed_seq<uintV>(deg, [&](size_t j) { return edges[off + j]; });
 
                     if (deg > 0)
-                        vertices[index] = std::make_pair(index, VertexEntry(types::CompressedEdges(S, index), dygrl::CompressedWalks(), SamplerManager()));
+                        vertices[index] = std::make_pair(index, VertexEntry(types::CompressedEdges(S, index), dygrl::CompressedWalks(), dygrl::SamplerManager(deg)));
                     else
-                        vertices[index] = std::make_pair(index, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(), SamplerManager()));
+                        vertices[index] = std::make_pair(index, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(), dygrl::SamplerManager(0)));
                 });
 
                 // 4. Construct the graph
@@ -77,7 +77,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-             * Number of vertices in a graph.
+             * @brief Number of vertices in a graph.
              *
              * @return - the number of vertices in a graph
              */
@@ -90,7 +90,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-             * Number of edges in a graph.
+             * @brief Number of edges in a graph.
              *
              * @return - the number of edges in a graph
              */
@@ -100,7 +100,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-             * Flattens the vertex tree to an array of vertex entries.
+             * @brief Flattens the vertex tree to an array of vertex entries.
              *
              * @return - the sequence of pointers to graph vertex entries
              */
@@ -135,7 +135,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-            * Flattens the graph to an array of vertices, their degrees, neighbors, and sampler managers.
+            * @brief Flattens the graph to an array of vertices, their degrees, neighbors, and sampler managers.
             *
             * @return - the sequence of vertices, their degrees, neighbors, and sampler managers
             */
@@ -155,6 +155,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                     flat_graph[key].neighbors = entry.second.compressed_edges.get_edges(key);
                     flat_graph[key].degrees   = entry.second.compressed_edges.degree();
+                    flat_graph[key].samplers  = entry.second.sampler_manager;
                 };
 
                 this->map_vertices(map_func);
@@ -163,7 +164,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     timer.reportTotal("time(seconds)");
 
                     auto size = flat_graph.size_in_bytes();
-                    std::cout << "Flat vertex tree memory footprint: "
+
+                    std::cout << "Dock::FlattenGraph: Flat vertex tree memory footprint: "
                               << utility::MB(size)
                               << " MB = " << utility::GB(size)
                               << " GB" << std::endl;
@@ -173,7 +175,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-             * Traverses vertices and applies mapping function.
+             * @brief Traverses vertices and applies mapping function.
              *
              * @tparam F
              *
@@ -188,7 +190,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-             * Destroys dock instance.
+             * @brief Destroys dock instance.
              */
             void destroy()
             {
@@ -199,12 +201,26 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             // TODO : working on it
             void create_random_walks()
             {
-                using VertexStruct  = std::pair<types::Vertex, VertexEntry>;
-
+                const RandomWalkModel* model;
                 auto graph          = this->flatten_graph();
                 auto total_vertices = this->number_of_vertices();
 
+                switch (config::random_walk_model)
+                {
+                    case types::DEEPWALK:
+                        model = new DeepWalk(&graph);
+                        break;
+                    case types::NODE2VEC:
+                        std::cerr << "Unrecognized random walking model" << std::endl;
+                        std::exit(1);
+                    default:
+                        std::cerr << "Unrecognized random walking model" << std::endl;
+                        std::exit(1);
+                }
+
+                using VertexStruct  = std::pair<types::Vertex, VertexEntry>;
                 auto vertices = pbbs::sequence<VertexStruct>(total_vertices);
+
                 auto walks    = total_vertices * config::walks_per_vertex;
                 auto cuckoo   = libcuckoo::cuckoohash_map<types::Vertex, std::vector<types::Vertex>>(total_vertices);
                 srand(time(nullptr));
@@ -212,66 +228,74 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 parallel_for(0, walks, [&](types::WalkID walk_id)
                 {
                     auto current_vertex = walk_id % total_vertices;
-                    if (graph[current_vertex].degrees == 0) return;
+                    if (graph[current_vertex].degrees == 0)
+                    {
+                        std::cout << current_vertex << std::endl;
+                        return;
+                    }
 
                     for(types::Position position = 0; position < config::walk_length; position++)
                     {
                         auto next_vertex = graph[current_vertex].neighbors[rand() % graph[current_vertex].degrees];
 
-                        if (!cuckoo.contains(current_vertex))
-                            cuckoo.insert(current_vertex, std::vector<types::Vertex>());
+                        types::PairedTriplet hash = pairings::Szudzik<types::Vertex>::pair({walk_id*config::walk_length + position, next_vertex});
 
-                        cuckoo.update_fn(current_vertex, [&](auto& vector)
-                        {
-                            types::PairedTriplet hash = pairings::Szudzik<types::Vertex>::pair({walk_id*config::walk_length + position, next_vertex});
-                            vector.push_back(hash);
-                        });
+//                        if (!cuckoo.contains(current_vertex))
+//                            cuckoo.insert(current_vertex, std::vector<types::Vertex>());
+//
+//                        cuckoo.update_fn(current_vertex, [&](auto& vector)
+//                        {
+//                            types::PairedTriplet hash = pairings::Szudzik<types::Vertex>::pair({walk_id*config::walk_length + position, next_vertex});
+//                            vector.push_back(hash);
+//                        });
 
                         current_vertex = next_vertex;
                     }
                 });
 
-                parallel_for(0, total_vertices, [&](types::Vertex vertex)
-                {
-                    if (cuckoo.contains(vertex))
-                    {
-                        auto triplets = cuckoo.find(vertex);
-                        auto sequence = pbbs::sequence<types::Vertex>(triplets.size());
+//                parallel_for(0, total_vertices, [&](types::Vertex vertex)
+//                {
+//                    if (cuckoo.contains(vertex))
+//                    {
+//                        auto triplets = cuckoo.find(vertex);
+//                        auto sequence = pbbs::sequence<types::Vertex>(triplets.size());
+//
+//                        for(auto index = 0; index < triplets.size(); index++)
+//                            sequence[index] = triplets[index];
+//
+//                        pbbs::sample_sort_inplace(pbbs::make_range(sequence.begin(), sequence.end()), std::less<>());
+//                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(sequence, vertex), SamplerManager()));
+//                    }
+//                    else
+//                    {
+//                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(), SamplerManager()));
+//                    }
+//                });
+//
+//                auto replace = [&] (const uintV src, const VertexEntry& x, const VertexEntry& y)
+//                {
+//                    auto tree_plus = tree_plus::uniont(x.compressed_walks, y.compressed_walks, src);
+//
+//                    // deallocate the memory
+//                    lists::deallocate(x.compressed_walks.plus);
+//                    tree_plus::Tree_GC::decrement_recursive(x.compressed_walks.root);
+//                    lists::deallocate(y.compressed_walks.plus);
+//                    tree_plus::Tree_GC::decrement_recursive(y.compressed_walks.root);
+//
+//                    return VertexEntry(x.compressed_edges, CompressedWalks(tree_plus.plus, tree_plus.root), x.sampler_manager);
+//                };
+//
+//                this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, vertices.begin(), vertices.size(), replace, true);
 
-                        for(auto index = 0; index < triplets.size(); index++)
-                            sequence[index] = triplets[index];
-
-                        pbbs::sample_sort_inplace(pbbs::make_range(sequence.begin(), sequence.end()), std::less<>());
-                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(sequence, vertex), SamplerManager()));
-                    }
-                    else
-                    {
-                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(), SamplerManager()));
-                    }
-                });
-
-                auto replace = [&] (const uintV src, const VertexEntry& x, const VertexEntry& y)
-                {
-                    auto tree_plus = tree_plus::uniont(x.compressed_walks, y.compressed_walks, src);
-
-                    // deallocate the memory
-                    lists::deallocate(x.compressed_walks.plus);
-                    tree_plus::Tree_GC::decrement_recursive(x.compressed_walks.root);
-                    lists::deallocate(y.compressed_walks.plus);
-                    tree_plus::Tree_GC::decrement_recursive(y.compressed_walks.root);
-
-                    return VertexEntry(x.compressed_edges, CompressedWalks(tree_plus.plus, tree_plus.root), x.sampler_manager);
-                };
-
-                this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, vertices.begin(), vertices.size(), replace, true);
+                delete model;
             }
 
             /**
-             * Walks through the walk given walk id.
+             * @brief Walks through the walk given walk id.
              *
-             * @param walk_id
+             * @param walk_id - unique walk ID
              *
-             * @return walk string representation
+             * @return - walk string representation
              */
             std::string rewalk(types::WalkID walk_id)
             {
@@ -307,7 +331,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-             * Prints memory footprint details.
+             * @brief Prints memory footprint details.
              */
             void memory_footprint() const
             {
@@ -381,7 +405,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-             * Prints memory pool stats for the underlying lists.
+             * @brief Prints memory pool stats for the underlying lists.
              */
             void print_memory_pool_stats() const
             {

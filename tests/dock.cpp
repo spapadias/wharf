@@ -118,10 +118,28 @@ TEST_F(DockTest, DockDestructor)
 
 TEST_F(DockTest, DockCreateRandomWalks)
 {
-    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges, false);
+    dock.destroy();
 
-    timer timer("Timer");
-    dock.create_random_walks();
-    timer.reportTotal(":time(seconds)");
+    std::this_thread::sleep_for(3000ms);
+
+    dygrl::Dock dock1 = dygrl::Dock(total_vertices, total_edges, offsets, edges, false);
+    dock1.destroy();
+
+    std::this_thread::sleep_for(3000ms);
+
+    dygrl::Dock dock2 = dygrl::Dock(total_vertices, total_edges, offsets, edges, true);
+    dock2.destroy();
+
+    std::this_thread::sleep_for(3000ms);
+
+
+
+////    for(auto i = 0; i < 10; i++)
+////    {
+//        timer timer("Timer");
+//        dock.create_random_walks();
+//        timer.reportTotal(":time(seconds)");
+////    }
 }
 

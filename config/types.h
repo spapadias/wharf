@@ -7,7 +7,7 @@ namespace types
     using Vertex               = uintV;
 
     // Degree = vertex degree
-    using Degree               = uint16_t;
+    using Degree               = uintE;
 
     // WalkID = unique walk id
     using WalkID               = uint64_t;

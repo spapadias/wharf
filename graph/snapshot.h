@@ -46,6 +46,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             * FlatVertexTree subscript operator overloading.
             *
             * @param vertex - graph vertex
+            *
             * @return - snapshot entry for a given vertex
             */
             VertexEntry& operator[](types::Vertex vertex)
@@ -82,8 +83,17 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
      */
     struct FlatGraphEntry
     {
-        types::Degree degrees;
         types::Vertex* neighbors;
+        types::Degree degrees;
+        const SamplerManager* samplers;
+
+        /**
+         * FlatGraphEntry destructor.
+         */
+        ~FlatGraphEntry()
+        {
+            pbbs::free_array(neighbors);
+        }
     };
 
     /**
@@ -105,19 +115,10 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-             * FlatGraph destructor.
-             */
-            ~FlatGraph()
-            {
-                parallel_for(0, this->snapshot.size(), [&](auto i) {
-                    pbbs::free_array(this->snapshot[i].neighbors);
-                });
-            }
-
-            /**
             * FlatGraph subscript operator overloading.
             *
             * @param vertex - graph vertex
+            *
             * @return - snapshot entry for a given vertex
             */
             FlatGraphEntry& operator[](types::Vertex vertex)
@@ -144,7 +145,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             {
                 std::atomic<size_t> total  = 0;
 
-                parallel_for(0, this->snapshot.size(), [&](auto index) {
+                parallel_for(0, this->snapshot.size(), [&](auto index)
+                {
                     total += sizeof(this->snapshot[index]) + (sizeof(this->snapshot[index].neighbors) * this->snapshot[index].degrees);
                 });
 
