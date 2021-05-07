@@ -15,15 +15,12 @@ class DockTest : public testing::Test
         uintE* offsets;
         bool mmap = false;          // TODO @Djordjije: do we need this?
         bool is_symmetric = true;   // TODO @Djordjije: do we need this?
-        std::string default_file_path = "data/google-web-graph";
+        std::string default_file_path = "data/email-graph";
 };
 
 void DockTest::SetUp()
 {
-    std::cout << "-----------------------------------------------------------------------------------------------------"
-              << "------------------------------------------------"
-              << std::endl;
-
+    std::cout << "-----------------------------------------------------------------------------------------------------" << std::endl;
     std::cout << "Dock running with " << num_workers() << " threads" << std::endl;
 
     // transform an input graph file into an adjacency graph format
@@ -50,9 +47,7 @@ void DockTest::TearDown()
         std::cerr << "DockTest::TearDown::Could not remove static graph input file" << std::endl;
     }
 
-    std::cout << "-----------------------------------------------------------------------------------------------------"
-              << "------------------------------------------------"
-              << std::endl;
+    std::cout << "-----------------------------------------------------------------------------------------------------" << std::endl;
 }
 
 TEST_F(DockTest, DockConstructor)
@@ -118,28 +113,15 @@ TEST_F(DockTest, DockDestructor)
 
 TEST_F(DockTest, DockCreateRandomWalks)
 {
-    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges, false);
-    dock.destroy();
+    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
 
-    std::this_thread::sleep_for(3000ms);
+//    for(auto i = 0; i < 10; i++)
+//    {
+        timer timer("Timer");
+        dock.create_random_walks();
+        timer.reportTotal(":time(seconds)");
+//    }
 
-    dygrl::Dock dock1 = dygrl::Dock(total_vertices, total_edges, offsets, edges, false);
-    dock1.destroy();
-
-    std::this_thread::sleep_for(3000ms);
-
-    dygrl::Dock dock2 = dygrl::Dock(total_vertices, total_edges, offsets, edges, true);
-    dock2.destroy();
-
-    std::this_thread::sleep_for(3000ms);
-
-
-
-////    for(auto i = 0; i < 10; i++)
-////    {
-//        timer timer("Timer");
-//        dock.create_random_walks();
-//        timer.reportTotal(":time(seconds)");
-////    }
+    dock.memory_footprint();
 }
 

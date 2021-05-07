@@ -17,7 +17,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
              *
              * @param snapshot - graph snapshot
              */
-            explicit DeepWalk(const dygrl::Snapshot* snapshot)
+            explicit DeepWalk(dygrl::Snapshot* snapshot)
             {
                 this->snapshot = snapshot;
             };
@@ -51,7 +51,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             *
             * @return - a new state of the walker
             */
-            types::State update_state(const types::State& state, types::Vertex vertex) final
+            types::State new_state(const types::State& state, types::Vertex vertex) final
             {
                 return types::State(vertex, vertex);
             }
@@ -69,8 +69,20 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 return 1.0;
             }
 
+            /**
+            * @brief Propose next vertex given current state.
+            *
+            * @param vertex - current walker state
+            *
+            * @return - proposed vertex
+            */
+            types::Vertex propose_vertex(const types::State& state) final
+            {
+                return this->snapshot->randomly_sample_neighbor(state.first);
+            }
+
         private:
-            const Snapshot* snapshot;
+            Snapshot* snapshot;
     };
 }
 

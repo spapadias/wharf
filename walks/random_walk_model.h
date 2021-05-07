@@ -27,7 +27,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             *
             * @return - a new state of the walker
             */
-            virtual types::State update_state(const types::State& state, types::Vertex vertex) = 0;
+            virtual types::State new_state(const types::State& state, types::Vertex vertex) = 0;
 
             /**
             * @brief Explains how to calculate the edge weight based on the current state and the potentially proposed vertex.
@@ -35,9 +35,18 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             * @param state  - current state of the walker
             * @param vertex - potentially proposed vertex
             *
-            * @return float - dynamically calculated weight
+            * @return - dynamically calculated weight
             */
             virtual float weight(const types::State& state, types::Vertex vertex) = 0;
+
+            /**
+             * @brief Propose next vertex given current state.
+             *
+             * @param vertex - current walker state
+             *
+             * @return - proposed vertex
+             */
+            virtual types::Vertex propose_vertex(const types::State& state) = 0;
     };
 }
 

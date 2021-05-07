@@ -4,14 +4,24 @@
 namespace dynamic_graph_representation_learning_with_metropolis_hastings
 {
     /**
-     * Snapshot is an interface that should be implemented by all types of snapshots
+     * @brief Snapshot is an interface that should be implemented by all types of snapshots
      * (e.g FlatVertexTree, FlatGraph, etc.).
      */
     class Snapshot
     {
         public:
+
             /**
-             * Snapshot size.
+            * @brief Given a vertex randomly sample one of the neighbours.
+            *
+            * @param vertex - current vertex
+            *
+            * @return - sampled neighbour
+            */
+            virtual types::Vertex randomly_sample_neighbor(types::Vertex vertex) = 0;
+
+            /**
+             * @brief Snapshot size.
              *
              * @return - number of entries in a snapshot
              */
@@ -26,14 +36,15 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
     };
 
     /**
-     * FlatVertexTree stores vertex entries in a flatten array.
+     * @brief FlatVertexTree stores vertex entries in a flatten array.
      * This allows for O(1) access to vertex content and promises improved cache locality.
      */
     class FlatVertexTree : public Snapshot
     {
         public:
+
             /**
-             * FlatVertexTree constructor.
+             * @brief FlatVertexTree constructor.
              *
              * @param vertices - number of vertices in a graph
              */
@@ -43,7 +54,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-            * FlatVertexTree subscript operator overloading.
+            * @brief FlatVertexTree subscript operator overloading.
             *
             * @param vertex - graph vertex
             *
@@ -55,7 +66,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-            * FlatVertexTree size.
+            * @brief FlatVertexTree size.
             *
             * @return - number of entries in a snapshot
             */
@@ -65,7 +76,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-            * FlatVertexTree size in bytes. The memory footprint of a snapshot.
+            * @brief FlatVertexTree size in bytes. The memory footprint of a snapshot.
             *
             * @return - size of a snapshot in bytes
             */
@@ -74,21 +85,39 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 return this->snapshot.size() * sizeof(this->snapshot[0]);
             }
 
+            /**
+            * @brief Given a vertex randomly sample one of the neighbours.
+            *
+            * @param vertex - current vertex
+            *
+            * @return - sampled neighbour
+            */
+            types::Vertex randomly_sample_neighbor(types::Vertex vertex) final
+            {
+                auto neighbors = snapshot[vertex].compressed_edges.get_edges(vertex);
+                auto degrees   = snapshot[vertex].compressed_edges.degree();
+
+                auto result = neighbors[rand() % degrees];
+
+                pbbs::free_array(neighbors);
+                return result;
+            }
+
         private:
             pbbs::sequence<VertexEntry> snapshot;
     };
 
     /**
-     * FlatGraphEntry represents one entry in the flat graph snapshot.
+     * @brief FlatGraphEntry represents one entry in the flat graph snapshot.
      */
     struct FlatGraphEntry
     {
         types::Vertex* neighbors;
         types::Degree degrees;
-        const SamplerManager* samplers;
+        SamplerManager* samplers;
 
         /**
-         * FlatGraphEntry destructor.
+         * @brief FlatGraphEntry destructor.
          */
         ~FlatGraphEntry()
         {
@@ -97,7 +126,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
     };
 
     /**
-     * FlatGraph stores for each vertex its neighbors, degree, and reference to its sampler manager.
+     * @brief FlatGraph stores for each vertex its neighbors, degree, and reference to its sampler manager.
      * This allows for O(1) access to the vertex, its edges and sampler manager and promises improved cache locality
      * at the expense of memory.
      */
@@ -105,7 +134,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
     {
         public:
             /**
-             * FlatGraph constructor.
+             * @brief FlatGraph constructor.
              *
              * @param vertices - number of vertices in a graph
              */
@@ -115,7 +144,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-            * FlatGraph subscript operator overloading.
+            * @brief FlatGraph subscript operator overloading.
             *
             * @param vertex - graph vertex
             *
@@ -127,7 +156,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-            * FlatGraph size.
+            * @brief FlatGraph size.
             *
             * @return - number of entries in a snapshot
             */
@@ -137,7 +166,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-            * FlatGraph size in bytes. The memory footprint of a snapshot.
+            * @brief FlatGraph size in bytes. The memory footprint of a snapshot.
             *
             * @return - size of a snapshot in bytes
             */
@@ -151,6 +180,18 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 });
 
                 return total;
+            }
+
+            /**
+            * @brief Given a vertex randomly sample one of the neighbours.
+            *
+            * @param vertex - current vertex
+            *
+            * @return - sampled neighbour
+            */
+            types::Vertex randomly_sample_neighbor(types::Vertex vertex) final
+            {
+                return snapshot[vertex].neighbors[rand() % snapshot[vertex].degrees];
             }
 
         private:
