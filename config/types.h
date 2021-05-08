@@ -6,9 +6,6 @@ namespace types
     // Vertex = graph vertex data type
     using Vertex               = uintV;
 
-    // Edge = graph edge data type
-    using Edge                 = uintE;
-
     // Degree = graph vertex degree data type
     using Degree               = uintE;
 

@@ -14,26 +14,26 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
     {
         public:
             /**
-             * CompressedWalks default constructor.
+             * @brief CompressedWalks default constructor.
              */
             CompressedWalks() : tree_plus::treeplus() {};
 
             /**
-             * CompressedWalks constructor.
+             * @brief CompressedWalks constructor.
              *
-             * @param plus
-             * @param root
+             * @param plus - tree plus
+             * @param root - tree root
              */
             CompressedWalks(tree_plus::AT* plus, tree_plus::treeplus::Node* root)
                 : tree_plus::treeplus(plus, root) {};
 
             /**
-            * CompressedWalks constructor.
+            * @brief CompressedWalks constructor.
             *
             * @tparam Sequence
             *
-            * @param sequence
-            * @param source
+            * @param sequence - sequence of walk parts
+            * @param source   - graph vertex
             * @param flag
             */
             template<class Sequence>
@@ -41,13 +41,13 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 : tree_plus::treeplus(sequence, source, flag) {};
 
             /**
-            * Finds the next vertex in the walk given walk id and position
+            * @brief Finds the next vertex in the walk given walk id and position
             *
-            * @param walk_id
-            * @param position
-            * @param source
+            * @param walk_id  - unique walk id
+            * @param position - position in the walk
+            * @param source   - current walk vertex
             *
-            * @return next vertex in the walk
+            * @return - next vertex in the walk
             */
             types::Vertex find_next(types::WalkID walk_id, types::Position position, types::Vertex source)
             {

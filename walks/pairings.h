@@ -4,8 +4,9 @@
 namespace pairings
 {
     /**
-      * Szudzik's pairing function.
+      * @brief Szudzik's pairing function.
       * This function takes two n bit numbers and maps them to a unique 2*n bit number.
+      *
       * @details https://www.vertexfragment.com/ramblings/cantor-szudzik-pairing-functions/
       *
       * @tparam Type
@@ -15,7 +16,7 @@ namespace pairings
     {
         public:
             /**
-             * Maps pair of numbers to a unique number.
+             * @brief Maps pair of numbers to a unique number.
              *
              * @param pair - pair of n bit numbers
              *
@@ -76,7 +77,7 @@ namespace pairings
             }
 
             /**
-            * Maps tuple of 3 numbers to a unique number.
+            * @brief Maps tuple of 3 numbers to a unique number.
             *
             * @param tuple - tuple of 3 n bit numbers
              *
@@ -88,7 +89,7 @@ namespace pairings
             };
 
             /**
-             * Converts a unique number to a unique pair of numbers.
+             * @brief Converts a unique number to a unique pair of numbers.
              *
              * @param encoded_value - encoded number
              *
@@ -110,7 +111,7 @@ namespace pairings
             }
 
             /**
-            * Converts a unique number to a unique tuple of numbers.
+            * @brief Converts a unique number to a unique tuple of numbers.
             *
             * @param encoded_value - encoded number
             *

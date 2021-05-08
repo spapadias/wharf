@@ -30,17 +30,18 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
              */
             types::State sample(types::State& state, dygrl::RandomWalkModel* model)
             {
-                // 1. Propose new candidate and calculate weights
+                // 1. propose new candidate and calculate weights
                 auto candidate_sample = model->propose_vertex(state);
                 float new_weight      = model->weight(state, candidate_sample);
                 float previous_weight = model->weight(state, this->last_sampled_vertex);
 
-                // 2. Try to accept the candidate
+                // 2. try to accept the candidate
                 if (this->accept(previous_weight, new_weight))
                 {
                     this->last_sampled_vertex = candidate_sample;
                 }
 
+                // 3. return new state
                 return model->new_state(state, this->last_sampled_vertex);
             }
 
@@ -49,7 +50,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
              *
              * @return - previously sampled vertex
              */
-            types::Vertex previously_sampled_vertex() const
+            [[nodiscard]] types::Vertex previously_sampled_vertex() const
             {
                 return this->last_sampled_vertex;
             }

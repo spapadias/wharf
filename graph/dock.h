@@ -5,7 +5,6 @@
 #include <cuckoohash_map.hh>
 
 #include <config.h>
-#include <utility.h>
 #include <pairings.h>
 #include <vertex.h>
 #include <snapshot.h>

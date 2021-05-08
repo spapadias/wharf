@@ -4,11 +4,11 @@
 namespace utility
 {
     /**
-     * Converts B to GB
+     * @brief Converts B to GB
      *
-     * @param bytes
+     * @param bytes - size in B
      *
-     * @return object size in GB
+     * @return size in GB
      */
     double GB(size_t bytes)
     {
@@ -21,11 +21,11 @@ namespace utility
     }
 
     /**
-     * Converts B to MB
+     * @brief Converts B to MB
      *
-     * @param bytes
+     * @param bytes - size in B
      *
-     * @return object size in MB
+     * @return size in MB
      */
     double MB(size_t bytes)
     {
@@ -37,16 +37,15 @@ namespace utility
     }
 
     /**
-     * Random number generator.
+     * @brief Random number generator.
+     * @details http://xoroshiro.di.unimi.it/#shootout
      */
     class Random
     {
         public:
-            // http://xoroshiro.di.unimi.it/#shootout
-            // We use xoroshiro128+, the fastest generator available
             uint64_t rng_seed0, rng_seed1;
 
-            Random(uint64_t seed)
+            explicit Random(uint64_t seed)
             {
                 for (int i = 0; i < 2; i++)
                 {
