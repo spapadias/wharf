@@ -3,6 +3,7 @@
 
 #define dygrl dynamic_graph_representation_learning_with_metropolis_hastings
 
+#include <utility.h>
 #include <types.h>
 #include <globals.h>
 

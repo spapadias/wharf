@@ -44,9 +44,19 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 return model->new_state(state, this->last_sampled_vertex);
             }
 
-            types::Vertex last_sampled_vertex;
+            /**
+             * @brief Previously sampled vertex.
+             *
+             * @return - previously sampled vertex
+             */
+            types::Vertex previously_sampled_vertex() const
+            {
+                return this->last_sampled_vertex;
+            }
 
-            private:
+        private:
+
+            types::Vertex last_sampled_vertex;
 
             /**
             * @brief Metropolis Hastings sampler initializer.
@@ -96,10 +106,18 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 }
             }
 
+            /**
+             * @brief Accept candidate.
+             *
+             * @param previous_weight - previously accepted cadidate weight
+             * @param new_weight      - new candidate weight
+             *
+             * @return - new candidate accepted or not
+             */
             bool accept(float previous_weight, float new_weight)
             {
                 if (previous_weight < new_weight) return true;
-                return ((double) rand() / (RAND_MAX)) <= (double)(new_weight) / (double)(previous_weight);
+                return config::random.drand() <= (double)(new_weight) / (double)(previous_weight);
             }
     };
 }

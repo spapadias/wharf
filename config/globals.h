@@ -13,7 +13,10 @@ namespace config
     constexpr auto random_walk_model    = types::RandomWalkModelType::DEEPWALK;
 
     // determines the initialization strategy for metropolis hastings samplers
-    constexpr auto sampler_init_strategy = types::SamplerInitStartegy::WEIGHT;
+    constexpr auto sampler_init_strategy = types::SamplerInitStartegy::BURNIN;
+
+    // random number generator
+    auto random                          = utility::Random(time(nullptr));
 }
 
 #endif // DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_GLOBALS_H

@@ -141,29 +141,43 @@ TEST_F(DockTest, DeepWalk)
 
 TEST_F(DockTest, Node2Vec)
 {
-    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
-    srand(time(nullptr));
+    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges, false);
 
-    auto graph          = dock.flatten_graph();
-    auto total_vertices = dock.number_of_vertices();
-    auto walks          = total_vertices * config::walks_per_vertex;
+    std::cout << total_vertices << std::endl;
+    std::cout << total_edges << std::endl;
 
-    dygrl::RandomWalkModel* model = new dygrl::Node2Vec(&graph, 0.5, 1);
-//    types::State state = model->initial_state(2);
-    types::State state = types::State(2, 0);
-
-    auto sampler = dygrl::MetropolisHastingsSampler(state, model);
-
-    std::map<types::Vertex, int> map = std::map<types::Vertex, int>();
-
-    for (int i = 0; i < 10000; i++)
+    for(auto i = 0; i < total_vertices; i++)
     {
-        map[sampler.sample(state, model).first] += 1;
+        std::cout << offsets[i] << " ";
     }
+    std::cout << std::endl;
 
-    for(auto elem : map)
+    for(auto i = 0; i < total_edges; i++)
     {
-        std::cout << elem.first << " -> " << elem.second << std::endl;
+        std::cout << edges[i] << " ";
     }
+    std::cout << std::endl;
+
+//    auto graph          = dock.flatten_graph();
+//    auto total_vertices = dock.number_of_vertices();
+//    auto walks          = total_vertices * config::walks_per_vertex;
+//
+//    dygrl::RandomWalkModel* model = new dygrl::Node2Vec(&graph, 0.5, 1);
+////    types::State state = model->initial_state(2);
+//    types::State state = types::State(2, 0);
+//
+//    auto sampler = dygrl::MetropolisHastingsSampler(state, model);
+//
+//    std::map<types::Vertex, int> map = std::map<types::Vertex, int>();
+//
+//    for (int i = 0; i < 10000; i++)
+//    {
+//        map[sampler.sample(state, model).first] += 1;
+//    }
+//
+//    for(auto elem : map)
+//    {
+//        std::cout << elem.first << " -> " << elem.second << std::endl;
+//    }
 }
 

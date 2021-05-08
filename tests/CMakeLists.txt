@@ -121,10 +121,15 @@ add_executable(dock dock.cpp)
 target_link_libraries(dock ${GTEST_LIBRARIES})
 add_test(NAME wharf COMMAND dock)
 
-# Pairing function unit tests
+# Pairing function tests
 add_executable(pairings pairings.cpp)
 target_link_libraries(pairings ${GTEST_LIBRARIES})
 add_test(NAME pairings COMMAND pairings)
+
+# Sampler tests
+add_executable(sampler sampler.cpp)
+target_link_libraries(sampler ${GTEST_LIBRARIES})
+add_test(NAME sampler COMMAND sampler)
 
 # -------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING WITH METROPOLIS HASTINGS ----------------------------
 
