@@ -114,14 +114,6 @@ TEST_F(DockTest, DockDestructor)
 TEST_F(DockTest, DockCreateRandomWalks)
 {
     dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
-
-//    for(auto i = 0; i < 10; i++)
-//    {
-        timer timer("Timer");
-        dock.create_random_walks();
-        timer.reportTotal(":time(seconds)");
-//    }
-
-    dock.memory_footprint();
+    dock.create_random_walks();
 }
 

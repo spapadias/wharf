@@ -6,17 +6,17 @@
 
 namespace dynamic_graph_representation_learning_with_metropolis_hastings
 {
-    // SamplerManager = parallel hash map that stores all samplers for one vertex in the graph
+    // SamplerManager = parallel hash map that stores all samplers for one graph vertex
     using SamplerManager = libcuckoo::cuckoohash_map<types::Vertex, dygrl::MetropolisHastingsSampler>;
 
     /**
-     * @brief VertexEntry represents a structure that contains the vertex data (compressed edges, compressed walks, and sampler manager).
+     * @brief VertexEntry represents a structure that contains the vertex data - compressed edges, compressed walks, and sampler manager.
      */
     struct VertexEntry
     {
         types::CompressedEdges compressed_edges;
         dygrl::CompressedWalks compressed_walks;
-        dygrl::SamplerManager*  sampler_manager;
+        dygrl::SamplerManager* sampler_manager;
 
         /**
          * @brief VertexEntry default constructor.
@@ -35,7 +35,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
          * @param compressed_walks - compressed tree of walks
          * @param sampler_manager  - manager of MH samplers
          */
-        VertexEntry(const types::CompressedEdges& compressed_edges, const dygrl::CompressedWalks& compressed_walks, const dygrl::SamplerManager&  sampler_manager)
+        VertexEntry(const types::CompressedEdges& compressed_edges, const dygrl::CompressedWalks& compressed_walks, const dygrl::SamplerManager& sampler_manager)
             : compressed_edges(compressed_edges), compressed_walks(compressed_walks), sampler_manager(new SamplerManager(sampler_manager)) {};
     };
 

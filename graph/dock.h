@@ -201,9 +201,14 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             // TODO : working on it
             void create_random_walks()
             {
-                RandomWalkModel* model;
                 auto graph          = this->flatten_graph();
                 auto total_vertices = this->number_of_vertices();
+                auto walks          = total_vertices * config::walks_per_vertex;
+                auto cuckoo         = libcuckoo::cuckoohash_map<types::Vertex, std::vector<types::Vertex>>(total_vertices);
+
+                using VertexStruct  = std::pair<types::Vertex, VertexEntry>;
+                auto vertices       = pbbs::sequence<VertexStruct>(total_vertices);
+                RandomWalkModel* model;
 
                 switch (config::random_walk_model)
                 {
@@ -218,13 +223,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         std::exit(1);
                 }
 
-                using VertexStruct  = std::pair<types::Vertex, VertexEntry>;
-                auto vertices = pbbs::sequence<VertexStruct>(total_vertices);
-
-                auto walks    = total_vertices * config::walks_per_vertex;
-                auto cuckoo   = libcuckoo::cuckoohash_map<types::Vertex, std::vector<types::Vertex>>(total_vertices);
-                srand(time(nullptr));
-
                 parallel_for(0, walks, [&](types::WalkID walk_id)
                 {
                     types::State state  = model->initial_state(walk_id % total_vertices);
@@ -232,23 +230,23 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                     for(types::Position position = 0; position < config::walk_length; position++)
                     {
+                        std::cout << state.first << " ";
+
                         if (!graph[state.first].samplers->contains(state.second))
                         {
                             graph[state.first].samplers->insert(state.second, MetropolisHastingsSampler(state, model));
                         }
 
-                        std::cout << state.first << " ";
-
                         auto new_state = graph[state.first].samplers->find(state.second).sample(state, model);
 
-                        if (!cuckoo.contains(state.first))
-                            cuckoo.insert(state.first, std::vector<types::Vertex>());
-
-                        cuckoo.update_fn(state.first, [&](auto& vector)
-                        {
-                            types::PairedTriplet hash = pairings::Szudzik<types::Vertex>::pair({walk_id*config::walk_length + position, new_state.first});
-                            vector.push_back(hash);
-                        });
+//                        if (!cuckoo.contains(state.first))
+//                            cuckoo.insert(state.first, std::vector<types::Vertex>());
+//
+//                        cuckoo.update_fn(state.first, [&](auto& vector)
+//                        {
+//                            types::PairedTriplet hash = pairings::Szudzik<types::Vertex>::pair({walk_id*config::walk_length + position, new_state.first});
+//                            vector.push_back(hash);
+//                        });
 
                         state = new_state;
                     }
@@ -256,39 +254,39 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     std::cout << std::endl;
                 });
 
-                parallel_for(0, total_vertices, [&](types::Vertex vertex)
-                {
-                    if (cuckoo.contains(vertex))
-                    {
-                        auto triplets = cuckoo.find(vertex);
-                        auto sequence = pbbs::sequence<types::Vertex>(triplets.size());
+//                parallel_for(0, total_vertices, [&](types::Vertex vertex)
+//                {
+//                    if (cuckoo.contains(vertex))
+//                    {
+//                        auto triplets = cuckoo.find(vertex);
+//                        auto sequence = pbbs::sequence<types::Vertex>(triplets.size());
+//
+//                        for(auto index = 0; index < triplets.size(); index++)
+//                            sequence[index] = triplets[index];
+//
+//                        pbbs::sample_sort_inplace(pbbs::make_range(sequence.begin(), sequence.end()), std::less<>());
+//                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(sequence, vertex), SamplerManager(0)));
+//                    }
+//                    else
+//                    {
+//                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(), SamplerManager(0)));
+//                    }
+//                });
 
-                        for(auto index = 0; index < triplets.size(); index++)
-                            sequence[index] = triplets[index];
-
-                        pbbs::sample_sort_inplace(pbbs::make_range(sequence.begin(), sequence.end()), std::less<>());
-                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(sequence, vertex), SamplerManager(0)));
-                    }
-                    else
-                    {
-                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(), SamplerManager(0)));
-                    }
-                });
-
-                auto replace = [&] (const uintV src, const VertexEntry& x, const VertexEntry& y)
-                {
-                    auto tree_plus = tree_plus::uniont(x.compressed_walks, y.compressed_walks, src);
-
-                    // deallocate the memory
-                    lists::deallocate(x.compressed_walks.plus);
-                    tree_plus::Tree_GC::decrement_recursive(x.compressed_walks.root);
-                    lists::deallocate(y.compressed_walks.plus);
-                    tree_plus::Tree_GC::decrement_recursive(y.compressed_walks.root);
-
-                    return VertexEntry(x.compressed_edges, CompressedWalks(tree_plus.plus, tree_plus.root), *x.sampler_manager);
-                };
-
-                this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, vertices.begin(), vertices.size(), replace, true);
+//                auto replace = [&] (const uintV src, const VertexEntry& x, const VertexEntry& y)
+//                {
+//                    auto tree_plus = tree_plus::uniont(x.compressed_walks, y.compressed_walks, src);
+//
+//                    // deallocate the memory
+//                    lists::deallocate(x.compressed_walks.plus);
+//                    tree_plus::Tree_GC::decrement_recursive(x.compressed_walks.root);
+//                    lists::deallocate(y.compressed_walks.plus);
+//                    tree_plus::Tree_GC::decrement_recursive(y.compressed_walks.root);
+//
+//                    return VertexEntry(x.compressed_edges, CompressedWalks(tree_plus.plus, tree_plus.root), *x.sampler_manager);
+//                };
+//
+//                this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, vertices.begin(), vertices.size(), replace, true);
 
                 delete model;
             }
@@ -440,8 +438,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             * maximum blocks = ((3*RAM)/4)/size of one block.
             * @see list_allocator.h
             *
-            * @param graph_vertices
-            * @param graph_edges
+            * @param graph_vertices - total graph vertices
+            * @param graph_edges    - total graph edges
             */
             static void init_memory_pools(size_t graph_vertices, size_t graph_edges)
             {

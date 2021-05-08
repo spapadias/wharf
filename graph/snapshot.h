@@ -10,15 +10,14 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
     class Snapshot
     {
         public:
-
             /**
-            * @brief Given a vertex randomly sample one of the neighbours.
+            * @brief Given a graph vertex it returns its neighbors and degree.
             *
-            * @param vertex - current vertex
+            * @param vertex - graph vertex
             *
-            * @return - sampled neighbour
+            * @return - neighbors and degree of a given vertex
             */
-            virtual types::Vertex randomly_sample_neighbor(types::Vertex vertex) = 0;
+            virtual types::Neighbors neighbors(types::Vertex vertex) = 0;
 
             /**
              * @brief Snapshot size.
@@ -28,7 +27,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             virtual types::Vertex size() = 0;
 
             /**
-             * Snapshot size in bytes. The memory footprint of a snapshot.
+             * @brief Snapshot size in bytes. The memory footprint of a snapshot.
              *
              * @return - size of a snapshot in bytes
              */
@@ -36,13 +35,12 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
     };
 
     /**
-     * @brief FlatVertexTree stores vertex entries in a flatten array.
+     * @brief FlatVertexTree stores vertex entries in an array.
      * This allows for O(1) access to vertex content and promises improved cache locality.
      */
     class FlatVertexTree : public Snapshot
     {
         public:
-
             /**
              * @brief FlatVertexTree constructor.
              *
@@ -86,21 +84,18 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-            * @brief Given a vertex randomly sample one of the neighbours.
+            * @brief Given a graph vertex it returns its neighbors and degree.
             *
-            * @param vertex - current vertex
+            * @param vertex - graph vertex
             *
-            * @return - sampled neighbour
+            * @return - neighbors and degree of a given vertex
             */
-            types::Vertex randomly_sample_neighbor(types::Vertex vertex) final
+            types::Neighbors neighbors(types::Vertex vertex) final
             {
                 auto neighbors = snapshot[vertex].compressed_edges.get_edges(vertex);
                 auto degrees   = snapshot[vertex].compressed_edges.degree();
 
-                auto result = neighbors[rand() % degrees];
-
-                pbbs::free_array(neighbors);
-                return result;
+                return std::make_tuple(neighbors, degrees, true);
             }
 
         private:
@@ -183,15 +178,15 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-            * @brief Given a vertex randomly sample one of the neighbours.
+            * @brief Returns neighbors of a given vertex.
             *
-            * @param vertex - current vertex
+            * @param vertex - graph vertex
             *
-            * @return - sampled neighbour
+            * @return - neighbors of a given vertex
             */
-            types::Vertex randomly_sample_neighbor(types::Vertex vertex) final
+            types::Neighbors neighbors(types::Vertex vertex) final
             {
-                return snapshot[vertex].neighbors[rand() % snapshot[vertex].degrees];
+                return std::make_tuple(snapshot[vertex].neighbors, snapshot[vertex].degrees, false);
             }
 
         private:

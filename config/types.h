@@ -3,14 +3,17 @@
 
 namespace types
 {
-    // Vertex = vertex data type
+    // Vertex = graph vertex data type
     using Vertex               = uintV;
 
-    // Degree = vertex degree
+    // Degree = graph vertex degree data type
     using Degree               = uintE;
 
+    // Neighbors = graph vertex neighbors
+    using Neighbors            = std::tuple<Vertex*, Degree, bool>;
+
     // WalkID = unique walk id
-    using WalkID               = uint64_t;
+    using WalkID               = uint32_t;
 
     // Position = the position of a vertex in the walk
     using Position             = uint8_t;
@@ -23,10 +26,8 @@ namespace types
     // (e.g DeepWalk = current vertex, Node2Vec = previously visited vertex by the walker)
     using State                = std::pair<Vertex, Vertex>;
 
-    // CompressedEdges = data structure (augmented parallel binary tree) that stores compressed edges
+    // CompressedEdges = structure (augmented parallel binary tree) that stores compressed edges
     using CompressedEdges      = tree_plus::treeplus;
-
-    // CompressedTreesLists = data structure (augmented parallel binary tree) that stores compressed edges & compressed walks
     using CompressedTreesLists = tree_plus::edge_list;
 
     // RandomWalkModelType = different walking models

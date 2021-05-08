@@ -8,16 +8,26 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
     class MetropolisHastingsSampler
     {
         public:
-
-            /**
-             * @brief MetropolisHastingsSampler constructor.
-             */
+             /**
+              * @brief MetropolisHastingsSampler constructor.
+              *
+              * @param current_state - current state of the walker
+              * @param model         - model of random walk
+              */
             MetropolisHastingsSampler(types::State& current_state, dygrl::RandomWalkModel* model)
             {
                 this->last_sampled_vertex = 0;
                 this->init(current_state, model, config::sampler_init_strategy);
             }
 
+            /**
+             * @brief Sample new vertex.
+             *
+             * @param state - current walker state
+             * @param model - random walk model
+             *
+             * @return - new state
+             */
             types::State sample(types::State& state, dygrl::RandomWalkModel* model)
             {
                 // 1. Propose new candidate and calculate weights
@@ -38,6 +48,13 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
         private:
             types::Vertex last_sampled_vertex;
 
+            /**
+             * @brief Metropolis Hastings sampler initializer.
+             *
+             * @param current_state - current state of the walker
+             * @param model         - model of random walk
+             * @param init_startegy - initialization strategy
+             */
             void init(types::State& current_state, dygrl::RandomWalkModel* model, types::SamplerInitStartegy init_startegy)
             {
                 /* Random initialization of MH sampler */
@@ -59,17 +76,14 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 else if (init_startegy == types::WEIGHT)
                 {
                     this->init(current_state, model, types::RANDOM);
-                    types::Vertex candidate_sample;
 
                     types::Vertex best_sample = this->last_sampled_vertex;
                     float best_sample_weight  = model->weight(current_state, best_sample);
 
-                    float weight;
-
                     for (int iter = 0; iter < 20; iter++)
                     {
-                        candidate_sample = model->propose_vertex(current_state);
-                        weight = model->weight(current_state, candidate_sample);
+                       types::Vertex candidate_sample = model->propose_vertex(current_state);
+                       float weight = model->weight(current_state, candidate_sample);
 
                         if (weight > best_sample_weight)
                         {
@@ -84,6 +98,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
             bool accept(float previous_weight, float new_weight)
             {
+//                auto random = pbbs::random(time(nullptr));
+
                 if (previous_weight < new_weight) return true;
                 return ((double) rand() / (RAND_MAX)) <= (double)(new_weight) / (double)(previous_weight);
             }

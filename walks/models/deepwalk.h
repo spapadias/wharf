@@ -20,7 +20,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             explicit DeepWalk(dygrl::Snapshot* snapshot)
             {
                 this->snapshot = snapshot;
-            };
+            }
 
             /**
             * @brief DeepWalk destructor.
@@ -78,7 +78,13 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             */
             types::Vertex propose_vertex(const types::State& state) final
             {
-                return this->snapshot->randomly_sample_neighbor(state.first);
+                auto random    = pbbs::random(time(nullptr));
+                auto neighbors = this->snapshot->neighbors(state.first);
+                auto vertex    = std::get<0>(neighbors)[random.rand() & std::get<1>(neighbors)];
+
+                if (std::get<2>(neighbors)) pbbs::free_array(std::get<0>(neighbors));
+
+                return vertex;
             }
 
         private:
