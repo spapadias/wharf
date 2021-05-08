@@ -11,6 +11,7 @@
 #include <snapshot.h>
 
 #include <models/deepwalk.h>
+#include <models/node2vec.h>
 
 namespace dynamic_graph_representation_learning_with_metropolis_hastings
 {
@@ -201,43 +202,43 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             // TODO : working on it
             void create_random_walks()
             {
-                auto graph          = this->flatten_graph();
-                auto total_vertices = this->number_of_vertices();
-                auto walks          = total_vertices * config::walks_per_vertex;
-                auto cuckoo         = libcuckoo::cuckoohash_map<types::Vertex, std::vector<types::Vertex>>(total_vertices);
-
-                using VertexStruct  = std::pair<types::Vertex, VertexEntry>;
-                auto vertices       = pbbs::sequence<VertexStruct>(total_vertices);
-                RandomWalkModel* model;
-
-                switch (config::random_walk_model)
-                {
-                    case types::DEEPWALK:
-                        model = new DeepWalk(&graph);
-                        break;
-                    case types::NODE2VEC:
-                        std::cerr << "Unrecognized random walking model" << std::endl;
-                        std::exit(1);
-                    default:
-                        std::cerr << "Unrecognized random walking model" << std::endl;
-                        std::exit(1);
-                }
-
-                parallel_for(0, walks, [&](types::WalkID walk_id)
-                {
-                    types::State state  = model->initial_state(walk_id % total_vertices);
-                    if (graph[state.first].degrees == 0) return;
-
-                    for(types::Position position = 0; position < config::walk_length; position++)
-                    {
-                        std::cout << state.first << " ";
-
-                        if (!graph[state.first].samplers->contains(state.second))
-                        {
-                            graph[state.first].samplers->insert(state.second, MetropolisHastingsSampler(state, model));
-                        }
-
-                        auto new_state = graph[state.first].samplers->find(state.second).sample(state, model);
+//                auto graph          = this->flatten_graph();
+//                auto total_vertices = this->number_of_vertices();
+//                auto walks          = total_vertices * config::walks_per_vertex;
+//                auto cuckoo         = libcuckoo::cuckoohash_map<types::Vertex, std::vector<types::Vertex>>(total_vertices);
+//
+//                using VertexStruct  = std::pair<types::Vertex, VertexEntry>;
+//                auto vertices       = pbbs::sequence<VertexStruct>(total_vertices);
+//                RandomWalkModel* model;
+//
+//                switch (config::random_walk_model)
+//                {
+//                    case types::DEEPWALK:
+//                        model = new DeepWalk(&graph);
+//                        break;
+//                    case types::NODE2VEC:
+//                        std::cerr << "Unrecognized random walking model" << std::endl;
+//                        std::exit(1);
+//                    default:
+//                        std::cerr << "Unrecognized random walking model" << std::endl;
+//                        std::exit(1);
+//                }
+//
+//                parallel_for(0, walks, [&](types::WalkID walk_id)
+//                {
+//                    types::State state  = model->initial_state(walk_id % total_vertices);
+//                    if (graph[state.first].degrees == 0) return;
+//
+//                    for(types::Position position = 0; position < config::walk_length; position++)
+//                    {
+//                        std::cout << state.first << " ";
+//
+//                        if (!graph[state.first].samplers->contains(state.second))
+//                        {
+//                            graph[state.first].samplers->insert(state.second, MetropolisHastingsSampler(state, model));
+//                        }
+//
+//                        auto new_state = graph[state.first].samplers->find(state.second).sample(state, model);
 
 //                        if (!cuckoo.contains(state.first))
 //                            cuckoo.insert(state.first, std::vector<types::Vertex>());
@@ -248,11 +249,11 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 //                            vector.push_back(hash);
 //                        });
 
-                        state = new_state;
-                    }
-
-                    std::cout << std::endl;
-                });
+//                        state = new_state;
+//                    }
+//
+//                    std::cout << std::endl;
+//                });
 
 //                parallel_for(0, total_vertices, [&](types::Vertex vertex)
 //                {
@@ -288,7 +289,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 //
 //                this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, vertices.begin(), vertices.size(), replace, true);
 
-                delete model;
+//                delete model;
             }
 
             /**

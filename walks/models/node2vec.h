@@ -1,31 +1,33 @@
-#ifndef DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_DEEPWALK_H
-#define DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_DEEPWALK_H
+#ifndef DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_NODE2VEC_H
+#define DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_NODE2VEC_H
 
 #include <random_walk_model.h>
 
 namespace dynamic_graph_representation_learning_with_metropolis_hastings
 {
     /**
-     * @brief DeepWalk random walk model implementation.
-     * @details https://dl.acm.org/doi/abs/10.1145/2623330.2623732
+     * @brief Node2Vec random walk model implementation.
+     * @details https://arxiv.org/abs/1607.00653
      */
-    class DeepWalk : public RandomWalkModel
+    class Node2Vec : public RandomWalkModel
     {
         public:
             /**
-             * @brief DeepWalk constructor.
+             * @brief Node2Vec constructor.
              *
              * @param snapshot - graph snapshot
              */
-            explicit DeepWalk(dygrl::Snapshot* snapshot)
+            explicit Node2Vec(dygrl::Snapshot* snapshot, float paramP, float paramQ)
             {
+                this->paramP = paramP;
+                this->paramQ = paramQ;
                 this->snapshot = snapshot;
             }
 
             /**
-            * @brief DeepWalk destructor.
+            * @brief Node2Vec destructor.
             */
-            ~DeepWalk()
+            ~Node2Vec()
             {
                 delete this->snapshot;
             }
@@ -39,7 +41,12 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             */
             types::State initial_state(types::Vertex vertex) final
             {
-                return types::State(vertex, vertex);
+                auto neighbors   = this->snapshot->neighbors(vertex);
+                auto prev_vertex = std::get<0>(neighbors)[rand() % std::get<1>(neighbors)];
+
+                if (std::get<2>(neighbors)) pbbs::free_array(std::get<0>(neighbors));
+
+                return types::State(vertex, prev_vertex);
             }
 
             /**
@@ -53,7 +60,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             */
             types::State new_state(const types::State& state, types::Vertex vertex) final
             {
-                return types::State(vertex, vertex);
+                return types::State(vertex, state.first);
             }
 
             /**
@@ -66,7 +73,18 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             */
             float weight(const types::State& state, types::Vertex vertex) final
             {
-                return 1.0;
+                if (vertex == state.second)
+                {
+                    return 1 / this->paramP;
+                }
+                else if (this->has_edge(state.second, vertex))
+                {
+                    return 1;
+                }
+                else
+                {
+                    return 1 / this->paramQ;
+                }
             }
 
             /**
@@ -88,7 +106,18 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
         private:
             Snapshot* snapshot;
+            float paramP;
+            float paramQ;
+
+            bool has_edge(types::Vertex prev, types::Vertex next)
+            {
+                auto neighbors = this->snapshot->neighbors(prev);
+                bool res = binary_search(std::get<0>(neighbors), std::get<0>(neighbors) + std::get<1>(neighbors), next);
+                if (std::get<2>(neighbors)) pbbs::free_array(std::get<0>(neighbors));
+
+                return res;
+            }
     };
 }
 
-#endif // DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_DEEPWALK_H
+#endif // DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_NODE2VEC_H

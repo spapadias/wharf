@@ -30,7 +30,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             virtual types::State new_state(const types::State& state, types::Vertex vertex) = 0;
 
             /**
-            * @brief Explains how to calculate the edge weight based on the current state and the potentially proposed vertex.
+            * @brief Calculates the edge weight based on the current state and the potentially proposed vertex.
             *
             * @param state  - current state of the walker
             * @param vertex - potentially proposed vertex

@@ -44,17 +44,17 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 return model->new_state(state, this->last_sampled_vertex);
             }
 
-
-        private:
             types::Vertex last_sampled_vertex;
 
+            private:
+
             /**
-             * @brief Metropolis Hastings sampler initializer.
-             *
-             * @param current_state - current state of the walker
-             * @param model         - model of random walk
-             * @param init_startegy - initialization strategy
-             */
+            * @brief Metropolis Hastings sampler initializer.
+            *
+            * @param current_state - current state of the walker
+            * @param model         - model of random walk
+            * @param init_startegy - initialization strategy
+            */
             void init(types::State& current_state, dygrl::RandomWalkModel* model, types::SamplerInitStartegy init_startegy)
             {
                 /* Random initialization of MH sampler */
@@ -98,8 +98,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
             bool accept(float previous_weight, float new_weight)
             {
-//                auto random = pbbs::random(time(nullptr));
-
                 if (previous_weight < new_weight) return true;
                 return ((double) rand() / (RAND_MAX)) <= (double)(new_weight) / (double)(previous_weight);
             }

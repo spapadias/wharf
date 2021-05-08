@@ -15,7 +15,7 @@ class DockTest : public testing::Test
         uintE* offsets;
         bool mmap = false;          // TODO @Djordjije: do we need this?
         bool is_symmetric = true;   // TODO @Djordjije: do we need this?
-        std::string default_file_path = "data/email-graph";
+        std::string default_file_path = "data/aspen-paper-graph";
 };
 
 void DockTest::SetUp()
@@ -111,9 +111,59 @@ TEST_F(DockTest, DockDestructor)
     ASSERT_EQ(flat_snapshot.size(), 0);
 }
 
-TEST_F(DockTest, DockCreateRandomWalks)
+TEST_F(DockTest, DeepWalk)
 {
     dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
-    dock.create_random_walks();
+    srand(time(nullptr));
+
+    auto graph          = dock.flatten_graph();
+    auto total_vertices = dock.number_of_vertices();
+    auto walks          = total_vertices * config::walks_per_vertex;
+
+    dygrl::RandomWalkModel* model = new dygrl::DeepWalk(&graph);
+    types::State state = model->initial_state(2);
+
+    auto sampler = dygrl::MetropolisHastingsSampler(state, model);
+
+    std::map<types::Vertex, int> map = std::map<types::Vertex, int>();
+
+    for (int i = 0; i < 10000; i++)
+    {
+        map[sampler.sample(state, model).first] += 1;
+    }
+
+    for(auto elem : map)
+    {
+        std::cout << elem.first << " -> " << elem.second << std::endl;
+    }
+}
+
+
+TEST_F(DockTest, Node2Vec)
+{
+    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+    srand(time(nullptr));
+
+    auto graph          = dock.flatten_graph();
+    auto total_vertices = dock.number_of_vertices();
+    auto walks          = total_vertices * config::walks_per_vertex;
+
+    dygrl::RandomWalkModel* model = new dygrl::Node2Vec(&graph, 0.5, 1);
+//    types::State state = model->initial_state(2);
+    types::State state = types::State(2, 0);
+
+    auto sampler = dygrl::MetropolisHastingsSampler(state, model);
+
+    std::map<types::Vertex, int> map = std::map<types::Vertex, int>();
+
+    for (int i = 0; i < 10000; i++)
+    {
+        map[sampler.sample(state, model).first] += 1;
+    }
+
+    for(auto elem : map)
+    {
+        std::cout << elem.first << " -> " << elem.second << std::endl;
+    }
 }
 
