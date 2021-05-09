@@ -35,8 +35,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
          * @param compressed_walks - compressed tree of walks
          * @param sampler_manager  - manager of MH samplers
          */
-        VertexEntry(const types::CompressedEdges& compressed_edges, const dygrl::CompressedWalks& compressed_walks, const dygrl::SamplerManager& sampler_manager)
-            : compressed_edges(compressed_edges), compressed_walks(compressed_walks), sampler_manager(new SamplerManager(sampler_manager)) {};
+        VertexEntry(const types::CompressedEdges& compressed_edges, const dygrl::CompressedWalks& compressed_walks, dygrl::SamplerManager* sampler_manager)
+            : compressed_edges(compressed_edges), compressed_walks(compressed_walks), sampler_manager(sampler_manager) {};
     };
 
     /**
@@ -83,11 +83,13 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             auto cw_plus = lists::copy_node(entry.second.compressed_walks.plus);         // cw plus part; bumps ref-cnt
             auto cw_root = tree_plus::Tree_GC::inc(entry.second.compressed_walks.root);  // cw root part; bumps ref-cnt
 
+            auto sampler = new SamplerManager(*entry.second.sampler_manager);
+
             return std::make_pair(entry.first,
                 VertexEntry(
                     types::CompressedEdges(ce_plus, ce_root),
                     dygrl::CompressedWalks(cw_plus, cw_root),
-                    *entry.second.sampler_manager
+                    sampler
                 )
             );
         }

@@ -111,73 +111,61 @@ TEST_F(DockTest, DockDestructor)
     ASSERT_EQ(flat_snapshot.size(), 0);
 }
 
+TEST_F(DockTest, InsertBatchOfEdges)
+{
+    // create wharf instance (vertices & edges)
+    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+    auto start_edges = dock.number_of_edges();
+
+    // geneate edges
+//    auto edges = utility::generate_batch_of_edges(2 * dock.number_of_vertices(), dock.number_of_vertices(), false, false);
+
+    std::tuple<uintV, uintV>* generated_edges = new std::tuple<uintV, uintV>[1];
+    generated_edges[0] = {1, 3};
+    auto edges_generated = 1;
+
+    // insert batch of edges
+    dock.insert_edges_batch(edges_generated, generated_edges, true, false);
+
+    std::cout << "Edges before batch insert: " << start_edges << std::endl;
+    std::cout << "Edges after batch insert: "  << dock.number_of_edges() << std::endl;
+
+    // assert edge insertion
+    ASSERT_GE(dock.number_of_edges(), start_edges);
+}
+
+TEST_F(DockTest, DeleteBatchOfEdges)
+{
+    // create wharf instance (vertices & edges)
+    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+    auto start_edges = dock.number_of_edges();
+
+    // geneate edges
+//    auto edges = utility::generate_batch_of_edges(2 * dock.number_of_vertices(), dock.number_of_vertices(), false, false);
+
+    std::tuple<uintV, uintV>* generated_edges = new std::tuple<uintV, uintV>[1];
+    generated_edges[0] = {2, 5};
+    auto edges_generated = 1;
+
+    // insert batch of edges
+    dock.delete_edges_batch(edges_generated, generated_edges, true, false);
+
+    std::cout << "Edges before batch delete: " << start_edges << std::endl;
+    std::cout << "Edges after batch delete: " << dock.number_of_edges() << std::endl;
+
+    // assert edge deletion
+    ASSERT_LE(dock.number_of_edges(), start_edges);
+}
+
 TEST_F(DockTest, DeepWalk)
 {
     dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
-    srand(time(nullptr));
+    dock.create_random_walks();
+    dock.memory_footprint();
 
-    auto graph          = dock.flatten_graph();
-    auto total_vertices = dock.number_of_vertices();
-    auto walks          = total_vertices * config::walks_per_vertex;
-
-    dygrl::RandomWalkModel* model = new dygrl::DeepWalk(&graph);
-    types::State state = model->initial_state(2);
-
-    auto sampler = dygrl::MetropolisHastingsSampler(state, model);
-
-    std::map<types::Vertex, int> map = std::map<types::Vertex, int>();
-
-    for (int i = 0; i < 10000; i++)
+    for(auto i = 0; i < dock.number_of_vertices() * config::walks_per_vertex; i++)
     {
-        map[sampler.sample(state, model).first] += 1;
+        std::cout << dock.rewalk(i) << std::endl;
     }
-
-    for(auto elem : map)
-    {
-        std::cout << elem.first << " -> " << elem.second << std::endl;
-    }
-}
-
-
-TEST_F(DockTest, Node2Vec)
-{
-    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges, false);
-
-    std::cout << total_vertices << std::endl;
-    std::cout << total_edges << std::endl;
-
-    for(auto i = 0; i < total_vertices; i++)
-    {
-        std::cout << offsets[i] << " ";
-    }
-    std::cout << std::endl;
-
-    for(auto i = 0; i < total_edges; i++)
-    {
-        std::cout << edges[i] << " ";
-    }
-    std::cout << std::endl;
-
-//    auto graph          = dock.flatten_graph();
-//    auto total_vertices = dock.number_of_vertices();
-//    auto walks          = total_vertices * config::walks_per_vertex;
-//
-//    dygrl::RandomWalkModel* model = new dygrl::Node2Vec(&graph, 0.5, 1);
-////    types::State state = model->initial_state(2);
-//    types::State state = types::State(2, 0);
-//
-//    auto sampler = dygrl::MetropolisHastingsSampler(state, model);
-//
-//    std::map<types::Vertex, int> map = std::map<types::Vertex, int>();
-//
-//    for (int i = 0; i < 10000; i++)
-//    {
-//        map[sampler.sample(state, model).first] += 1;
-//    }
-//
-//    for(auto elem : map)
-//    {
-//        std::cout << elem.first << " -> " << elem.second << std::endl;
-//    }
 }
 
