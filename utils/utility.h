@@ -6,7 +6,7 @@
 namespace utility
 {
     /**
-     * @brief Converts B to GB
+     * @brief Converts B to GB.
      *
      * @param bytes - size in B
      *
@@ -23,7 +23,7 @@ namespace utility
     }
 
     /**
-     * @brief Converts B to MB
+     * @brief Converts B to MB.
      *
      * @param bytes - size in B
      *

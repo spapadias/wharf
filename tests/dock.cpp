@@ -15,7 +15,7 @@ class DockTest : public testing::Test
         uintE* offsets;
         bool mmap = false;          // TODO @Djordjije: do we need this?
         bool is_symmetric = true;   // TODO @Djordjije: do we need this?
-        std::string default_file_path = "data/aspen-paper-graph";
+        std::string default_file_path = "data/email-graph";
 };
 
 void DockTest::SetUp()
@@ -157,13 +157,26 @@ TEST_F(DockTest, DeleteBatchOfEdges)
     ASSERT_LE(dock.number_of_edges(), start_edges);
 }
 
-TEST_F(DockTest, DeepWalk)
+TEST_F(DockTest, DEV)
 {
     dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
     dock.create_random_walks();
-    dock.memory_footprint();
 
-    for(auto i = 0; i < dock.number_of_vertices() * config::walks_per_vertex; i++)
+    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
+    {
+        std::cout << dock.rewalk(i) << std::endl;
+    }
+
+    std::tuple<uintV, uintV>* generated_edges = new std::tuple<uintV, uintV>[1];
+    generated_edges[0] = {1, 3};
+//    generated_edges[1] = {3, 1};
+    auto edges_generated = 1;
+
+    // insert batch of edges
+    dock.insert_edges_batch(edges_generated, generated_edges, true, false);
+//    dock.delete_edges_batch(edges_generated, generated_edges, true, false);
+
+    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
     {
         std::cout << dock.rewalk(i) << std::endl;
     }
