@@ -11,11 +11,12 @@ include_directories(graph)
 include_directories(walks)
 include_directories(utils)
 include_directories(config)
+include_directories(training)
 
 # set up google tests
 enable_testing()
 add_subdirectory(tests)
 
 # experiments
-#add_subdirectory(experiments)
+add_subdirectory(experiments)
 # -------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING WITH METROPOLIS HASTINGS ----------------------------

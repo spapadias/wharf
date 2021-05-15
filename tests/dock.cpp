@@ -15,7 +15,7 @@ class DockTest : public testing::Test
         uintE* offsets;
         bool mmap = false;          // TODO @Djordjije: do we need this?
         bool is_symmetric = true;   // TODO @Djordjije: do we need this?
-        std::string default_file_path = "data/email-graph";
+        std::string default_file_path = "data/aspen-paper-graph";
 };
 
 void DockTest::SetUp()
