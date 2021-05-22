@@ -28,10 +28,17 @@ void learn_embeddings(commandLine& command_line)
     dygrl::Dock dock = dygrl::Dock(n, m, offsets, edges);
     dock.create_random_walks();
 
+
+    ofstream myfile;
+    myfile.open("txt/all");
+
     for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
     {
-        std::cout << dock.rewalk(i) << std::endl;
+        myfile << dock.rewalk(i) << "\n";
+//        std::cout << dock.rewalk(i) << std::endl;
     }
+
+    myfile.close();
 
     train_main(command_line.argc, command_line.argv);
 }

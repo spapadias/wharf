@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # script options
-clean_after_experiments=True
+clean_after_experiments=False
 
 # execution options
-declare -a graphs=("aspen-paper-graph")
-declare -a walks_per_node=(1)
-declare -a walk_length=(10)
+declare -a graphs=("email-graph")
+declare -a walks_per_node=(10)
+declare -a walk_length=(80)
 
 # convert graphs in adjacency graph format if necessary
 for graph in "${graphs[@]}"; do
@@ -25,21 +25,21 @@ mkdir -p ../../cmake-build;
 cd ../../cmake-build;
 cmake ..;
 cd experiments;
+mkdir -p txt;
 
 # build the learn embeddings experiment
 make learn_embeddings
 
-## Execute experiments
-#for wpv in "${walks_per_node[@]}"; do
-#    for wl in "${walk_length[@]}"; do
-#        for graph in "${graphs[@]}"; do
-#            printf "\n \n \n"
-#            echo "Executing experiment with parameters: " "${graph}" "${wpv}" "${wl}"
-#            time ./learn_embeddings -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}"
-#            #    numactl -i all ./memory_footprint -s -f "data/${graph}.adj" -w "${wpn}" -l "${wl}" todo: check numactl for parallel execution. read aspen readme
-#        done
-#    done
-#done
+# execute experiments
+for wpv in "${walks_per_node[@]}"; do
+    for wl in "${walk_length[@]}"; do
+        for graph in "${graphs[@]}"; do
+            printf "\n \n"
+            echo "Executing experiment with parameters: " "${graph}" "${wpv}" "${wl}"
+            time ./learn_embeddings -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}"
+        done
+    done
+done
 
 # clean build if necessary
 if [ "$clean_after_experiments" = True ] ; then

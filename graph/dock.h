@@ -306,12 +306,14 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 types::Vertex current_vertex = walk_id % this->number_of_vertices();
 
                 std::stringstream string_stream;
-                string_stream << "WalkID: " << walk_id << " | ";
+//                string_stream << "WalkID: " << walk_id << " | ";
 
                 // 2. Rewalk
                 for (types::Position position = 0; position < config::walk_length; position++)
                 {
-                    position + 1 == config::walk_length ? string_stream << current_vertex : string_stream << current_vertex << ", ";
+//                    position + 1 == config::walk_length ? string_stream << current_vertex : string_stream << current_vertex << ", ";
+                    position + 1 == config::walk_length ? string_stream << current_vertex : string_stream << current_vertex << " ";
+
 
                     auto tree_node = this->graph_tree.find(current_vertex);
 
