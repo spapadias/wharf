@@ -165,18 +165,18 @@ TEST_F(DockTest, RandomWalks)
         std::cout << dock.rewalk(i) << std::endl;
     }
 
-//    // geneate edges
-//    auto edges = utility::generate_batch_of_edges(5 * dock.number_of_vertices(), dock.number_of_vertices(), false, false);
-//    auto generated_edges = edges.first;
-//    auto edges_generated = edges.second;
-//
-//    // insert batch of edges
-//    dock.insert_edges_batch(edges_generated, generated_edges, true, false);
-////    dock.delete_edges_batch(edges_generated, generated_edges, true, false);
-//
-//    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
-//    {
-//        std::cout << dock.rewalk(i) << std::endl;
-//    }
+    // geneate edges
+    auto edges = utility::generate_batch_of_edges(5 * dock.number_of_vertices(), dock.number_of_vertices(), false, false);
+    auto generated_edges = edges.first;
+    auto edges_generated = edges.second;
+
+    // insert batch of edges
+    dock.insert_edges_batch(edges_generated, generated_edges, true, false);
+//    dock.delete_edges_batch(edges_generated, generated_edges, true, false);
+
+    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
+    {
+        std::cout << dock.rewalk(i) << std::endl;
+    }
 }
 
