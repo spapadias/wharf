@@ -76,7 +76,7 @@ option(HOMEGROWN    "???"               OFF)
 option(DOCK_DEBUG   "Dock debug mode"   OFF)
 option(SERIAL       "???"               OFF)
 
-set(SERIAL ON)
+#set(SERIAL ON)
 set(DOCK_DEBUG ON)
 
 # build variables

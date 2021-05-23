@@ -232,8 +232,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                     for(types::Position position = 0; position < config::walk_length; position++)
                     {
-//                        std::cout << state.first << " ";
-
                         if (!graph[state.first].samplers->contains(state.second))
                         {
                             graph[state.first].samplers->insert(state.second, MetropolisHastingsSampler(state, model));
@@ -252,8 +250,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                         state = new_state;
                     }
-
-//                    std::cout << std::endl;
                 });
 
                 parallel_for(0, total_vertices, [&](types::Vertex vertex)
@@ -304,16 +300,12 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             {
                 // 1. Grab the first vertex in the walk
                 types::Vertex current_vertex = walk_id % this->number_of_vertices();
-
                 std::stringstream string_stream;
-//                string_stream << "WalkID: " << walk_id << " | ";
 
                 // 2. Rewalk
                 for (types::Position position = 0; position < config::walk_length; position++)
                 {
-//                    position + 1 == config::walk_length ? string_stream << current_vertex : string_stream << current_vertex << ", ";
                     position + 1 == config::walk_length ? string_stream << current_vertex : string_stream << current_vertex << " ";
-
 
                     auto tree_node = this->graph_tree.find(current_vertex);
 
@@ -665,7 +657,11 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 #endif
             }
 
-
+            /**
+             * @brief Updates affected walks in batch mode.
+             *
+             * @param types::MapOfChanges - rewalking points
+             */
             void batch_walk_update(types::MapOfChanges& rewalk_points)
             {
                 types::ChangeAccumulator deletes = types::ChangeAccumulator();
@@ -677,7 +673,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 for(auto& entry : rewalk_points.lock_table())
                 {
                     affected_walks[index++] = entry.first;
-                    std::cout << entry.first << std::endl;
                 }
 
                 auto graph = this->flatten_graph();
@@ -760,11 +755,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     pbbs::sample_sort_inplace(pbbs::make_range(sequence.begin(), sequence.end()), std::less<>());
                     delete_walks[index++] = std::make_pair(item.first, VertexEntry(types::CompressedEdges(), dygrl::CompressedWalks(sequence, item.first), new dygrl::SamplerManager(0)));
                 }
-
-//                for(int i = 0; i < delete_walks.size(); i++)
-//                {
-//                    std::cout << delete_walks[i].first << " " << delete_walks[i].second.compressed_walks.size() << std::endl;
-//                }
 
                 auto replaceD = [&] (const uintV src, const VertexEntry& x, const VertexEntry& y)
                 {
