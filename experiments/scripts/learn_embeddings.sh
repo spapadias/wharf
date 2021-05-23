@@ -36,7 +36,7 @@ for wpv in "${walks_per_node[@]}"; do
         for graph in "${graphs[@]}"; do
             printf "\n \n"
             echo "Executing experiment with parameters: " "${graph}" "${wpv}" "${wl}"
-            time ./learn_embeddings -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}"
+            time ./learn_embeddings -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -output "djordjije" -size 200
         done
     done
 done

@@ -22,9 +22,15 @@ namespace compressed_lists {
   static constexpr const size_t head_frequency = 8;
   static constexpr const size_t head_mask = (1 << head_frequency) - 1;
 
-  static bool is_head(const uintV& vtx_id) {
-    return (pbbs::hash32_2(vtx_id) & head_mask) == 0;
-  }
+    #ifdef VERTEXLONG
+        static bool is_head(const uintV& vtx_id) {
+            return (pbbs::hash64(vtx_id) & head_mask) == 0;
+        }
+    #else
+        static bool is_head(const uintV& vtx_id) {
+        return (pbbs::hash32_2(vtx_id) & head_mask) == 0;
+      }
+    #endif
 
 
   template <class F>

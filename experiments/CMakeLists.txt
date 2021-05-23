@@ -34,7 +34,7 @@ else()
 endif()
 
 # set compile flags
-set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS}")
+set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS} -DVERTEXLONG")
 
 file(COPY ../experiments/data DESTINATION .)
 file(COPY ../experiments/scripts/SNAPtoAdj DESTINATION .)
