@@ -13,9 +13,9 @@ class DockTest : public testing::Test
         long total_edges;
         uintV* edges;
         uintE* offsets;
-        bool mmap = false;          // TODO @Djordjije: do we need this?
-        bool is_symmetric = true;   // TODO @Djordjije: do we need this?
-        std::string default_file_path = "data/email-graph";
+        bool mmap = false;
+        bool is_symmetric = true;
+        std::string default_file_path = "data/aspen-paper-graph";
 };
 
 void DockTest::SetUp()
@@ -125,7 +125,6 @@ TEST_F(DockTest, InsertBatchOfEdges)
     // insert batch of edges
     dock.insert_edges_batch(edges_generated, generated_edges, true, false);
 
-
     std::cout << "Edges before batch insert: " << start_edges << std::endl;
     std::cout << "Edges after batch insert: "  << dock.number_of_edges() << std::endl;
 
@@ -154,7 +153,7 @@ TEST_F(DockTest, DeleteBatchOfEdges)
     ASSERT_LE(dock.number_of_edges(), start_edges);
 }
 
-TEST_F(DockTest, RandomWalks)
+TEST_F(DockTest, UpdateRandomWalks)
 {
     // create graph and walks
     dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
@@ -172,7 +171,6 @@ TEST_F(DockTest, RandomWalks)
 
     // insert batch of edges
     dock.insert_edges_batch(edges_generated, generated_edges, true, false);
-//    dock.delete_edges_batch(edges_generated, generated_edges, true, false);
 
     for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
     {
