@@ -31,10 +31,10 @@ namespace types
     using CompressedTreesLists = tree_plus::edge_list;
 
     // RandomWalkModelType = different walking models
-    enum RandomWalkModelType { DEEPWALK, NODE2VEC };
+    enum RandomWalkModelType   { DEEPWALK, NODE2VEC };
 
     // StartMode = edge sampler initialization strategy
-    enum SamplerInitStartegy { RANDOM, BURNIN, WEIGHT };
+    enum SamplerInitStartegy   { RANDOM, BURNIN, WEIGHT };
 
     // Global Map of Changes (MoC) = contains starting positions to crop the walk
     using MapOfChanges         = libcuckoo::cuckoohash_map<WalkID, std::tuple<Position, Vertex>>;
