@@ -83,7 +83,12 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             auto cw_plus = lists::copy_node(entry.second.compressed_walks.plus);         // cw plus part; bumps ref-cnt
             auto cw_root = tree_plus::Tree_GC::inc(entry.second.compressed_walks.root);  // cw root part; bumps ref-cnt
 
-            auto sampler = new SamplerManager(*entry.second.sampler_manager);
+            auto sampler = new SamplerManager(entry.second.sampler_manager->size());
+
+            for(auto& table_entry : entry.second.sampler_manager->lock_table())
+            {
+                sampler->insert(table_entry.first, table_entry.second);
+            }
 
             return std::make_pair(entry.first,
                 VertexEntry(
