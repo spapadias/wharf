@@ -327,6 +327,33 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 return string_stream.str();
             }
 
+            types::Vertex vertex_at_walk(types::WalkID walk_id, types::Position position)
+            {
+                // 1. Grab the first vertex in the walk
+                types::Vertex current_vertex = walk_id % this->number_of_vertices();
+
+                for (types::Position pos = 0; pos < position; pos++)
+                {
+                    auto tree_node = this->graph_tree.find(current_vertex);
+
+                    #ifdef DOCK_DEBUG
+                        if (!tree_node.valid)
+                        {
+                            std::cerr << "Dock debug error! Dock::Rewalk::Vertex="
+                                      << current_vertex << " is not found in the vertex tree!"
+                                      << std::endl;
+
+                            std::exit(1);
+                        }
+                    #endif
+
+                    if (tree_node.value.compressed_edges.degree() == 0) break;
+                    current_vertex = tree_node.value.compressed_walks.find_next(walk_id, pos, current_vertex);
+                }
+
+                return current_vertex;
+            }
+
             /**
             * @brief Inserts a batch of edges in the graph.
             *
@@ -699,15 +726,28 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     auto current_vertex_old_walk = std::get<1>(entry);
                     auto current_vertex_new_walk = current_vertex_old_walk;
 
+                    auto state = model->initial_state(current_vertex_new_walk);
+
+                    if (config::random_walk_model == types::NODE2VEC && current_position > 0)
+                    {
+                        state.first = current_vertex_new_walk;
+                        state.second = this->vertex_at_walk(affected_walks[index], current_position - 1);
+                        std::cout << "WALK: " << affected_walks[index] << " POSITION: " << (int) current_position - 1 << " STATE: " << state.second << std::endl;
+                    }
+
                     for (types::Position position = current_position; position < config::walk_length; position++)
                     {
                         auto tree_node = this->graph_tree.find(current_vertex_old_walk);
                         auto next_old_walk = tree_node.value.compressed_walks.find_next(affected_walks[index], position, current_vertex_old_walk);
 
-                        auto state = model->initial_state(current_vertex_new_walk);
-                        auto new_state = graph[state.first].samplers->find(state.second).sample(state, model);
+                        if (!graph[state.first].samplers->contains(state.second))
+                        {
+                            graph[state.first].samplers->insert(state.second, MetropolisHastingsSampler(state, model));
+                        }
 
-                        types::PairedTriplet hash_insert = pairings::Szudzik<types::Vertex>::pair({affected_walks[index]*config::walk_length + position, new_state.first});
+                        state = graph[state.first].samplers->find(state.second).sample(state, model);
+
+                        types::PairedTriplet hash_insert = pairings::Szudzik<types::Vertex>::pair({affected_walks[index]*config::walk_length + position, state.first});
                         types::PairedTriplet hash_delete = pairings::Szudzik<types::Vertex>::pair({affected_walks[index]*config::walk_length + position, next_old_walk});
 
                         if (!deletes.contains(current_vertex_old_walk)) deletes.insert(current_vertex_old_walk, std::vector<types::PairedTriplet>());
@@ -723,7 +763,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                             vector.push_back(hash_insert);
                         });
 
-                        current_vertex_new_walk = new_state.first;
+                        current_vertex_new_walk = state.first;
                         current_vertex_old_walk = next_old_walk;
                     }
                 });
