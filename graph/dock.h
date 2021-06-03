@@ -479,7 +479,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         std::cout << "Walk ID: " << item.first
                                   << " Position: "
                                   << (int) std::get<0>(item.second)
-                                  << " Next: "
+                                  << " Vertex: "
                                   << std::get<1>(item.second)
                                   << std::endl;
                     }
@@ -645,7 +645,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         std::cout << "Walk ID: " << item.first
                                   << " Position: "
                                   << (int) std::get<0>(item.second)
-                                  << " Next: "
+                                  << " Vertex: "
                                   << std::get<1>(item.second)
                                   << std::endl;
                     }
@@ -758,7 +758,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                 auto replaceD = [&] (const uintV src, const VertexEntry& x, const VertexEntry& y)
                 {
-                    // TODO Caution! y first, then x
                     auto tree_plus = tree_plus::difference(y.compressed_walks, x.compressed_walks, src);
 
                     // deallocate the memory

@@ -44,4 +44,5 @@ file(COPY ../experiments/scripts/SNAPtoAdj DESTINATION .)
 #add_executable(memory_footprint src/memory_footprint.cpp)
 #add_executable(run_batch_updates src/run_batch_updates.cpp)
 add_executable(learn_embeddings src/learn_embeddings.cpp ../training/word2vec.c)
+add_executable(compression src/compression.cpp)
 # -------------------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING -----------------------------------------

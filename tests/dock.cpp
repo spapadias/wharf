@@ -15,7 +15,7 @@ class DockTest : public testing::Test
         uintE* offsets;
         bool mmap = false;
         bool is_symmetric = true;
-        std::string default_file_path = "data/email-graph";
+        std::string default_file_path = "data/aspen-paper-graph";
 };
 
 void DockTest::SetUp()
@@ -164,17 +164,17 @@ TEST_F(DockTest, UpdateRandomWalks)
         std::cout << dock.rewalk(i) << std::endl;
     }
 
-//    // geneate edges
-//    auto edges = utility::generate_batch_of_edges(5 * dock.number_of_vertices(), dock.number_of_vertices(), false, false);
-//    auto generated_edges = edges.first;
-//    auto edges_generated = edges.second;
-//
-//    // insert batch of edges
-//    dock.insert_edges_batch(edges_generated, generated_edges, true, false);
-//
-//    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
-//    {
-//        std::cout << dock.rewalk(i) << std::endl;
-//    }
+    // geneate edges
+    auto edges = utility::generate_batch_of_edges(5 * dock.number_of_vertices(), dock.number_of_vertices(), false, false);
+    auto generated_edges = edges.first;
+    auto edges_generated = edges.second;
+
+    // insert batch of edges
+    dock.insert_edges_batch(edges_generated, generated_edges, true, false);
+
+    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
+    {
+        std::cout << dock.rewalk(i) << std::endl;
+    }
 }
 

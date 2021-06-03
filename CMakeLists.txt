@@ -1,5 +1,5 @@
 # -------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING WITH METROPOLIS HASTINGS ----------------------------
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.13)
 project(dynamic_graph_representation_learning_with_metropolis_hastings)
 
 # libraries
