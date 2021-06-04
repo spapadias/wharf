@@ -732,7 +732,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     {
                         state.first = current_vertex_new_walk;
                         state.second = this->vertex_at_walk(affected_walks[index], current_position - 1);
-                        std::cout << "WALK: " << affected_walks[index] << " POSITION: " << (int) current_position - 1 << " STATE: " << state.second << std::endl;
+//                        std::cout << "WALK: " << affected_walks[index] << " POSITION: " << (int) current_position - 1 << " STATE: " << state.second << std::endl;
                     }
 
                     for (types::Position position = current_position; position < config::walk_length; position++)
@@ -840,10 +840,11 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 size_t vertex_node_size = Graph::node_size();
                 size_t c_tree_node_size = types::CompressedTreesLists::node_size();
 
-                size_t edges_heads = 0;
-                size_t walks_heads = 0;
-                size_t edges_bytes = 0;
-                size_t walks_bytes = 0;
+                size_t edges_heads    = 0;
+                size_t walks_heads    = 0;
+                size_t edges_bytes    = 0;
+                size_t walks_bytes    = 0;
+                size_t samplers_bytes = 0;
                 size_t flat_graph_bytes = 0;
                 auto flat_graph = this->flatten_vertex_tree();
 
@@ -856,6 +857,11 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                     edges_bytes += flat_graph[i].compressed_edges.size_in_bytes(i);
                     walks_bytes += flat_graph[i].compressed_walks.size_in_bytes(i);
+
+                    for (auto& entry : flat_graph[i].sampler_manager->lock_table())
+                    {
+                        samplers_bytes += sizeof(entry.first) + sizeof(entry.second);
+                    }
                 }
 
                 std::cout << "Graph: \n\t" << "Vertices: " << graph_vertices << ", Edges: " << graph_edges << std::endl;
@@ -884,6 +890,11 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                           << " MB = " << utility::GB(walks_bytes + walks_heads*c_tree_node_size)
                           << " GB" << std::endl;
 
+                std::cout << "Samplers: \n\t"
+                          << "Total memory usage: " << utility::MB(samplers_bytes)
+                          << " MB = " << utility::GB(samplers_bytes)
+                          << " GB" << std::endl;
+
                 std::cout << "Flat graph: \n\t"
                           << "Total memory usage: " << utility::MB(flat_graph_bytes)
                           << " MB = " << utility::GB(flat_graph_bytes)
@@ -891,7 +902,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                 size_t total_memory = Graph::get_used_bytes()
                         + walks_bytes + walks_heads*c_tree_node_size
-                        + edges_bytes + edges_heads*c_tree_node_size;
+                        + edges_bytes + edges_heads*c_tree_node_size + samplers_bytes;
 
                 std::cout << "Total memory used: \n\t" << utility::MB(total_memory) << " MB = "
                           << utility::GB(total_memory) << " GB" << std::endl;

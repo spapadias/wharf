@@ -38,11 +38,8 @@ set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS} -DVERTEXLONG")
 
 file(COPY ../experiments/data DESTINATION .)
 file(COPY ../experiments/scripts/SNAPtoAdj DESTINATION .)
-file(COPY ../experiments/scripts/SNAPtoAdj DESTINATION .)
+file(COPY ../experiments/scripts/inverted_index_pam DESTINATION .)
 
-# MEMORY FOOTPRINT EXPERIMENT EXECUTABLE
-#add_executable(memory_footprint src/memory_footprint.cpp)
-#add_executable(run_batch_updates src/run_batch_updates.cpp)
-add_executable(learn_embeddings src/learn_embeddings.cpp ../training/word2vec.c)
-add_executable(compression src/compression.cpp)
+# EXPERIMENS EXECUTABLES
+add_executable(memory_experiments src/memory_experiments.cpp)
 # -------------------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING -----------------------------------------

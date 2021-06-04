@@ -5,7 +5,7 @@ clean_after_experiments=False
 
 # execution options
 declare -a graphs=("email-graph")
-declare -a walks_per_node=(10)
+declare -a walks_per_node=(40)
 declare -a walk_length=(80)
 
 # convert graphs in adjacency graph format if necessary
