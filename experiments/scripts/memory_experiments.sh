@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # script options
-clean_after_experiments=False
+clean_after_experiments=True
 
 # execution options
 walk_model="deepwalk" # deepwalk | node2vec
