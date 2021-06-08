@@ -1,4 +1,4 @@
-# -------------------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING -----------------------------------------
+# -------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING WITH METROPOLIS HASTINGS ----------------------------
 
 option(CLANG     "???" OFF)
 option(CILK      "???" OFF)
@@ -11,7 +11,7 @@ set(OMPFLAGS     "-DOPENMP -fopenmp")
 set(CILKFLAGS    "-DCILK -fcilkplus")
 set(HGFLAGS      "-DHOMEGROWN -pthread")
 set(OPTIMIZATION "-O3 -g")
-set(CFLAGS       "-DEDGELONG  -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC ") #
+set(CFLAGS       "-DEDGELONG  -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC -DVERTEXLONG")
 
 if(CLANG)
     set(CMAKE_CXX_COMPILER "clang++")
@@ -34,12 +34,13 @@ else()
 endif()
 
 # set compile flags
-set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS} -DVERTEXLONG")
+set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS}")
 
 file(COPY ../experiments/data DESTINATION .)
 file(COPY ../experiments/scripts/SNAPtoAdj DESTINATION .)
 file(COPY ../experiments/scripts/inverted_index_pam DESTINATION .)
 
 # EXPERIMENS EXECUTABLES
-add_executable(memory_experiments src/memory_experiments.cpp)
-# -------------------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING -----------------------------------------
+add_executable(memory_footprint src/memory_footprint.cpp)
+
+# -------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING WITH METROPOLIS HASTINGS ----------------------------

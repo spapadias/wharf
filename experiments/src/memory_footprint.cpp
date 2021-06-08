@@ -15,43 +15,56 @@ void memory_footprint(commandLine& command_line)
     double paramQ           = command_line.getOptionDoubleValue("-paramQ", config::paramQ);
     string init_strategy    = string(command_line.getOptionValue("-init", "weight"));
 
-
     config::walks_per_vertex = walks_per_vertex;
     config::walk_length      = length_of_walks;
+
+    std::cout << "Walks per vertex: " << (int) config::walks_per_vertex << " | " << "Walk length: " <<  (int) config::walk_length << std::endl;
 
     if (model == "deepwalk")
     {
         config::random_walk_model = types::RandomWalkModelType::DEEPWALK;
+
+        std::cout << "Walking model: DEEPWALK" << std::endl;
     }
     else if (model == "node2vec")
     {
         config::random_walk_model = types::RandomWalkModelType::NODE2VEC;
         config::paramP = paramP;
         config::paramQ = paramQ;
+
+        std::cout << "Walking model: NODE2VEC | Params (p,q) = " << "(" << config::paramP << "," << config::paramQ << ")" << std::endl;
     }
     else
     {
-        std::cout << "Unrecognized walking model" << std::endl;
+        std::cerr << "Unrecognized walking model! Abort" << std::endl;
         std::exit(1);
     }
 
     if (init_strategy == "burnin")
     {
         config::sampler_init_strategy = types::SamplerInitStartegy::BURNIN;
+
+        std::cout << "Sampler strategy: BURNIN" << std::endl;
     }
     else if (init_strategy == "weight")
     {
         config::sampler_init_strategy = types::SamplerInitStartegy::WEIGHT;
+
+        std::cout << "Sampler strategy: WEIGHT" << std::endl;
     }
     else if (init_strategy == "random")
     {
         config::sampler_init_strategy = types::SamplerInitStartegy::RANDOM;
+
+        std::cout << "Sampler strategy: RANDOM" << std::endl;
     }
     else
     {
-        std::cout << "Unrecognized sampler init strategy" << std::endl;
+        std::cerr << "Unrecognized sampler init strategy" << std::endl;
         std::exit(1);
     }
+
+    std::cout << std::endl;
 
     size_t n;
     size_t m;
@@ -65,17 +78,19 @@ void memory_footprint(commandLine& command_line)
     dock.create_random_walks();
     dock.memory_footprint();
 
-    ofstream walks;
-    walks.open ("data/walks.txt");
+    std::cout << "Writing " << config::walks_per_vertex * dock.number_of_vertices() << " walks to a file" << std::endl << std::endl;
+    ofstream walks; walks.open ("data/walks.txt");
 
     for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
     {
+        if (i % 100000 == 0) std::cout << i << " walks written" << std::endl;
         walks << dock.rewalk(i) << std::endl;
     }
 
     walks.close();
+    std::cout << std::endl;
 
-    // transform an input graph file into an adjacency graph format
+    std::cout << "Writing walks into PAM inverted index ..." << std::endl << std::endl;
     std::string command = "./inverted_index_pam -f data/walks.txt ";
     system(command.c_str());
 }
@@ -84,6 +99,9 @@ int main(int argc, char** argv)
 {
     std::cout << "Running experiment with: " << num_workers() << " threads." << std::endl;
     commandLine command_line(argc, argv, "");
+
     memory_footprint(command_line);
 }
+
+
 
