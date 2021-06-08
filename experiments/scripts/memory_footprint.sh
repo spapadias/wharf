@@ -8,7 +8,7 @@ walk_model="deepwalk"             # deepwalk | node2vec
 paramP=0.2                        # node2vec paramP
 paramQ=0.7                        # node2vec paramQ
 sampler_init_strategy="weight"    # random | burnin | weight
-declare -a graphs=("email-graph")
+declare -a graphs=("email-graph" "aspen-paper-graph")
 declare -a walks_per_node=(40 80 120)
 declare -a walk_length=(20 40 60)
 
