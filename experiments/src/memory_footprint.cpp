@@ -80,23 +80,14 @@ void memory_footprint(commandLine& command_line)
 
     std::cout << "Writing " << config::walks_per_vertex * dock.number_of_vertices() << " walks to a file" << std::endl << std::endl;
     ofstream walks;
-    std::string buffer;
     walks.open ("data/walks.txt");
 
     for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
     {
-        if (i % 100000 == 0)
-        {
-            if(i % 1000000 == 0) std::cout << i << " walks written" << std::endl;
-            walks << buffer;
-            buffer.resize(0);
-        }
-
-        buffer.append(dock.rewalk(i));
-        buffer.append("\n");
+        if (i % 1000000 == 0) std::cout << "Written " << i << " walks" << std::endl;
+        walks << dock.rewalk(i) << '\n';
     }
 
-    walks << buffer;
     walks.close();
     std::cout << std::endl;
 
