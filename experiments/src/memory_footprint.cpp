@@ -83,7 +83,7 @@ void memory_footprint(commandLine& command_line)
 
     for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
     {
-        if (i % 100000 == 0) std::cout << i << " walks written" << std::endl;
+        if (i % 1000000 == 0) std::cout << i << " walks written" << std::endl;
         walks << dock.rewalk(i) << std::endl;
     }
 
