@@ -37,8 +37,8 @@ endif()
 set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS}")
 
 file(COPY ../experiments/data DESTINATION .)
-file(COPY ../experiments/scripts/SNAPtoAdj DESTINATION .)
-file(COPY ../experiments/scripts/inverted_index_pam DESTINATION .)
+file(COPY bin/SNAPtoAdj DESTINATION .)
+file(COPY bin/inverted_index_pam DESTINATION .)
 
 # EXPERIMENS EXECUTABLES
 add_executable(memory_footprint src/memory_footprint.cpp)

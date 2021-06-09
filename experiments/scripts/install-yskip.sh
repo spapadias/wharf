@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# clone yskip repo
+# clone yskip repository
 cd ../
 git clone https://github.com/yahoojapan/yskip.git
 cd yskip
@@ -10,5 +10,5 @@ cd yskip
 make
 sudo make install
 
-# remove repo
+# remove repository
 rm -rf ../yskip

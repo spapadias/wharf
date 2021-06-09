@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # script options
-clean_build=True
+clean_build=False
 
 # execution options
 walk_model="deepwalk"             # deepwalk | node2vec
 paramP=0.2                        # node2vec paramP
 paramQ=0.7                        # node2vec paramQ
 sampler_init_strategy="weight"    # random | burnin | weight
-declare -a graphs=("email-graph" "aspen-paper-graph")
-declare -a walks_per_node=(40 80 120)
-declare -a walk_length=(20 40 60)
+declare -a graphs=("email-graph")
+declare -a walks_per_node=(40)
+declare -a walk_length=(60)
 
 # convert graphs in adjacency graph format if necessary
 for graph in "${graphs[@]}"; do
@@ -19,7 +19,7 @@ for graph in "${graphs[@]}"; do
       echo 'Skipping conversion of a graph ' "${graph[@]}" ' to adjacency graph format!'
   else
       echo 'Converting graph ' "${graph[@]}" ' to adjacency graph format ...'
-      ./SNAPtoAdj -s -f "../data/${graph}" "../data/${graph}.adj"
+      ./../bin/SNAPtoAdj -s -f "../data/${graph}" "../data/${graph}.adj"
       echo 'Graph ' "${graph[@]}" ' converted to adjacency graph format!'
   fi
 done

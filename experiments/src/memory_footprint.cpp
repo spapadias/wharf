@@ -78,23 +78,29 @@ void memory_footprint(commandLine& command_line)
     dock.create_random_walks();
     dock.memory_footprint();
 
-    std::cout << "Writing " << config::walks_per_vertex * dock.number_of_vertices() << " walks to a file" << std::endl << std::endl;
-    ofstream walks;
-    walks.open ("data/walks.txt");
-
-    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
+    std::cout << "Writing " << config::walks_per_vertex * dock.number_of_vertices() << " walks to a file" << std::endl;
+    
+    parallel_for(0, config::walks_per_vertex * dock.number_of_vertices(), [&](types::WalkID walk_id)
     {
-        if (i % 1000000 == 0) std::cout << "Written " << i << " walks" << std::endl;
-        walks << dock.rewalk(i) << '\n';
-    }
+        std::ofstream outfile;
+        std::stringstream ss;
+        ss << "data/" << std::this_thread::get_id() << ".txt";
 
-    walks.close();
+        outfile.open(ss.str(), std::ios::out | std::ios::app);
+        outfile << dock.rewalk(walk_id) << '\n';
+    });
+
     std::cout << std::endl;
 
+    std::cout << "Concatenating files ..." << std::endl;
+    std::string command = "cat data/*.txt >> data/walks; rm -rf data/*.txt";
+    system(command.c_str());
+
     std::cout << "Writing walks into PAM inverted index ..." << std::endl << std::endl;
-    std::string command = "./inverted_index_pam -f data/walks.txt ";
+    command = "./inverted_index_pam -f data/walks";
     system(command.c_str());
 }
+
 
 int main(int argc, char** argv)
 {

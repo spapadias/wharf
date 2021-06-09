@@ -64,7 +64,7 @@ set(GTEST_LIBRARIES libgtest libgtest_main libgmock)
 # ---------------------------------------------------- TEST DATA -------------------------------------------------------
 
 file(COPY ../experiments/data DESTINATION .)
-file(COPY ../experiments/scripts/SNAPtoAdj DESTINATION .)
+file(COPY ../experiments/bin/SNAPtoAdj DESTINATION .)
 
 # -------------------------------------------------- COMPILE FLAGS -----------------------------------------------------
 
