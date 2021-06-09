@@ -82,8 +82,6 @@ void memory_footprint(commandLine& command_line)
 
     parallel_for(0, config::walks_per_vertex * dock.number_of_vertices(), [&](types::WalkID walk_id)
     {
-        if(walk_id % 1000000 == 0) std::cout << "Written " << walk_id << " walks ..." << std::endl;
-
         std::ofstream outfile;
         std::stringstream ss;
         ss << "data/" << std::this_thread::get_id() << ".txt";
