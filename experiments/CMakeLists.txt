@@ -42,5 +42,6 @@ file(COPY bin/inverted_index_pam DESTINATION .)
 
 # EXPERIMENS EXECUTABLES
 add_executable(memory_footprint src/memory_footprint.cpp)
+add_executable(throughput src/throughput.cpp)
 
 # -------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING WITH METROPOLIS HASTINGS ----------------------------
