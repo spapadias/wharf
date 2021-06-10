@@ -93,11 +93,14 @@ void memory_footprint(commandLine& command_line)
     std::cout << std::endl;
 
     std::cout << "Concatenating files ..." << std::endl;
-    std::string command = "cat data/*.txt >> data/walks; rm -rf data/*.txt";
+    std::string command = "cat data/*.txt >> data/walks.txt;";
     system(command.c_str());
 
     std::cout << "Writing walks into PAM inverted index ..." << std::endl << std::endl;
-    command = "./inverted_index_pam -f data/walks";
+    command = "./inverted_index_pam -f data/walks.txt";
+    system(command.c_str());
+
+    command = "rm -rf data/*.txt";
     system(command.c_str());
 }
 
