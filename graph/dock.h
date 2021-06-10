@@ -366,11 +366,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             */
             void insert_edges_batch(size_t m, std::tuple<uintV, uintV>* edges, bool sorted = false, bool remove_dups = false, size_t nn = std::numeric_limits<size_t>::max(), bool apply_walk_updates = true, bool run_seq = false)
             {
-                #ifdef DOCK_TIMER
-                    timer graph_update_time("Dock::InsertEdgesBatch::GraphUpdateTime");
-                    timer walk_update_time("Dock::InsertEdgesBatch::WalkUpdateTime");
-                #endif
-
                 auto fl = run_seq ? pbbs::fl_sequential : pbbs::no_flag;
 
                 // 1. Set up
@@ -472,25 +467,13 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     return VertexEntry(union_edge_tree, a.compressed_walks, a.sampler_manager);
                 };
 
-                #ifdef DOCK_TIMER
-                    graph_update_time.start();
-                #endif
-
+                graph_update_timer_insert.start();
                 this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, new_verts, num_starts, replace, true, run_seq);
+                graph_update_timer_insert.stop();
 
-                #ifdef DOCK_TIMER
-                    graph_update_time.stop();
-                #endif
-
-                #ifdef DOCK_TIMER
-                    walk_update_time.start();
-                #endif
-
+                walk_update_timer_insert.start();
                 if (apply_walk_updates) this->batch_walk_update(rewalk_points);
-
-                #ifdef DOCK_TIMER
-                    walk_update_time.stop();
-                #endif
+                walk_update_timer_insert.stop();
 
                 // 6. Deallocate memory
                 if (num_starts > stack_size) pbbs::free_array(new_verts);
@@ -513,11 +496,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                     table.unlock();
                 #endif
-
-                #ifdef DOCK_TIMER
-                    graph_update_time.reportTotal("time(seconds)");
-                    walk_update_time.reportTotal("time(seconds)");
-                #endif
             }
 
             /**
@@ -532,11 +510,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             */
             void delete_edges_batch(size_t m, tuple<uintV, uintV>* edges, bool sorted = false, bool remove_dups = false, size_t nn = std::numeric_limits<size_t>::max(), bool apply_walk_updates = true, bool run_seq = false)
             {
-                #ifdef DOCK_TIMER
-                    timer graph_update_time("Dock::DeleteEdgesBatch::GraphUpdateTime");
-                    timer walk_update_time("Dock::DeleteEdgesBatch::WalkUpdateTime");
-                #endif
-
                 auto fl = run_seq ? pbbs::fl_sequential : pbbs::no_flag;
 
                 // 1. Set up
@@ -638,25 +611,13 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     return VertexEntry(difference_edge_tree, a.compressed_walks, a.sampler_manager);
                 };
 
-                #ifdef DOCK_TIMER
-                    graph_update_time.start();
-                #endif
-
+                graph_update_timer_delete.start();
                 this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, new_verts, num_starts, replace, true, run_seq);
+                graph_update_timer_delete.stop();
 
-                #ifdef DOCK_TIMER
-                    graph_update_time.stop();
-                #endif
-
-                #ifdef DOCK_TIMER
-                    walk_update_time.start();
-                #endif
-
+                walk_update_timer_delete.start();
                 if (apply_walk_updates) this->batch_walk_update(rewalk_points);
-
-                #ifdef DOCK_TIMER
-                    walk_update_time.stop();
-                #endif
+                walk_update_timer_delete.stop();
 
                 // 6. Deallocate memory
                 if (num_starts > stack_size) pbbs::free_array(new_verts);
@@ -676,11 +637,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                                   << std::get<1>(item.second)
                                   << std::endl;
                     }
-                #endif
-
-                #ifdef DOCK_TIMER
-                    graph_update_time.reportTotal("time(seconds)");
-                    walk_update_time.reportTotal("time(seconds)");
                 #endif
             }
 

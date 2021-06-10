@@ -13,10 +13,10 @@ namespace config
     auto random_walk_model     = types::RandomWalkModelType::NODE2VEC;
 
     // determines parameter P for node2vec model
-    double paramP               = 0.7;
+    double paramP              = 0.7;
 
     // determines parameter Q for node2vec model
-    double paramQ               = 0.3;
+    double paramQ              = 0.3;
 
     // determines the initialization strategy for metropolis hastings samplers
     auto sampler_init_strategy = types::SamplerInitStartegy::WEIGHT;

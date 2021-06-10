@@ -18,7 +18,8 @@ void memory_footprint(commandLine& command_line)
     config::walks_per_vertex = walks_per_vertex;
     config::walk_length      = length_of_walks;
 
-    std::cout << "Walks per vertex: " << (int) config::walks_per_vertex << " | " << "Walk length: " <<  (int) config::walk_length << std::endl;
+    std::cout << "Walks per vertex: " << (int) config::walks_per_vertex << std::endl;
+    std::cout << "Walk length: " << (int) config::walk_length << std::endl;
 
     if (model == "deepwalk")
     {
@@ -64,15 +65,11 @@ void memory_footprint(commandLine& command_line)
         std::exit(1);
     }
 
-    std::cout << std::endl;
-
     size_t n;
     size_t m;
     uintE* offsets;
     uintV* edges;
-    std::cout << "Reading Unweighted Graph" << std::endl;
     std::tie(n, m, offsets, edges) = read_unweighted_graph(fname.c_str(), is_symmetric, mmap);
-    std::cout << "Read Unweighted Graph" << std::endl;
 
     dygrl::Dock dock = dygrl::Dock(n, m, offsets, edges);
     dock.create_random_walks();
@@ -90,13 +87,11 @@ void memory_footprint(commandLine& command_line)
         outfile << dock.rewalk(walk_id) << '\n';
     });
 
-    std::cout << std::endl;
-
     std::cout << "Concatenating files ..." << std::endl;
     std::string command = "cat data/*.txt >> data/walks.txt;";
     system(command.c_str());
 
-    std::cout << "Writing walks into PAM inverted index ..." << std::endl << std::endl;
+    std::cout << "Writing walks into PAM inverted index ..." << std::endl;
     command = "./inverted_index_pam -f data/walks.txt";
     system(command.c_str());
 
