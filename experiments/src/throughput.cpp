@@ -75,21 +75,26 @@ void throughput(commandLine& command_line)
     dygrl::Dock dock = dygrl::Dock(n, m, offsets, edges);
     dock.create_random_walks();
 
-    auto batch_sizes = pbbs::sequence<size_t>(6);
+    auto batch_sizes = pbbs::sequence<size_t>(5);
     batch_sizes[0] = std::pow(10, 1);
     batch_sizes[1] = std::pow(10, 2);
     batch_sizes[2] = std::pow(10, 3);
     batch_sizes[3] = std::pow(10, 4);
     batch_sizes[4] = std::pow(10, 5);
-    batch_sizes[5] = std::pow(10, 6);
-//    batch_sizes[6] = std::pow(10, 7);
-//    batch_sizes[7] = std::pow(10, 8);
-//    batch_sizes[8] = std::pow(10, 9);
+    //batch_sizes[5] = std::pow(10, 6);
+    //batch_sizes[6] = std::pow(10, 7);
+    //batch_sizes[7] = std::pow(10, 8);
+    //batch_sizes[8] = std::pow(10, 9);
 
     for (short int i = 0; i < batch_sizes.size(); i++)
     {
         timer insert_timer("InsertTimer");
         timer delete_timer("DeleteTimer");
+
+        graph_update_timer_insert.reset();
+        walk_update_timer_insert.reset();
+        graph_update_timer_delete.reset();
+        walk_update_timer_delete.reset();
 
         std::cout << "Batch size = " << 2*batch_sizes[i] << " | ";
 
@@ -100,17 +105,13 @@ void throughput(commandLine& command_line)
 
             std::cout << edges.second << " ";
 
-            {
-                insert_timer.start();
-                dock.insert_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
-                insert_timer.stop();
-            }
+            insert_timer.start();
+            dock.insert_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
+            insert_timer.stop();
 
-            {
-                delete_timer.start();
-                dock.delete_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
-                delete_timer.stop();
-            }
+            delete_timer.start();
+            dock.delete_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
+            delete_timer.stop();
         }
 
         std::cout << std::endl;
