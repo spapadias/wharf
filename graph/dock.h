@@ -734,11 +734,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                             });
 
                             current_vertex_new_walk = state.first;
-
-                            if (current_vertex_new_walk == 0 || current_vertex_new_walk == 1)
-                            {
-                                std::cout << state.first << " | " << state.second << " | " << (int) position << " | " << (int) current_position << std::endl;
-                            }
                         }
                     }
 
