@@ -608,7 +608,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         }
                     });
 
-                    return VertexEntry(difference_edge_tree, a.compressed_walks, a.sampler_manager);
+                    return VertexEntry(difference_edge_tree, a.compressed_walks, b.sampler_manager);
                 };
 
                 graph_update_timer_delete.start();
@@ -677,53 +677,72 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 parallel_for(0, affected_walks.size(), [&](auto index)
                 {
                     auto entry = rewalk_points.template find(affected_walks[index]);
-                    auto current_position = std::get<0>(entry);
 
+                    auto current_position        = std::get<0>(entry);
                     auto current_vertex_old_walk = std::get<1>(entry);
                     auto current_vertex_new_walk = current_vertex_old_walk;
 
-                    std::cout << "DEBUG: " << (int) current_position << "," << current_vertex_new_walk << std::endl;
+                    auto state = types::State();
 
-                    auto state = model->initial_state(current_vertex_new_walk);
-
-                    if (config::random_walk_model == types::NODE2VEC && current_position > 0)
+                    if (graph[current_vertex_new_walk].degrees == 0)
                     {
-                        state.first = current_vertex_new_walk;
-                        state.second = this->vertex_at_walk(affected_walks[index], current_position - 1);
+                        current_vertex_new_walk = current_vertex_old_walk = affected_walks[index] % this->number_of_vertices();
+                        current_position = 0;
+                    }
+
+                    if (graph[current_vertex_new_walk].degrees != 0)
+                    {
+                        state = model->initial_state(current_vertex_new_walk);
+
+                        if (config::random_walk_model == types::NODE2VEC && current_position > 0)
+                        {
+                            state.first = current_vertex_new_walk;
+                            state.second = this->vertex_at_walk(affected_walks[index], current_position - 1);
 //                        std::cout << "WALK: " << affected_walks[index] << " POSITION: " << (int) current_position - 1 << " STATE: " << state.second << std::endl;
+                        }
                     }
 
                     for (types::Position position = current_position; position < config::walk_length; position++)
                     {
                         auto tree_node = this->graph_tree.find(current_vertex_old_walk);
                         auto next_old_walk = tree_node.value.compressed_walks.find_next(affected_walks[index], position, current_vertex_old_walk);
-
-                        if (!graph[state.first].samplers->contains(state.second))
-                        {
-                            graph[state.first].samplers->insert(state.second, MetropolisHastingsSampler(state, model));
-                        }
-
-                        state = graph[state.first].samplers->find(state.second).sample(state, model);
-
-                        types::PairedTriplet hash_insert = pairings::Szudzik<types::Vertex>::pair({affected_walks[index]*config::walk_length + position, state.first});
                         types::PairedTriplet hash_delete = pairings::Szudzik<types::Vertex>::pair({affected_walks[index]*config::walk_length + position, next_old_walk});
 
                         if (!deletes.contains(current_vertex_old_walk)) deletes.insert(current_vertex_old_walk, std::vector<types::PairedTriplet>());
-                        if (!inserts.contains(current_vertex_new_walk)) inserts.insert(current_vertex_new_walk, std::vector<types::PairedTriplet>());
 
                         deletes.update_fn(current_vertex_old_walk, [&](auto& vector)
                         {
                             vector.push_back(hash_delete);
                         });
 
-                        inserts.update_fn(current_vertex_new_walk, [&](auto& vector)
-                        {
-                            vector.push_back(hash_insert);
-                        });
-
-                        current_vertex_new_walk = state.first;
                         current_vertex_old_walk = next_old_walk;
+
+                        if (graph[current_vertex_new_walk].degrees != 0)
+                        {
+                            if (!graph[state.first].samplers->contains(state.second))
+                            {
+                                graph[state.first].samplers->insert(state.second, MetropolisHastingsSampler(state, model));
+                            }
+
+                            state = graph[state.first].samplers->find(state.second).sample(state, model);
+                            types::PairedTriplet hash_insert = pairings::Szudzik<types::Vertex>::pair({affected_walks[index]*config::walk_length + position, state.first});
+                            if (!inserts.contains(current_vertex_new_walk)) inserts.insert(current_vertex_new_walk, std::vector<types::PairedTriplet>());
+
+                            inserts.update_fn(current_vertex_new_walk, [&](auto& vector)
+                            {
+                                vector.push_back(hash_insert);
+                            });
+
+                            current_vertex_new_walk = state.first;
+
+                            if (current_vertex_new_walk == 0 || current_vertex_new_walk == 1)
+                            {
+                                std::cout << state.first << " | " << state.second << " | " << (int) position << " | " << (int) current_position << std::endl;
+                            }
+                        }
                     }
+
+                    std::cout << std::endl;
                 });
 
                 using VertexStruct  = std::pair<types::Vertex, VertexEntry>;

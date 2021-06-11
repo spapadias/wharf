@@ -197,5 +197,10 @@ TEST_F(DockTest, Testing)
         auto edges = utility::generate_batch_of_edges(batch_sizes[i], total_vertices, false, false);
         dock.delete_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
     }
+
+    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
+    {
+        std::cout << dock.rewalk(i) << std::endl;
+    }
 }
 
