@@ -670,7 +670,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         model = new Node2Vec(&graph, config::paramP, config::paramQ);
                         break;
                     default:
-                        std::cerr << "Unrecognized random walking model" << std::endl;
+                        std::cerr << "Unrecognized random walking model!" << std::endl;
                         std::exit(1);
                 }
 
@@ -681,6 +681,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                     auto current_vertex_old_walk = std::get<1>(entry);
                     auto current_vertex_new_walk = current_vertex_old_walk;
+
+                    std::cout << "DEBUG: " << (int) current_position << "," << current_vertex_new_walk << std::endl;
 
                     auto state = model->initial_state(current_vertex_new_walk);
 

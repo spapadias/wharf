@@ -75,14 +75,14 @@ void throughput(commandLine& command_line)
     dygrl::Dock dock = dygrl::Dock(n, m, offsets, edges);
     dock.create_random_walks();
 
-    auto batch_sizes = pbbs::sequence<size_t>(5);
-    batch_sizes[0] = std::pow(10, 1);
-    batch_sizes[1] = std::pow(10, 2);
-    batch_sizes[2] = std::pow(10, 3);
-    batch_sizes[3] = std::pow(10, 4);
-    batch_sizes[4] = std::pow(10, 5);
-    //batch_sizes[5] = std::pow(10, 6);
-    //batch_sizes[6] = std::pow(10, 7);
+    auto batch_sizes = pbbs::sequence<size_t>(1);
+//    batch_sizes[0] = std::pow(10, 1);
+//    batch_sizes[1] = std::pow(10, 2);
+//    batch_sizes[2] = std::pow(10, 3);
+//    batch_sizes[3] = std::pow(10, 4);
+//    batch_sizes[4] = std::pow(10, 5);
+//    batch_sizes[5] = std::pow(10, 6);
+    batch_sizes[0] = std::pow(10, 7);
     //batch_sizes[7] = std::pow(10, 8);
     //batch_sizes[8] = std::pow(10, 9);
 
@@ -105,9 +105,9 @@ void throughput(commandLine& command_line)
 
             std::cout << edges.second << " ";
 
-            insert_timer.start();
-            dock.insert_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
-            insert_timer.stop();
+//            insert_timer.start();
+//            dock.insert_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
+//            insert_timer.stop();
 
             delete_timer.start();
             dock.delete_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
@@ -116,13 +116,13 @@ void throughput(commandLine& command_line)
 
         std::cout << std::endl;
 
-        std::cout << "Average insert time = " << insert_timer.get_total() / n_trials << std::endl;
-        std::cout << "Average graph update insert time = " << graph_update_timer_insert.get_total() / n_trials << std::endl;
-        std::cout << "Average walk update insert time = " << walk_update_timer_insert.get_total() / n_trials << std::endl;
-
-        std::cout << "Average delete time = " << delete_timer.get_total() / n_trials << std::endl;
-        std::cout << "Average graph update delete time = " << graph_update_timer_delete.get_total() / n_trials << std::endl;
-        std::cout << "Average walk update delete time = " << walk_update_timer_delete.get_total() / n_trials << std::endl;
+//        std::cout << "Average insert time = " << insert_timer.get_total() / n_trials << std::endl;
+//        std::cout << "Average graph update insert time = " << graph_update_timer_insert.get_total() / n_trials << std::endl;
+//        std::cout << "Average walk update insert time = " << walk_update_timer_insert.get_total() / n_trials << std::endl;
+//
+//        std::cout << "Average delete time = " << delete_timer.get_total() / n_trials << std::endl;
+//        std::cout << "Average graph update delete time = " << graph_update_timer_delete.get_total() / n_trials << std::endl;
+//        std::cout << "Average walk update delete time = " << walk_update_timer_delete.get_total() / n_trials << std::endl;
 
         std::cout << std::endl;
     }

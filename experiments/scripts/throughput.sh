@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # script options
-clean_build=True
+clean_build=False
 
 # execution options
 walk_model="deepwalk"             # deepwalk | node2vec
