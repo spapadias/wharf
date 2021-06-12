@@ -75,9 +75,12 @@ TEST_F(DockTest, DockConstructor)
         ASSERT_EQ(flat_snapshot[i].compressed_walks.root, nullptr);
         ASSERT_EQ(flat_snapshot[i].compressed_walks.size(), 0);
 
-        auto edges = flat_snapshot[i].compressed_edges.get_edges(i);
+        // assert empty samplers
+        ASSERT_EQ(flat_snapshot[i].sampler_manager->size(), 0);
 
         // assert expected neighbours
+        auto edges = flat_snapshot[i].compressed_edges.get_edges(i);
+
         for(auto j = 0; j < degree; j++)
         {
             bool flag = false;
@@ -118,12 +121,12 @@ TEST_F(DockTest, InsertBatchOfEdges)
     auto start_edges = dock.number_of_edges();
 
     // geneate edges
-    auto edges = utility::generate_batch_of_edges(5 * dock.number_of_vertices(), dock.number_of_vertices(), false, false);
+    auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
     auto generated_edges = edges.first;
     auto edges_generated = edges.second;
 
     // insert batch of edges
-    dock.insert_edges_batch(edges_generated, generated_edges, true, false);
+    dock.insert_edges_batch(edges_generated, generated_edges, true, false, std::numeric_limits<size_t>::max(), false);
 
     std::cout << "Edges before batch insert: " << start_edges << std::endl;
     std::cout << "Edges after batch insert: "  << dock.number_of_edges() << std::endl;
@@ -139,12 +142,12 @@ TEST_F(DockTest, DeleteBatchOfEdges)
     auto start_edges = dock.number_of_edges();
 
     // geneate edges
-    auto edges = utility::generate_batch_of_edges(5 * dock.number_of_vertices(), dock.number_of_vertices(), false, false);
+    auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
     auto generated_edges = edges.first;
     auto edges_generated = edges.second;
 
     // insert batch of edges
-    dock.delete_edges_batch(edges_generated, generated_edges, true, false);
+    dock.delete_edges_batch(edges_generated, generated_edges, true, false, std::numeric_limits<size_t>::max(), false);
 
     std::cout << "Edges before batch delete: " << start_edges << std::endl;
     std::cout << "Edges after batch delete: " << dock.number_of_edges() << std::endl;
@@ -153,25 +156,78 @@ TEST_F(DockTest, DeleteBatchOfEdges)
     ASSERT_LE(dock.number_of_edges(), start_edges);
 }
 
-TEST_F(DockTest, UpdateRandomWalks)
+TEST_F(DockTest, UpdateRandomWalksOnInsertEdges)
 {
     // create graph and walks
     dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
     dock.create_random_walks();
 
+    // print random walks
     for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
     {
         std::cout << dock.rewalk(i) << std::endl;
     }
 
     // geneate edges
-    auto edges = utility::generate_batch_of_edges(5 * dock.number_of_vertices(), dock.number_of_vertices(), false, false);
+    auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
     auto generated_edges = edges.first;
     auto edges_generated = edges.second;
 
     // insert batch of edges
     dock.insert_edges_batch(edges_generated, generated_edges, true, false);
 
+    // print updated random walks
+    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
+    {
+        std::cout << dock.rewalk(i) << std::endl;
+    }
+}
+
+TEST_F(DockTest, UpdateRandomWalksOnDeleteEdges)
+{
+    // create graph and walks
+    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+    dock.create_random_walks();
+
+    // print random walks
+    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
+    {
+        std::cout << dock.rewalk(i) << std::endl;
+    }
+
+    // geneate edges
+    auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
+    auto generated_edges = edges.first;
+    auto edges_generated = edges.second;
+
+    // insert batch of edges
+    dock.delete_edges_batch(edges_generated, generated_edges, true, false);
+
+    // print updated random walks
+    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
+    {
+        std::cout << dock.rewalk(i) << std::endl;
+    }
+}
+
+TEST_F(DockTest, UpdateRandomWalks)
+{
+    // create graph and walks
+    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+    dock.create_random_walks();
+
+    for(int i = 0; i < 20; i++)
+    {
+        // geneate edges
+        auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
+        auto generated_edges = edges.first;
+        auto edges_generated = edges.second;
+
+        dock.insert_edges_batch(edges_generated, generated_edges, true, false);
+        dock.delete_edges_batch(edges_generated, generated_edges, true, false);
+    }
+
+    // print random walks
     for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
     {
         std::cout << dock.rewalk(i) << std::endl;
@@ -180,24 +236,28 @@ TEST_F(DockTest, UpdateRandomWalks)
 
 TEST_F(DockTest, Testing)
 {
+    // create graph and walks
     dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
     dock.create_random_walks();
 
+    // print random walks
     for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
     {
         std::cout << dock.rewalk(i) << std::endl;
     }
 
-    auto batch_sizes = pbbs::sequence<size_t>(1);
-    batch_sizes[0] = std::pow(10, 7);
-
-    for (short int i = 0; i < batch_sizes.size(); i++)
+    for(int i = 0; i < 20; i++)
     {
-        size_t graph_size_pow2 = 1 << (pbbs::log2_up(total_vertices) - 1);
-        auto edges = utility::generate_batch_of_edges(batch_sizes[i], total_vertices, false, false);
-        dock.delete_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
+        // geneate edges
+        auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
+        auto generated_edges = edges.first;
+        auto edges_generated = edges.second;
+
+        dock.insert_edges_batch(edges_generated, generated_edges, true, false);
+        dock.delete_edges_batch(edges_generated, generated_edges, true, false);
     }
 
+    // print random walks
     for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
     {
         std::cout << dock.rewalk(i) << std::endl;

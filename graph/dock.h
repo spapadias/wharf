@@ -464,16 +464,16 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         }
                     });
 
-                    return VertexEntry(union_edge_tree, a.compressed_walks, a.sampler_manager);
+                    return VertexEntry(union_edge_tree, a.compressed_walks, b.sampler_manager);
                 };
 
-                graph_update_timer_insert.start();
+                graph_update_time_on_insert.start();
                 this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, new_verts, num_starts, replace, true, run_seq);
-                graph_update_timer_insert.stop();
+                graph_update_time_on_insert.stop();
 
-                walk_update_timer_insert.start();
+                walk_update_time_on_insert.start();
                 if (apply_walk_updates) this->batch_walk_update(rewalk_points);
-                walk_update_timer_insert.stop();
+                walk_update_time_on_insert.stop();
 
                 // 6. Deallocate memory
                 if (num_starts > stack_size) pbbs::free_array(new_verts);
@@ -601,9 +601,10 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         else
                         {
                             types::Position current_min_pos = get<0>(rewalk_points.find(walk_id));
+
                             if (current_min_pos > position)
                             {
-                                rewalk_points.template insert(walk_id, std::make_tuple(position, v));
+                                rewalk_points.template update(walk_id, std::make_tuple(position, v));
                             }
                         }
                     });
@@ -611,13 +612,13 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     return VertexEntry(difference_edge_tree, a.compressed_walks, b.sampler_manager);
                 };
 
-                graph_update_timer_delete.start();
+                graph_update_time_on_delete.start();
                 this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, new_verts, num_starts, replace, true, run_seq);
-                graph_update_timer_delete.stop();
+                graph_update_time_on_delete.stop();
 
-                walk_update_timer_delete.start();
+                walk_update_time_on_delete.start();
                 if (apply_walk_updates) this->batch_walk_update(rewalk_points);
-                walk_update_timer_delete.stop();
+                walk_update_time_on_delete.stop();
 
                 // 6. Deallocate memory
                 if (num_starts > stack_size) pbbs::free_array(new_verts);
@@ -736,8 +737,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                             current_vertex_new_walk = state.first;
                         }
                     }
-
-                    std::cout << std::endl;
                 });
 
                 using VertexStruct  = std::pair<types::Vertex, VertexEntry>;
