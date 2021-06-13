@@ -1,10 +1,10 @@
 # -------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING WITH METROPOLIS HASTINGS ----------------------------
 
-option(CLANG     "???" OFF)
-option(CILK      "???" OFF)
-option(OPENMP    "???" OFF)
-option(HOMEGROWN "???" OFF)
-option(SERIAL    "???" OFF)
+option(CLANG        OFF)
+option(CILK         OFF)
+option(OPENMP       OFF)
+option(HOMEGROWN    OFF)
+option(SERIAL       OFF)
 
 # compile flags options
 set(OMPFLAGS     "-DOPENMP -fopenmp")
@@ -41,7 +41,7 @@ file(COPY bin/SNAPtoAdj DESTINATION .)
 file(COPY bin/inverted_index_pam DESTINATION .)
 
 # EXPERIMENS EXECUTABLES
-add_executable(memory_footprint src/memory_footprint.cpp)
 add_executable(throughput src/throughput.cpp)
+add_executable(memory_footprint src/memory_footprint.cpp)
 
 # -------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING WITH METROPOLIS HASTINGS ----------------------------
