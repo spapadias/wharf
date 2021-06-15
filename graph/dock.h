@@ -321,6 +321,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     #endif
 
                     if (tree_node.value.compressed_edges.degree() == 0) break;
+                    if (tree_node.value.compressed_edges.degree() == 0 || tree_node.value.compressed_walks.size() == 0) break;
                     current_vertex = tree_node.value.compressed_walks.find_next(walk_id, position, current_vertex);
                 }
 
@@ -471,9 +472,13 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, new_verts, num_starts, replace, true, run_seq);
                 graph_update_time_on_insert.stop();
 
+                std::cout << "BEFORE WALK UPDATE -> does 802292 exists in the tree?" << this->graph_tree.find(802292) << std::endl;
+
                 walk_update_time_on_insert.start();
                 if (apply_walk_updates) this->batch_walk_update(rewalk_points);
                 walk_update_time_on_insert.stop();
+
+                std::cout << "AFTER WALK UPDATE -> does 802292 exists in the tree?" << this->graph_tree.find(802292) << std::endl;
 
                 // 6. Deallocate memory
                 if (num_starts > stack_size) pbbs::free_array(new_verts);
@@ -780,7 +785,9 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     return VertexEntry(x.compressed_edges, dygrl::CompressedWalks(tree_plus.plus, tree_plus.root), x.sampler_manager);
                 };
 
+                std::cout << "BEFORE WALK DELETE ACCUMULATOR -> does 802292 exists in the tree?" << this->graph_tree.find(802292) << std::endl;
                 this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, delete_walks.begin(), delete_walks.size(), replaceD, true);
+                std::cout << "AFTER WALK DELETE ACCUMULATOR -> does 802292 exists in the tree?" << this->graph_tree.find(802292) << std::endl;
 
                 auto replaceI = [&] (const uintV src, const VertexEntry& x, const VertexEntry& y)
                 {
@@ -795,7 +802,9 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     return VertexEntry(x.compressed_edges, dygrl::CompressedWalks(tree_plus.plus, tree_plus.root), x.sampler_manager);
                 };
 
+                std::cout << "BEFORE WALK INSERT ACCUMULATOR -> does 802292 exists in the tree?" << this->graph_tree.find(802292) << std::endl;
                 this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, insert_walks.begin(), insert_walks.size(), replaceI, true);
+                std::cout << "AFTER WALK INSERT ACCUMULATOR -> does 802292 exists in the tree?" << this->graph_tree.find(802292) << std::endl;
             }
 
             /**
