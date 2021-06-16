@@ -1,16 +1,18 @@
 #!/bin/bash
 
 # script options
-clean_build=False
+clean_build=True                            # cleans build folder after the execution
 
 # execution options
 walk_model="deepwalk"                       # deepwalk | node2vec
-paramP=0.2                                  # node2vec paramP
-paramQ=0.7                                  # node2vec paramQ
+paramP=0.2                                  # node2vec's paramP
+paramQ=0.7                                  # node2vec's paramQ
 sampler_init_strategy="random"              # random | burnin | weight
-declare -a graphs=("email-graph")
-declare -a walks_per_node=(1)
-declare -a walk_length=(10)
+vector_dimension=120                        # size of learned vectors
+learning_strategy=2                         # 1: online | 2: mini-batch (default)
+declare -a graphs=("email-graph")           # array of graphs
+declare -a walks_per_vertex=(1)             # walks per vertex to generate
+declare -a walk_length=(10)                 # length of one walk
 
 # 1. convert graphs in adjacency graph format if necessary
 for graph in "${graphs[@]}"; do
@@ -29,14 +31,13 @@ mkdir -p ../../build;
 cd ../../build;
 cmake -DCMAKE_BUILD_TYPE=Release ..;
 cd experiments;
-
-make vertex_classification
+make vertex-classification
 
 # 3. execute experiments
-for wpv in "${walks_per_node[@]}"; do
+for wpv in "${walks_per_vertex[@]}"; do
     for wl in "${walk_length[@]}"; do
         for graph in "${graphs[@]}"; do
-            time ./vertex_classification -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}"
+            time ./vertex-classification -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}" -d "${vector_dimension}" -le "${learning_strategy}"
         done
     done
 done

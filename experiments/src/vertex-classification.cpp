@@ -13,11 +13,30 @@ void vertex_classification(commandLine& command_line)
     double paramQ           = command_line.getOptionDoubleValue("-paramQ", config::paramQ);
     string init_strategy    = string(command_line.getOptionValue("-init", "weight"));
 
+    size_t vector_dimension = command_line.getOptionLongValue("-d", 100);
+    size_t learning_strategy = command_line.getOptionLongValue("-le", 2);
+
     config::walks_per_vertex = walks_per_vertex;
     config::walk_length      = length_of_walks;
 
     std::cout << "Walks per vertex: " << (int) config::walks_per_vertex << std::endl;
     std::cout << "Walk length: " << (int) config::walk_length << std::endl;
+    std::cout << "Vector dimension: " << vector_dimension << std::endl;
+    std::cout << "Learning strategy: ";
+
+    if(learning_strategy == 1)
+    {
+        std::cout << "Online" << std::endl;
+    }
+    else if(learning_strategy == 2)
+    {
+        std::cout << "Mini-Batch" << std::endl;
+    }
+    else
+    {
+        std::cerr << "Unrecognized learning strategy! Abort" << std::endl;
+        std::exit(1);
+    }
 
     if (model == "deepwalk")
     {
@@ -74,17 +93,19 @@ void vertex_classification(commandLine& command_line)
 
     std::cout << "Learning embeddings..." << std::endl;
 
-    stringstream stream;
-    stream << "printf '";
+    stringstream command; command << "printf '";
 
     for(int i = 0; i < n * walks_per_vertex; i++)
     {
-        stream << dock.rewalk(i) << std::endl;
+        command << dock.rewalk(i) << std::endl;
     }
 
-    stream << "'";
-    stream << " | yskip - model";
-    system(stream.str().c_str());
+    command << "' | yskip --thread-num=" << num_workers();
+    if (std::ifstream("model")) command << " --initial-model=model";
+    command << " -d " << vector_dimension  << " -l " << learning_strategy << " - model";
+
+    std::cout << command.str() << std::endl;
+    system(command.str().c_str());
 }
 
 int main(int argc, char** argv)
