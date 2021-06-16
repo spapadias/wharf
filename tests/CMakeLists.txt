@@ -69,12 +69,12 @@ file(COPY ../experiments/bin/SNAPtoAdj DESTINATION .)
 # -------------------------------------------------- COMPILE FLAGS -----------------------------------------------------
 
 # build options
-option(CLANG        "???"               OFF)
-option(CILK         "???"               OFF)
-option(OPENMP       "???"               OFF)
-option(HOMEGROWN    "???"               OFF)
-option(DOCK_DEBUG   "Dock debug mode"   OFF)
-option(SERIAL       "???"               OFF)
+option(CLANG        OFF)
+option(CILK         OFF)
+option(OPENMP       OFF)
+option(HOMEGROWN    OFF)
+option(DOCK_DEBUG   OFF)
+option(SERIAL       OFF)
 
 set(SERIAL ON)
 set(DOCK_DEBUG ON)
@@ -109,7 +109,7 @@ endif()
 
 # set compile flags
 if (DOCK_DEBUG)
-    set(CMAKE_CXX_FLAGS "${DOCK_DEBUG_FLAGS} ${PFLAGS} -DDOCK_DEBUG -DDOCK_TIMER -DVERTEXLONG") # -DDOCK_DEBUG -DDOCK_TIMER
+    set(CMAKE_CXX_FLAGS "${DOCK_DEBUG_FLAGS} ${PFLAGS} -DDOCK_DEBUG -DDOCK_TIMER") # -DDOCK_DEBUG -DDOCK_TIMER -DVERTEXLONG
 else()
     set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS}")
 endif()
