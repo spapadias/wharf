@@ -15,7 +15,7 @@ class DockTest : public testing::Test
         uintE* offsets;
         bool mmap = false;
         bool is_symmetric = true;
-        std::string default_file_path = "data/wiki-graph";
+        std::string default_file_path = "data/aspen-paper-graph";
 };
 
 void DockTest::SetUp()
@@ -72,8 +72,8 @@ TEST_F(DockTest, DockConstructor)
         ASSERT_EQ(flat_snapshot[i].compressed_edges.degree(), degree);
 
         // assert that compressed_walks_tree is empty
-        ASSERT_EQ(flat_snapshot[i].compressed_walks.root, nullptr);
-        ASSERT_EQ(flat_snapshot[i].compressed_walks.size(), 0);
+        ASSERT_EQ(flat_snapshot[i].inverted_index.proxy.root, nullptr);
+        ASSERT_EQ(flat_snapshot[i].inverted_index.proxy.size(), 0);
 
         // assert empty samplers
         ASSERT_EQ(flat_snapshot[i].sampler_manager->size(), 0);
@@ -114,118 +114,125 @@ TEST_F(DockTest, DockDestructor)
     ASSERT_EQ(flat_snapshot.size(), 0);
 }
 
-TEST_F(DockTest, InsertBatchOfEdges)
-{
-    // create wharf instance (vertices & edges)
-    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
-    auto start_edges = dock.number_of_edges();
+//TEST_F(DockTest, InsertBatchOfEdges)
+//{
+//    // create wharf instance (vertices & edges)
+//    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+//    auto start_edges = dock.number_of_edges();
+//
+//    // geneate edges
+//    auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
+//
+//    // insert batch of edges
+//    dock.insert_edges_batch(edges.second, edges.first, true, false, std::numeric_limits<size_t>::max(), false);
+//
+//    std::cout << "Edges before batch insert: " << start_edges << std::endl;
+//    std::cout << "Edges after batch insert: "  << dock.number_of_edges() << std::endl;
+//
+//    // assert edge insertion
+//    ASSERT_GE(dock.number_of_edges(), start_edges);
+//}
 
-    // geneate edges
-    auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
+//TEST_F(DockTest, DeleteBatchOfEdges)
+//{
+//    // create wharf instance (vertices & edges)
+//    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+//    auto start_edges = dock.number_of_edges();
+//
+//    // geneate edges
+//    auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
+//
+//    // insert batch of edges
+//    dock.delete_edges_batch(edges.second, edges.first, true, false, std::numeric_limits<size_t>::max(), false);
+//
+//    std::cout << "Edges before batch delete: " << start_edges << std::endl;
+//    std::cout << "Edges after batch delete: " << dock.number_of_edges() << std::endl;
+//
+//    // assert edge deletion
+//    ASSERT_LE(dock.number_of_edges(), start_edges);
+//}
+//
+//TEST_F(DockTest, UpdateRandomWalksOnInsertEdges)
+//{
+//    // create graph and walks
+//    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+//    dock.create_random_walks();
+//
+//    // print random walks
+//    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
+//    {
+//        std::cout << dock.rewalk(i) << std::endl;
+//    }
+//
+//    // geneate edges
+//    auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
+//
+//    // insert batch of edges
+//    dock.insert_edges_batch(edges.second, edges.first, true, false);
+//
+//    // print updated random walks
+//    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
+//    {
+//        std::cout << dock.rewalk(i) << std::endl;
+//    }
+//}
+//
+//TEST_F(DockTest, UpdateRandomWalksOnDeleteEdges)
+//{
+//    // create graph and walks
+//    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+//    dock.create_random_walks();
+//
+//    // print random walks
+//    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
+//    {
+//        std::cout << dock.rewalk(i) << std::endl;
+//    }
+//
+//    // geneate edges
+//    auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
+//
+//    // insert batch of edges
+//    dock.delete_edges_batch(edges.second, edges.first, true, false);
+//
+//    // print updated random walks
+//    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
+//    {
+//        std::cout << dock.rewalk(i) << std::endl;
+//    }
+//}
+//
+//TEST_F(DockTest, UpdateRandomWalks)
+//{
+//    // create graph and walks
+//    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+//    dock.create_random_walks();
+//
+//    // print random walks
+//    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
+//    {
+//        std::cout << dock.rewalk(i) << std::endl;
+//    }
+//
+//    for(int i = 0; i < 10; i++)
+//    {
+//        // geneate edges
+//        auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
+//
+//        dock.insert_edges_batch(edges.second, edges.first, true, false);
+//        dock.delete_edges_batch(edges.second, edges.first, true, false);
+//    }
+//
+//    // print random walks
+//    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
+//    {
+//        std::cout << dock.rewalk(i) << std::endl;
+//    }
+//}
 
-    // insert batch of edges
-    dock.insert_edges_batch(edges.second, edges.first, true, false, std::numeric_limits<size_t>::max(), false);
-
-    std::cout << "Edges before batch insert: " << start_edges << std::endl;
-    std::cout << "Edges after batch insert: "  << dock.number_of_edges() << std::endl;
-
-    // assert edge insertion
-    ASSERT_GE(dock.number_of_edges(), start_edges);
-}
-
-TEST_F(DockTest, DeleteBatchOfEdges)
-{
-    // create wharf instance (vertices & edges)
-    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
-    auto start_edges = dock.number_of_edges();
-
-    // geneate edges
-    auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
-
-    // insert batch of edges
-    dock.delete_edges_batch(edges.second, edges.first, true, false, std::numeric_limits<size_t>::max(), false);
-
-    std::cout << "Edges before batch delete: " << start_edges << std::endl;
-    std::cout << "Edges after batch delete: " << dock.number_of_edges() << std::endl;
-
-    // assert edge deletion
-    ASSERT_LE(dock.number_of_edges(), start_edges);
-}
-
-TEST_F(DockTest, UpdateRandomWalksOnInsertEdges)
+TEST_F(DockTest, DEV)
 {
     // create graph and walks
     dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
     dock.create_random_walks();
-
-    // print random walks
-    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
-    {
-        std::cout << dock.rewalk(i) << std::endl;
-    }
-
-    // geneate edges
-    auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
-
-    // insert batch of edges
-    dock.insert_edges_batch(edges.second, edges.first, true, false);
-
-    // print updated random walks
-    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
-    {
-        std::cout << dock.rewalk(i) << std::endl;
-    }
-}
-
-TEST_F(DockTest, UpdateRandomWalksOnDeleteEdges)
-{
-    // create graph and walks
-    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
-    dock.create_random_walks();
-
-    // print random walks
-    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
-    {
-        std::cout << dock.rewalk(i) << std::endl;
-    }
-
-    // geneate edges
-    auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
-
-    // insert batch of edges
-    dock.delete_edges_batch(edges.second, edges.first, true, false);
-
-    // print updated random walks
-    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
-    {
-        std::cout << dock.rewalk(i) << std::endl;
-    }
-}
-
-TEST_F(DockTest, UpdateRandomWalks)
-{
-    // create graph and walks
-    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
-    dock.create_random_walks();
-
-    // print random walks
-    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
-    {
-        std::cout << dock.rewalk(i) << std::endl;
-    }
-
-    for(int i = 0; i < 10; i++)
-    {
-        // geneate edges
-        auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
-
-        dock.insert_edges_batch(edges.second, edges.first, true, false);
-        dock.delete_edges_batch(edges.second, edges.first, true, false);
-    }
-
-    // print random walks
-    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
-    {
-        std::cout << dock.rewalk(i) << std::endl;
-    }
 }

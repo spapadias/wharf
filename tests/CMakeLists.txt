@@ -117,7 +117,7 @@ endif()
 # ------------------------------------------------------ TESTS ---------------------------------------------------------
 
 # Dock tests
-add_executable(dock dock.cpp)
+add_executable(dock dock.cpp ../walks/inverted_index.h)
 target_link_libraries(dock ${GTEST_LIBRARIES})
 add_test(NAME wharf COMMAND dock)
 
