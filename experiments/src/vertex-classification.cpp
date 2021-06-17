@@ -2,12 +2,11 @@
 
 void vertex_classification(commandLine& command_line)
 {
-    // 1. graph input parameters
+    // 1. collect command line parameters
     string fname             = string(command_line.getOptionValue("-f", "email-graph"));
     bool mmap                = command_line.getOption("-m");
     bool is_symmetric        = command_line.getOption("-s");
 
-    // 2. model input parameters
     size_t walks_per_vertex  = command_line.getOptionLongValue("-w", config::walks_per_vertex);
     size_t length_of_walks   = command_line.getOptionLongValue("-l", config::walk_length);
     string model             = string(command_line.getOptionValue("-model", "deepwalk"));
@@ -17,6 +16,7 @@ void vertex_classification(commandLine& command_line)
     size_t vector_dimension  = command_line.getOptionLongValue("-d", 100);
     size_t learning_strategy = command_line.getOptionLongValue("-le", 2);
 
+    // 2. set up command line parameters
     config::walks_per_vertex = walks_per_vertex;
     config::walk_length      = length_of_walks;
 
@@ -103,10 +103,7 @@ void vertex_classification(commandLine& command_line)
 
     command << "' | yskip --thread-num=" << num_workers();
     if (std::ifstream("model")) command << " --initial-model=model";
-    command << " -d " << vector_dimension  << " -l " << learning_strategy << " - model";
-    system(command.str().c_str());
-
-    command.str("");
+    command << " -d " << vector_dimension  << " -l " << learning_strategy << " - model;";
     command << "perl to_word2vec.pl < model > model.w2v";
     system(command.str().c_str());
 }

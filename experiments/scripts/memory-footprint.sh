@@ -1,18 +1,18 @@
 #!/bin/bash
 
 # script options
-clean_build=True
+clean_build=True                         # cleans build folder after the execution
 
 # execution options
-walk_model="deepwalk"             # deepwalk | node2vec
-paramP=0.2                        # node2vec paramP
-paramQ=0.7                        # node2vec paramQ
-sampler_init_strategy="random"    # random | burnin | weight
-declare -a graphs=("email-graph")
-declare -a walks_per_node=(5 10 15)
-declare -a walk_length=(20 40 80)
+walk_model="deepwalk"                    # deepwalk | node2vec
+paramP=0.2                               # node2vec's paramP
+paramQ=0.7                               # node2vec's paramQ
+sampler_init_strategy="random"           # random | burnin | weight
+declare -a graphs=("aspen-paper-graph")  # array of graphs
+declare -a walks_per_vertex=(5 10 15)    # walks per vertex to generate
+declare -a walk_length=(20 40 80)        # length of one walk
 
-# convert graphs in adjacency graph format if necessary
+# 1. convert graphs in adjacency graph format if necessary
 for graph in "${graphs[@]}"; do
   FILE=../data/"${graph}".adj
   if test -f "$FILE"; then
@@ -24,24 +24,25 @@ for graph in "${graphs[@]}"; do
   fi
 done
 
-# create the build directory
-mkdir -p ../../cmake-build; cd ../../cmake-build; cmake -DCMAKE_BUILD_TYPE=Release ..; cd experiments;
+# 2. build the executable
+mkdir -p ../../build;
+cd ../../build;
+cmake -DCMAKE_BUILD_TYPE=Release ..;
+cd experiments;
+make memory-footprint
 
-# build the learn embeddings experiment
-make memory_footprint
-
-# execute experiments
-for wpv in "${walks_per_node[@]}"; do
+# 3. execute experiments
+for wpv in "${walks_per_vertex[@]}"; do
     for wl in "${walk_length[@]}"; do
         for graph in "${graphs[@]}"; do
             printf "\n"
             printf "Graph: ${graph}\n"
-            time ./memory_footprint -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}"
+            time ./memory-footprint -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}"
         done
     done
 done
 
-# clean build if necessary
+# 4. clean build if necessary
 if [ "$clean_build" = True ] ; then
     cd ../../;
     rm -rf cmake-build;

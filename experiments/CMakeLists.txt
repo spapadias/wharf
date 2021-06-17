@@ -1,17 +1,17 @@
 # -------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING WITH METROPOLIS HASTINGS ----------------------------
 
-option(CLANG        OFF)
-option(CILK         OFF)
-option(OPENMP       OFF)
-option(HOMEGROWN    OFF)
-option(SERIAL       OFF)
+option(CLANG     OFF)
+option(CILK      OFF)
+option(OPENMP    OFF)
+option(HOMEGROWN OFF)
+option(SERIAL    OFF)
 
 # compile flags options
 set(OMPFLAGS     "-DOPENMP -fopenmp")
 set(CILKFLAGS    "-DCILK -fcilkplus")
 set(HGFLAGS      "-DHOMEGROWN -pthread")
 set(OPTIMIZATION "-O3 -g")
-set(CFLAGS       "-DEDGELONG  -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC -DVERTEXLONG")
+set(CFLAGS       "-DEDGELONG  -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC") # -DVERTEXLONG
 
 if(CLANG)
     set(CMAKE_CXX_COMPILER "clang++")
@@ -41,9 +41,9 @@ file(COPY bin/SNAPtoAdj DESTINATION .)
 file(COPY bin/to_word2vec.pl DESTINATION .)
 file(COPY bin/inverted_index_pam DESTINATION .)
 
-# EXPERIMENS EXECUTABLES
+# experiments executables
 add_executable(throughput src/throughput.cpp)
-add_executable(memory_footprint src/memory_footprint.cpp)
+add_executable(memory-footprint src/memory-footprint.cpp)
 add_executable(vertex-classification src/vertex-classification.cpp)
 
 # -------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING WITH METROPOLIS HASTINGS ----------------------------
