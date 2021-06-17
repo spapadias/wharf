@@ -36,13 +36,14 @@ endif()
 # set compile flags
 set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS}")
 
-file(COPY ../experiments/data DESTINATION .)
+file(COPY data DESTINATION .)
 file(COPY bin/SNAPtoAdj DESTINATION .)
+file(COPY bin/to_word2vec.pl DESTINATION .)
 file(COPY bin/inverted_index_pam DESTINATION .)
 
 # EXPERIMENS EXECUTABLES
 add_executable(throughput src/throughput.cpp)
 add_executable(memory_footprint src/memory_footprint.cpp)
-add_executable(vertex_classification src/vertex_classification.cpp)
+add_executable(vertex-classification src/vertex-classification.cpp)
 
 # -------------------------- DYNAMIC GRAPH REPRESENTATION LEARNING WITH METROPOLIS HASTINGS ----------------------------

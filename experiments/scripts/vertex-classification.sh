@@ -1,17 +1,17 @@
 #!/bin/bash
 
 # script options
-clean_build=True                            # cleans build folder after the execution
+clean_build=False                           # cleans build folder after the execution
 
 # execution options
 walk_model="deepwalk"                       # deepwalk | node2vec
 paramP=0.2                                  # node2vec's paramP
 paramQ=0.7                                  # node2vec's paramQ
 sampler_init_strategy="random"              # random | burnin | weight
-vector_dimension=120                        # size of learned vectors
+vector_dimension=5                          # size of learned vectors
 learning_strategy=2                         # 1: online | 2: mini-batch (default)
-declare -a graphs=("email-graph")           # array of graphs
-declare -a walks_per_vertex=(1)             # walks per vertex to generate
+declare -a graphs=("aspen-paper-graph")     # array of graphs
+declare -a walks_per_vertex=(2)             # walks per vertex to generate
 declare -a walk_length=(10)                 # length of one walk
 
 # 1. convert graphs in adjacency graph format if necessary
