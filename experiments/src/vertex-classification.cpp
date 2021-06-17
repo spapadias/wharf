@@ -94,66 +94,71 @@ void vertex_classification(commandLine& command_line)
     // 4. learn emebeddings
     std::cout << "Learning embeddings..." << std::endl;
     stringstream command;
-    command << "printf '";
+//    command << "printf '";
+
+    std::ofstream file("file.txt");
 
     for(int i = 0; i < n * walks_per_vertex; i++)
     {
-        command << dock.rewalk(i) << std::endl;
+        file << dock.rewalk(i) << std::endl;
+//        command << dock.rewalk(i) << std::endl;
     }
 
-    command << "' | yskip --thread-num="
-            << num_workers()
-            << " -d " << vector_dimension
-            << " -l " << learning_strategy
-            << " - model;"
-            << "perl to_word2vec.pl < model > model.w2v";
+    file.close();
 
-    system(command.str().c_str());
-    command.str("");
+//    command << "' | yskip --thread-num="
+//            << num_workers()
+//            << " -d " << vector_dimension
+//            << " -l " << learning_strategy
+//            << " - model;"
+//            << "perl to_word2vec.pl < model > model.w2v";
 
-    // 5.
-    for(int i = 0; i < 1; i++)
-    {
-        // geneate edges
-        auto edges = utility::generate_batch_of_edges(10, dock.number_of_vertices(), false, false);
-        auto map = dock.insert_edges_batch(edges.second, edges.first, true, false);
-        command << "printf '";
+    command << "yskip file.txt model; perl to_word2vec.pl < model > model.w2v";
+    auto res = system(command.str().c_str());
 
-        for(auto& entry : map.lock_table())
-        {
-            command << dock.rewalk(entry.first) << std::endl;
-        }
-
-        command << "' | yskip --thread-num="
-                << num_workers()
-                << " --initial-model=model"
-                << " -d " << vector_dimension
-                << " -l " << learning_strategy
-                << " - model;"
-                << "perl to_word2vec.pl < model > model.w2v";
-
-        system(command.str().c_str());
-        command.str("");
-
-        map = dock.delete_edges_batch(edges.second, edges.first, true, false);
-        command << "printf '";
-
-        for(auto& entry : map.lock_table())
-        {
-            command << dock.rewalk(entry.first) << std::endl;
-        }
-
-        command << "' | yskip --thread-num="
-                << num_workers()
-                << " --initial-model=model"
-                << " -d " << vector_dimension
-                << " -l " << learning_strategy
-                << " - model;"
-                << "perl to_word2vec.pl < model > model.w2v";
-
-        system(command.str().c_str());
-        command.str("");
-    }
+//    // 5.
+//    for(int i = 0; i < 1; i++)
+//    {
+//        // geneate edges
+//        auto edges = utility::generate_batch_of_edges(10, dock.number_of_vertices(), false, false);
+//        auto map = dock.insert_edges_batch(edges.second, edges.first, true, false);
+//        command << "printf '";
+//
+//        for(auto& entry : map.lock_table())
+//        {
+//            command << dock.rewalk(entry.first) << std::endl;
+//        }
+//
+//        command << "' | yskip --thread-num="
+//                << num_workers()
+//                << " --initial-model=model"
+//                << " -d " << vector_dimension
+//                << " -l " << learning_strategy
+//                << " - model;"
+//                << "perl to_word2vec.pl < model > model.w2v";
+//
+//        system(command.str().c_str());
+//        command.str("");
+//
+//        map = dock.delete_edges_batch(edges.second, edges.first, true, false);
+//        command << "printf '";
+//
+//        for(auto& entry : map.lock_table())
+//        {
+//            command << dock.rewalk(entry.first) << std::endl;
+//        }
+//
+//        command << "' | yskip --thread-num="
+//                << num_workers()
+//                << " --initial-model=model"
+//                << " -d " << vector_dimension
+//                << " -l " << learning_strategy
+//                << " - model;"
+//                << "perl to_word2vec.pl < model > model.w2v";
+//
+//        system(command.str().c_str());
+//        command.str("");
+//    }
 }
 
 int main(int argc, char** argv)

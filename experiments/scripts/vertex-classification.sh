@@ -10,7 +10,7 @@ paramQ=0.7                                  # node2vec's paramQ
 sampler_init_strategy="random"              # random | burnin | weight
 vector_dimension=5                          # size of learned vectors
 learning_strategy=2                         # 1: online | 2: mini-batch (default)
-declare -a graphs=("aspen-paper-graph")     # array of graphs
+declare -a graphs=("wiki-graph")            # array of graphs
 declare -a walks_per_vertex=(2)             # walks per vertex to generate
 declare -a walk_length=(10)                 # length of one walk
 
