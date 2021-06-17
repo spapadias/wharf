@@ -15,7 +15,7 @@ class DockTest : public testing::Test
         uintE* offsets;
         bool mmap = false;
         bool is_symmetric = true;
-        std::string default_file_path = "data/aspen-paper-graph";
+        std::string default_file_path = "data/wiki-graph";
 };
 
 void DockTest::SetUp()
@@ -229,36 +229,3 @@ TEST_F(DockTest, UpdateRandomWalks)
         std::cout << dock.rewalk(i) << std::endl;
     }
 }
-
-//TEST_F(DockTest, DEV)
-//{
-//    // create graph and walks
-//    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
-//    dock.create_random_walks();
-//
-//    // print random walks
-//    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
-//    {
-//        std::cout << dock.rewalk(i) << std::endl;
-//    }
-//
-//    for(int i = 0; i < 1; i++)
-//    {
-//        // geneate edges
-//        auto edges = utility::generate_batch_of_edges(10, dock.number_of_vertices(), false, false);
-//
-//        auto map = dock.insert_edges_batch(edges.second, edges.first, true, false);
-//
-//        for(auto& entry : map.lock_table())
-//        {
-//            std::cout << dock.rewalk(entry.first) << std::endl;
-//        }
-//
-//        map = dock.delete_edges_batch(edges.second, edges.first, true, false);
-//
-//        for(auto& entry : map.lock_table())
-//        {
-//            std::cout << dock.rewalk(entry.first) << std::endl;
-//        }
-//    }
-//}

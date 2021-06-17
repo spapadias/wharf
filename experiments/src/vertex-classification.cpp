@@ -101,11 +101,59 @@ void vertex_classification(commandLine& command_line)
         command << dock.rewalk(i) << std::endl;
     }
 
-    command << "' | yskip --thread-num=" << num_workers();
-    if (std::ifstream("model")) command << " --initial-model=model";
-    command << " -d " << vector_dimension  << " -l " << learning_strategy << " - model;";
-    command << "perl to_word2vec.pl < model > model.w2v";
+    command << "' | yskip --thread-num="
+            << num_workers()
+            << " -d " << vector_dimension
+            << " -l " << learning_strategy
+            << " - model;"
+            << "perl to_word2vec.pl < model > model.w2v";
+
     system(command.str().c_str());
+    command.str("");
+
+    // 5.
+    for(int i = 0; i < 1; i++)
+    {
+        // geneate edges
+        auto edges = utility::generate_batch_of_edges(10, dock.number_of_vertices(), false, false);
+        auto map = dock.insert_edges_batch(edges.second, edges.first, true, false);
+        command << "printf '";
+
+        for(auto& entry : map.lock_table())
+        {
+            command << dock.rewalk(entry.first) << std::endl;
+        }
+
+        command << "' | yskip --thread-num="
+                << num_workers()
+                << " --initial-model=model"
+                << " -d " << vector_dimension
+                << " -l " << learning_strategy
+                << " - model;"
+                << "perl to_word2vec.pl < model > model.w2v";
+
+        system(command.str().c_str());
+        command.str("");
+
+        map = dock.delete_edges_batch(edges.second, edges.first, true, false);
+        command << "printf '";
+
+        for(auto& entry : map.lock_table())
+        {
+            command << dock.rewalk(entry.first) << std::endl;
+        }
+
+        command << "' | yskip --thread-num="
+                << num_workers()
+                << " --initial-model=model"
+                << " -d " << vector_dimension
+                << " -l " << learning_strategy
+                << " - model;"
+                << "perl to_word2vec.pl < model > model.w2v";
+
+        system(command.str().c_str());
+        command.str("");
+    }
 }
 
 int main(int argc, char** argv)
