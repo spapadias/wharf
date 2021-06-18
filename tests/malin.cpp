@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <dock.h>
+#include <malin.h>
 
-class DockTest : public testing::Test
+class MalinTest : public testing::Test
 {
     public:
         void SetUp()    override;
@@ -18,7 +18,7 @@ class DockTest : public testing::Test
         std::string default_file_path = "data/aspen-paper-graph";
 };
 
-void DockTest::SetUp()
+void MalinTest::SetUp()
 {
     std::cout << "-----------------------------------------------------------------------------------------------------" << std::endl;
     std::cout << "Dock running with " << num_workers() << " threads" << std::endl;
@@ -37,7 +37,7 @@ void DockTest::SetUp()
     std::cout << std::endl;
 }
 
-void DockTest::TearDown()
+void MalinTest::TearDown()
 {
     // remove adjaceny graph format representation
     int graph = system("rm -rf data/adjacency-graph-format.txt");
@@ -50,16 +50,16 @@ void DockTest::TearDown()
     std::cout << "-----------------------------------------------------------------------------------------------------" << std::endl;
 }
 
-TEST_F(DockTest, DockConstructor)
+TEST_F(MalinTest, MalinConstructor)
 {
-    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges, false);
+    dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges, false);
 
     // assert the number of vertices and edges in a graph
-    ASSERT_EQ(dock.number_of_vertices(), total_vertices);
-    ASSERT_EQ(dock.number_of_edges(), total_edges);
+    ASSERT_EQ(malin.number_of_vertices(), total_vertices);
+    ASSERT_EQ(malin.number_of_edges(), total_edges);
 
     // construct a flat snapshot of a graph
-    auto flat_snapshot = dock.flatten_vertex_tree();
+    auto flat_snapshot = malin.flatten_vertex_tree();
 
     // assert
     parallel_for(0, total_vertices, [&] (long i)
@@ -72,8 +72,8 @@ TEST_F(DockTest, DockConstructor)
         ASSERT_EQ(flat_snapshot[i].compressed_edges.degree(), degree);
 
         // assert that compressed_walks_tree is empty
-        ASSERT_EQ(flat_snapshot[i].inverted_index.proxy.root, nullptr);
-        ASSERT_EQ(flat_snapshot[i].inverted_index.proxy.size(), 0);
+        ASSERT_EQ(flat_snapshot[i].inverted_index.root, nullptr);
+        ASSERT_EQ(flat_snapshot[i].inverted_index.size(), 0);
 
         // assert empty samplers
         ASSERT_EQ(flat_snapshot[i].sampler_manager->size(), 0);
@@ -95,20 +95,20 @@ TEST_F(DockTest, DockConstructor)
     });
 }
 
-TEST_F(DockTest, DockDestructor)
+TEST_F(MalinTest, MalinDestructor)
 {
-    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+    dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
 
-    dock.print_memory_pool_stats();
-    dock.destroy();
-    dock.print_memory_pool_stats();
+    malin.print_memory_pool_stats();
+    malin.destroy();
+    malin.print_memory_pool_stats();
 
     // assert vertices and edges
-    ASSERT_EQ(dock.number_of_vertices(), 0);
-    ASSERT_EQ(dock.number_of_edges(), 0);
+    ASSERT_EQ(malin.number_of_vertices(), 0);
+    ASSERT_EQ(malin.number_of_edges(), 0);
 
     // construct a flat snapshot of a graph
-    auto flat_snapshot = dock.flatten_vertex_tree();
+    auto flat_snapshot = malin.flatten_vertex_tree();
 
     // assert that flat snapshot does not exits
     ASSERT_EQ(flat_snapshot.size(), 0);
@@ -230,9 +230,9 @@ TEST_F(DockTest, DockDestructor)
 //    }
 //}
 
-TEST_F(DockTest, DEV)
-{
-    // create graph and walks
-    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
-    dock.create_random_walks();
-}
+//TEST_F(DockTest, DEV)
+//{
+//    // create graph and walks
+//    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
+//    dock.create_random_walks();
+//}

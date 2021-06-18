@@ -117,9 +117,9 @@ endif()
 # ------------------------------------------------------ TESTS ---------------------------------------------------------
 
 # Dock tests
-add_executable(dock dock.cpp ../walks/inverted_index.h)
-target_link_libraries(dock ${GTEST_LIBRARIES})
-add_test(NAME wharf COMMAND dock)
+add_executable(malin malin.cpp)
+target_link_libraries(malin ${GTEST_LIBRARIES})
+add_test(NAME malin COMMAND malin)
 
 # Pairing function tests
 add_executable(pairings pairings.cpp)

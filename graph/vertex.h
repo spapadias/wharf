@@ -10,7 +10,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
     using SamplerManager = libcuckoo::cuckoohash_map<types::Vertex, dygrl::MetropolisHastingsSampler>;
 
     /**
-     * @brief VertexEntry represents a structure that contains the vertex data - compressed edges, compressed walks, and sampler manager.
+     * @brief VertexEntry represents a structure that contains the vertex data - compressed edges, inverted index, and sampler manager.
      */
     struct VertexEntry
     {
@@ -48,7 +48,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
         using val_t = VertexEntry;     // value: compressed edges, walks inverted index and metropolis hastings samplers
         using aug_t = types::Degree;   // augmentation: vertex degree
 
-        using entry_t = std::pair<key_t, val_t>;  // vertex - <vertex id, {compressed-edges, walks InvIndx, MH samplers}>
+        using entry_t = std::pair<key_t, val_t>;  // vertex - <vertex id, {compressed-edges, walks index, MH samplers}>
 
         // key x key -> key
         static bool comp(const key_t& keyX, const key_t& keyY)
@@ -77,9 +77,11 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
         // copy existing entry
         static entry_t copy_entry(const entry_t& entry)
         {
+            // copy edges
             auto ce_plus = lists::copy_node(entry.second.compressed_edges.plus);         // ce plus part; bumps ref-cnt
             auto ce_root = tree_plus::Tree_GC::inc(entry.second.compressed_edges.root);  // ce root part; bumps ref-cnt
 
+            // copy samplers
             auto sampler = new SamplerManager(entry.second.sampler_manager->size());
             for(auto& table_entry : entry.second.sampler_manager->lock_table())
             {
@@ -87,9 +89,10 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             return std::make_pair(entry.first,
-                VertexEntry(
+                VertexEntry
+                (
                     types::CompressedEdges(ce_plus, ce_root),
-                    dygrl::InvertedIndex(entry.second.inverted_index),
+                    dygrl::InvertedIndex(entry.second.inverted_index),          // copy inverted index
                     sampler
                 )
             );
@@ -111,6 +114,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 T.root = entry.second.compressed_edges.root;
                 entry.second.compressed_edges.root = nullptr;
             }
+
+            entry.second.inverted_index.~InvertedIndex();
 
             delete entry.second.sampler_manager;
         }
