@@ -76,8 +76,8 @@ option(HOMEGROWN    OFF)
 option(DOCK_DEBUG   OFF)
 option(SERIAL       OFF)
 
-#set(SERIAL ON)
-set(DOCK_DEBUG ON)
+set(SERIAL ON)
+set(MALIN_DEBUG ON)
 
 # build variables
 set(OMPFLAGS         "-DOPENMP -fopenmp")
@@ -85,7 +85,7 @@ set(CILKFLAGS        "-DCILK -fcilkplus")
 set(HGFLAGS          "-DHOMEGROWN -pthread")
 set(OPTIMIZATION     "-O3 -g")
 set(CFLAGS           "-DEDGELONG -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC -DNDEBUG")
-set(DOCK_DEBUG_FLAGS "-DEDGELONG -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC")
+set(MALIN_DEBUG_FLAGS "-DEDGELONG -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC")
 
 if(CLANG)
     set(CMAKE_CXX_COMPILER "clang++")
@@ -108,8 +108,8 @@ else()
 endif()
 
 # set compile flags
-if (DOCK_DEBUG)
-    set(CMAKE_CXX_FLAGS "${DOCK_DEBUG_FLAGS} ${PFLAGS} -DMALIN_DEBUG -DMALIN_TIMER") # -DVERTEXLONG
+if (MALIN_DEBUG)
+    set(CMAKE_CXX_FLAGS "${MALIN_DEBUG_FLAGS} ${PFLAGS} -DMALIN_DEBUG -DMALIN_TIMER") # -DVERTEXLONG
 else()
     set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS}")
 endif()

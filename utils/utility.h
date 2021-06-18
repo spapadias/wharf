@@ -64,14 +64,14 @@ namespace utility
         bool run_seq = false
     )
     {
-        #ifdef DOCK_TIMER
+        #ifdef MALIN_TIMER
             timer timer("Utility::GenerateBatchOfEdges");
         #endif
 
         using Edge = std::tuple<uintV, uintV>;  // (vertex1, vertex2)
 
         // 1. Set up for the edge generation
-        auto rand              = pbbs::random(std::time(nullptr));
+        auto rand              = pbbs::random(0);
         size_t graph_size_pow2 = 1 << (pbbs::log2_up(vertices_number) - 1);
         auto rmat              = rMat<uintV>(graph_size_pow2, rand.ith_rand(0), a, b, c);
         auto edges             = (directed) ? pbbs::new_array<Edge>(edges_number) : pbbs::new_array<Edge>(2 * edges_number);
@@ -125,14 +125,14 @@ namespace utility
 
         pbbs::free_array(edges);
 
-        #ifdef DOCK_DEBUG
+        #ifdef MALIN_DEBUG
             std::cout << edges_generated << " / "
                       << ((directed) ? edges_number : 2 * edges_number)
                       << " distinct edges (direction, duplicate removal and self-loop processing)"
                       << std::endl;
         #endif
 
-        #ifdef DOCK_TIMER
+        #ifdef MALIN_TIMER
             timer.reportTotal("time(seconds)");
         #endif
 

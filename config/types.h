@@ -18,9 +18,6 @@ namespace types
     // Position = the position of a vertex in the walk
     using Position             = uint8_t;
 
-    // PairedTriplet = a triplet <WalkID, Position, NextVertex> after encoded with the pairing function
-    using PairedTriplet        = uint64_t;
-
     // State = the state is defined as a pair of two numbers,
     // where the first represents the current vertex and the second contains the extra information
     // (e.g DeepWalk = current vertex, Node2Vec = previously visited vertex by the walker)
@@ -40,7 +37,7 @@ namespace types
     using MapOfChanges         = libcuckoo::cuckoohash_map<WalkID, std::tuple<Position, Vertex>>;
 
     // ChangeAccumulator = accumulator of changes for walk updates
-    using ChangeAccumulator    = libcuckoo::cuckoohash_map<WalkID, std::vector<PairedTriplet>>;
+    using ChangeAccumulator    = libcuckoo::cuckoohash_map<Vertex, std::vector<std::pair<uintV, types::Vertex>>>;
 }
 
 #endif // DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_TYPES_H
