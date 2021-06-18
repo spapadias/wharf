@@ -15,13 +15,13 @@ class MalinTest : public testing::Test
         uintE* offsets;
         bool mmap = false;
         bool is_symmetric = true;
-        std::string default_file_path = "data/aspen-paper-graph";
+        std::string default_file_path = "data/email-graph";
 };
 
 void MalinTest::SetUp()
 {
     std::cout << "-----------------------------------------------------------------------------------------------------" << std::endl;
-    std::cout << "Dock running with " << num_workers() << " threads" << std::endl;
+    std::cout << "Malin running with " << num_workers() << " threads" << std::endl;
 
     // transform an input graph file into an adjacency graph format
     std::string command = "./SNAPtoAdj -s -f " + this->default_file_path + " data/adjacency-graph-format.txt";
@@ -29,7 +29,7 @@ void MalinTest::SetUp()
 
     if (result != 0)
     {
-        std::cerr << "DockTest::SetUp::Input file could not be transformed!" << std::endl;
+        std::cerr << "MalinTest::SetUp::Input file could not be transformed!" << std::endl;
         exit(1);
     }
 
@@ -44,7 +44,7 @@ void MalinTest::TearDown()
 
     if (graph != 0)
     {
-        std::cerr << "DockTest::TearDown::Could not remove static graph input file" << std::endl;
+        std::cerr << "MalinTest::TearDown::Could not remove static graph input file" << std::endl;
     }
 
     std::cout << "-----------------------------------------------------------------------------------------------------" << std::endl;
@@ -230,9 +230,15 @@ TEST_F(MalinTest, MalinDestructor)
 //    }
 //}
 
-//TEST_F(DockTest, DEV)
-//{
-//    // create graph and walks
-//    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
-//    dock.create_random_walks();
-//}
+TEST_F(MalinTest, DEV)
+{
+    // create graph and walks
+    dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
+    malin.create_random_walks();
+
+    // print random walks
+    for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
+    {
+        std::cout << malin.assemble_walk(i) << std::endl;
+    }
+}

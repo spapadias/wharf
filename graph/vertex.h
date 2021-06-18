@@ -115,7 +115,10 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 entry.second.compressed_edges.root = nullptr;
             }
 
-            entry.second.inverted_index.~InvertedIndex();
+            if (entry.second.inverted_index.root)
+            {
+                entry.second.inverted_index.~InvertedIndex();
+            }
 
             delete entry.second.sampler_manager;
         }

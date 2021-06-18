@@ -198,136 +198,126 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 this->graph_tree.root = nullptr;
             }
 
-//            /**
-//             * @brief Creates initial set of random walks.
-//             */
-//            void create_random_walks()
-//            {
-//                auto graph          = this->flatten_graph();
-//                auto total_vertices = this->number_of_vertices();
-//                auto walks          = total_vertices * config::walks_per_vertex;
-//                auto cuckoo         = libcuckoo::cuckoohash_map<types::Vertex, std::vector<InvertedIndex::WalkEntry::entry_t>>(total_vertices);
-//
-//                using VertexStruct  = std::pair<types::Vertex, VertexEntry>;
-//                auto vertices       = pbbs::sequence<VertexStruct>(total_vertices);
-//                RandomWalkModel* model;
-//
-//                switch (config::random_walk_model)
-//                {
-//                    case types::DEEPWALK:
-//                        model = new DeepWalk(&graph);
-//                        break;
-//                    case types::NODE2VEC:
-//                        model = new Node2Vec(&graph, config::paramP, config::paramQ);
-//                        break;
-//                    default:
-//                        std::cerr << "Unrecognized random walking model" << std::endl;
-//                        std::exit(1);
-//                }
-//
-//                parallel_for(0, walks, [&](types::WalkID walk_id)
-//                {
-//                    if (graph[walk_id % total_vertices].degrees == 0) return;
-//                    types::State state = model->initial_state(walk_id % total_vertices);
-//
-//                    for(types::Position position = 0; position < config::walk_length; position++)
-//                    {
-//                        if (!graph[state.first].samplers->contains(state.second))
-//                        {
-//                            graph[state.first].samplers->insert(state.second, MetropolisHastingsSampler(state, model));
-//                        }
-//
-//                        auto new_state = graph[state.first].samplers->find(state.second).sample(state, model);
-//
-//                        if (!cuckoo.contains(state.first))
-//                            cuckoo.insert(state.first, std::vector<InvertedIndex::WalkEntry::entry_t>());
-//
-//                        cuckoo.update_fn(state.first, [&](auto& vector)
-//                        {
-//                            vector.push_back(std::make_pair(std::make_pair(walk_id, position), new_state.first));
-//                        });
-//
-//                        std::cout << state.first << " ";
-//                        state = new_state;
-//                    }
-//
-//                    std::cout << std::endl;
-//                });
-//
-//                parallel_for(0, total_vertices, [&](types::Vertex vertex)
-//                {
-//                    if (cuckoo.contains(vertex))
-//                    {
-//                        auto triplets = cuckoo.find(vertex);
-//                        auto sequence = pbbs::sequence<InvertedIndex::WalkEntry::entry_t>(triplets.size());
-//
-//                        for(auto index = 0; index < triplets.size(); index++)
-//                            sequence[index] = triplets[index];
-//
-//                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::InvertedIndex(sequence), new dygrl::SamplerManager(0)));
-//                    }
-//                    else
-//                    {
-//                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::InvertedIndex(), new dygrl::SamplerManager(0)));
-//                    }
-//                });
-//
-//                auto replace = [&] (const uintV src, const VertexEntry& x, const VertexEntry& y)
-//                {
-//                    auto tree_plus = InvertedIndex::Index::map_union(x.inverted_index.proxy, y.inverted_index.proxy);
-//                    return VertexEntry(x.compressed_edges, dygrl::InvertedIndex(tree_plus), x.sampler_manager);
-//                };
-//
-//                this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, vertices.begin(), vertices.size(), replace, true);
-//
-//                auto index           = this->graph_tree.find(0).value.inverted_index;
-//                auto size            = index.proxy.size();
-//
-//                index.proxy.iter_elms([&](auto& elem) {
-//                   std::cout << (int)elem.first.first << "," << (int)elem.first.second << " | " << elem.second << std::endl;
-//                });
-//
-//                delete model;
-//            }
+            /**
+             * @brief Creates initial set of random walks.
+             */
+            void create_random_walks()
+            {
+                auto graph          = this->flatten_graph();
+                auto total_vertices = this->number_of_vertices();
+                auto walks          = total_vertices * config::walks_per_vertex;
+                auto cuckoo         = libcuckoo::cuckoohash_map<types::Vertex, std::vector<dygrl::WalkIndexEntry::entry_t>>(total_vertices);
 
-//            /**
-//             * @brief Walks through the walk given walk id.
-//             *
-//             * @param walk_id - unique walk ID
-//             *
-//             * @return - walk string representation
-//             */
-//            std::string rewalk(types::WalkID walk_id)
-//            {
-//                // 1. Grab the first vertex in the walk
-//                types::Vertex current_vertex = walk_id % this->number_of_vertices();
-//                std::stringstream string_stream;
-//
-//                // 2. Rewalk
-//                for (types::Position position = 0; position < config::walk_length; position++)
-//                {
-//                    position + 1 == config::walk_length ? string_stream << current_vertex : string_stream << current_vertex << " ";
-//
-//                    auto tree_node = this->graph_tree.find(current_vertex);
-//
-//                    #ifdef DOCK_DEBUG
-//                        if (!tree_node.valid)
-//                        {
-//                            std::cerr << "Dock debug error! Dock::Rewalk::Vertex="
-//                                      << current_vertex << " is not found in the vertex tree!"
-//                                      << std::endl;
-//
-//                            std::exit(1);
-//                        }
-//                    #endif
-//
-//                    if (tree_node.value.compressed_edges.degree() == 0) break;
-//                    current_vertex = tree_node.value.compressed_walks.find_next(walk_id, position, current_vertex);
-//                }
-//
-//                return string_stream.str();
-//            }
-//
+                using VertexStruct  = std::pair<types::Vertex, VertexEntry>;
+                auto vertices       = pbbs::sequence<VertexStruct>(total_vertices);
+                RandomWalkModel* model;
+
+                switch (config::random_walk_model)
+                {
+                    case types::DEEPWALK:
+                        model = new DeepWalk(&graph);
+                        break;
+                    case types::NODE2VEC:
+                        model = new Node2Vec(&graph, config::paramP, config::paramQ);
+                        break;
+                    default:
+                        std::cerr << "Unrecognized random walking model" << std::endl;
+                        std::exit(1);
+                }
+
+                // generate walks in parallel
+                parallel_for(0, walks, [&](types::WalkID walk_id)
+                {
+                    if (graph[walk_id % total_vertices].degrees == 0) return;
+                    types::State state = model->initial_state(walk_id % total_vertices);
+
+                    for(types::Position position = 0; position < config::walk_length; position++)
+                    {
+                        if (!graph[state.first].samplers->contains(state.second))
+                        {
+                            graph[state.first].samplers->insert(state.second, MetropolisHastingsSampler(state, model));
+                        }
+
+                        auto new_state = graph[state.first].samplers->find(state.second).sample(state, model);
+
+                        if (!cuckoo.contains(state.first))
+                            cuckoo.insert(state.first, std::vector<dygrl::WalkIndexEntry::entry_t>());
+
+                        cuckoo.update_fn(state.first, [&](auto& vector)
+                        {
+                            vector.push_back(std::make_pair(walk_id*config::walk_length + position, new_state.first));
+                        });
+
+                        state = new_state;
+                    }
+                });
+
+                parallel_for(0, total_vertices, [&](types::Vertex vertex)
+                {
+                    if (cuckoo.contains(vertex))
+                    {
+                        auto triplets = cuckoo.find(vertex);
+                        auto sequence = pbbs::sequence<dygrl::WalkIndexEntry::entry_t>(triplets.size());
+
+                        for(auto index = 0; index < triplets.size(); index++)
+                            sequence[index] = triplets[index];
+
+                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::InvertedIndex(sequence), new dygrl::SamplerManager(0)));
+                    }
+                    else
+                    {
+                        vertices[vertex] = std::make_pair(vertex, VertexEntry(types::CompressedEdges(), dygrl::InvertedIndex(), new dygrl::SamplerManager(0)));
+                    }
+                });
+
+                auto replace = [&] (const uintV src, const VertexEntry& x, const VertexEntry& y)
+                {
+                    auto index = InvertedIndex::map_union(x.inverted_index, y.inverted_index);
+                    return VertexEntry(x.compressed_edges, dygrl::InvertedIndex(index), x.sampler_manager);
+                };
+
+                this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, vertices.begin(), vertices.size(), replace, true);
+                delete model;
+            }
+
+            /**
+             * @brief Walks through the walk given walk id.
+             *
+             * @param walk_id - unique walk ID
+             *
+             * @return - walk string representation
+             */
+            std::string assemble_walk(types::WalkID walk_id)
+            {
+                // 1. Grab the first vertex in the walk
+                types::Vertex current_vertex = walk_id % this->number_of_vertices();
+                std::stringstream string_stream;
+
+                // 2. Rewalk
+                for (types::Position position = 0; position < config::walk_length; position++)
+                {
+                    position + 1 == config::walk_length ? string_stream << current_vertex : string_stream << current_vertex << " ";
+
+                    auto vertex = this->graph_tree.find(current_vertex);
+
+                    #ifdef MALIN_DEBUG
+                        if (!vertex.valid)
+                        {
+                            std::cerr << "Dock debug error! Dock::Rewalk::Vertex="
+                                      << current_vertex << " is not found in the vertex tree!"
+                                      << std::endl;
+
+                            std::exit(1);
+                        }
+                    #endif
+
+                    if (vertex.value.compressed_edges.degree() == 0 || vertex.value.inverted_index.size() == 0) break;
+                    current_vertex = vertex.value.inverted_index.find_next(walk_id, position);
+                }
+
+                return string_stream.str();
+            }
+
 //            types::Vertex vertex_at_walk(types::WalkID walk_id, types::Position position)
 //            {
 //                // 1. Grab the first vertex in the walk
@@ -911,8 +901,9 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 std::cout << std::endl;
             }
 
-        private:
             Graph graph_tree;
+
+        private:
 
             /**
             * Initializes memory pools for underlying lists.
