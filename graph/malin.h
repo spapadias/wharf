@@ -724,7 +724,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 auto insert_walks  = pbbs::sequence<VertexStruct>(inserts.size());
                 auto delete_walks  = pbbs::sequence<VertexStruct>(deletes.size());
 
-                std::cout << "SIZES = " << insert_walks.size() << " | " << delete_walks.size() << std::endl;
+//                std::cout << "SIZES = " << insert_walks.size() << " | " << delete_walks.size() << std::endl;
 
                 index = 0;
                 for(auto& item : inserts.lock_table())
@@ -748,17 +748,48 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     delete_walks[index++] = std::make_pair(item.first, VertexEntry(types::CompressedEdges(), dygrl::InvertedIndex(sequence), new dygrl::SamplerManager(0)));
                 }
 
+                pbbs::sample_sort_inplace(pbbs::make_range(delete_walks.begin(), delete_walks.end()), [&](auto& first, auto& second) {
+                    return first.first < second.first;
+                });
+
+                pbbs::sample_sort_inplace(pbbs::make_range(insert_walks.begin(), insert_walks.end()), [&](auto& first, auto& second) {
+                    return first.first < second.first;
+                });
+
+//                for(auto& entry : delete_walks)
+//                {
+//                    std::cout << entry.first << " | "
+//                              << entry.second.compressed_edges.size()
+//                              << ","
+//                              << entry.second.inverted_index.size()
+//                              << ","
+//                              << entry.second.sampler_manager->size()
+//                              << std::endl;
+//                }
+
                 auto replaceD = [&] (const intV& v, const VertexEntry& x, const VertexEntry& y)
                 {
                     auto inv_index = InvertedIndex::map_difference(x.inverted_index, y.inverted_index);
 
-//                    std::cout << x.inverted_index.size() << " | " << y.inverted_index.size() << " | " << inv_index.size() << std::endl;
+                    std::cout << x.inverted_index.size() << " | " << y.inverted_index.size() << " | " << inv_index.size() << std::endl;
                     std::cout << "Vertex: " << v << std::endl;
 
                     return VertexEntry(x.compressed_edges, dygrl::InvertedIndex(inv_index), x.sampler_manager);
                 };
 
                 this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, delete_walks.begin(), delete_walks.size(), replaceD, true);
+
+                auto replaceI = [&] (const intV& v, const VertexEntry& x, const VertexEntry& y)
+                {
+                    auto inv_index = InvertedIndex::map_union(x.inverted_index, y.inverted_index);
+
+                    std::cout << x.inverted_index.size() << " | " << y.inverted_index.size() << " | " << inv_index.size() << std::endl;
+                    std::cout << "Vertex: " << v << std::endl;
+
+                    return VertexEntry(x.compressed_edges, dygrl::InvertedIndex(inv_index), x.sampler_manager);
+                };
+
+                this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, insert_walks.begin(), insert_walks.size(), replaceI, true);
             }
 
 //            /**

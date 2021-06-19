@@ -15,7 +15,7 @@ class MalinTest : public testing::Test
         uintE* offsets;
         bool mmap = false;
         bool is_symmetric = true;
-        std::string default_file_path = "data/google-graph";
+        std::string default_file_path = "data/aspen-paper-graph";
 };
 
 void MalinTest::SetUp()
@@ -239,22 +239,16 @@ TEST_F(MalinTest, DEV)
     // print random walks
     for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
     {
-        if(i != 161269) continue;
         std::cout << malin.assemble_walk(i) << std::endl;
     }
 
-    auto edges = utility::generate_batch_of_edges(1, malin.number_of_vertices(), false, false);
-//    edges.first[0] = std::make_tuple(0, 3);
-//    edges.first[1] = std::make_tuple(3, 0);
-//    edges.second   = 2;
-
+    auto edges = utility::generate_batch_of_edges(100000, malin.number_of_vertices(), false, false);
     malin.insert_edges_batch(edges.second, edges.first, true, false);
 
     stringstream stream;
     // print random walks
     for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
     {
-        if(i != 161269) continue;
-         std::cout << malin.assemble_walk(i) << std::endl;
+        std::cout << malin.assemble_walk(i) << std::endl;
     }
 }
