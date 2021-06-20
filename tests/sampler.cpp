@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <dock.h>
+#include <malin.h>
 #include <math.h>
 
 class SamplerTest : public testing::Test

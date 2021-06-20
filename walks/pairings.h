@@ -28,7 +28,7 @@ namespace pairings
             {
                 if ( pair.second >= pair.first )
                 {
-                    #ifdef DOCK_DEBUG
+                    #ifdef MALIN_DEBUG
                         Type encoded_value = pair.second * ( pair.second + 1 ) + pair.first;
                         auto decoded_value = unpair(encoded_value);
 
@@ -53,7 +53,7 @@ namespace pairings
                 }
                 else
                 {
-                    #ifdef DOCK_DEBUG
+                    #ifdef MALIN_DEBUG
                         Type encoded_value = pair.first * pair.first + pair.second;
                         auto decoded_value = unpair(encoded_value);
 

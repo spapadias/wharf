@@ -69,15 +69,15 @@ file(COPY ../experiments/bin/SNAPtoAdj DESTINATION .)
 # -------------------------------------------------- COMPILE FLAGS -----------------------------------------------------
 
 # build options
-option(CLANG        "???"               OFF)
-option(CILK         "???"               OFF)
-option(OPENMP       "???"               OFF)
-option(HOMEGROWN    "???"               OFF)
-option(DOCK_DEBUG   "Dock debug mode"   OFF)
-option(SERIAL       "???"               OFF)
+option(CLANG      OFF)
+option(CILK       OFF)
+option(OPENMP     OFF)
+option(HOMEGROWN  OFF)
+option(DOCK_DEBUG OFF)
+option(SERIAL     OFF)
 
-set(SERIAL ON)
-set(DOCK_DEBUG ON)
+#set(SERIAL ON)
+set(MALIN_DEBUG ON)
 
 # build variables
 set(OMPFLAGS         "-DOPENMP -fopenmp")
@@ -108,8 +108,8 @@ else()
 endif()
 
 # set compile flags
-if (DOCK_DEBUG)
-    set(CMAKE_CXX_FLAGS "${DOCK_DEBUG_FLAGS} ${PFLAGS} -DDOCK_DEBUG -DDOCK_TIMER -DVERTEXLONG") # -DDOCK_DEBUG -DDOCK_TIMER
+if (MALIN_DEBUG)
+    set(CMAKE_CXX_FLAGS "${DOCK_DEBUG_FLAGS} ${PFLAGS} -DMALIN_DEBUG -DMALIN_TIMER -DVERTEXLONG")
 else()
     set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS}")
 endif()
@@ -117,9 +117,9 @@ endif()
 # ------------------------------------------------------ TESTS ---------------------------------------------------------
 
 # Dock tests
-add_executable(dock dock.cpp)
-target_link_libraries(dock ${GTEST_LIBRARIES})
-add_test(NAME wharf COMMAND dock)
+add_executable(malin malin.cpp)
+target_link_libraries(malin ${GTEST_LIBRARIES})
+add_test(NAME malin COMMAND malin)
 
 # Pairing function tests
 add_executable(pairings pairings.cpp)
