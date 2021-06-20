@@ -164,7 +164,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     const auto& value = entry.second;
 
                     flat_graph[key].neighbors = entry.second.compressed_edges.get_edges(key);
-                    flat_graph[key].degrees   = entry.second.compressed_edges.degree();
+                    flat_graph[key].degree    = entry.second.compressed_edges.degree();
                     flat_graph[key].samplers  = entry.second.sampler_manager;
                 };
 
@@ -208,9 +208,72 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 this->graph_tree.root = nullptr;
             }
 
-//            /**
-//             * @brief Creates initial set of random walks.
-//             */
+            /**
+            * @brief Creates initial set of random walks.
+            */
+            void generate_initial_random_walks()
+            {
+                auto graph             = this->flatten_graph();
+                auto total_vertices    = this->number_of_vertices();
+                auto walks_to_generate = total_vertices * config::walks_per_vertex;
+                auto cuckoo            = libcuckoo::cuckoohash_map<types::Vertex, std::vector<types::Vertex>>(total_vertices);
+
+                using VertexStruct  = std::pair<types::Vertex, VertexEntry>;
+                auto vertices       = pbbs::sequence<VertexStruct>(total_vertices);
+
+                RandomWalkModel* model;
+                switch (config::random_walk_model)
+                {
+                    case types::DEEPWALK:
+                        model = new DeepWalk(&graph);
+                        break;
+                    case types::NODE2VEC:
+                        model = new Node2Vec(&graph, config::paramP, config::paramQ);
+                        break;
+                    default:
+                        std::cerr << "Unrecognized random walking model" << std::endl;
+                        std::exit(1);
+                }
+
+                // 1. walk in parallel
+                parallel_for(0, walks_to_generate, [&](types::WalkID walk_id)
+                {
+                    if (graph[walk_id % total_vertices].degree == 0)
+                    {
+                        types::PairedTriplet hash = pairings::Szudzik<types::Vertex>::pair({walk_id*config::walk_length, std::numeric_limits<uint32_t>::max() - 1});
+                        cuckoo.insert(walk_id % total_vertices, hash);
+                        return;
+                    }
+
+//                    types::State state  = model->initial_state(walk_id % total_vertices);
+
+//                    for(types::Position position = 0; position < config::walk_length; position++)
+//                    {
+//                        if (!graph[state.first].samplers->contains(state.second))
+//                        {
+//                            graph[state.first].samplers->insert(state.second, MetropolisHastingsSampler(state, model));
+//                        }
+//
+//                        auto new_state = graph[state.first].samplers->find(state.second).sample(state, model);
+//
+//                        if (!cuckoo.contains(state.first))
+//                            cuckoo.insert(state.first, std::vector<types::Vertex>());
+//
+//                        cuckoo.update_fn(state.first, [&](auto& vector)
+//                        {
+//                            types::PairedTriplet hash = pairings::Szudzik<types::Vertex>::pair({walk_id*config::walk_length + position, new_state.first});
+//                            vector.push_back(hash);
+//                        });
+//
+//                        state = new_state;
+//                    }
+                });
+
+            }
+
+            /**
+             * @brief Creates initial set of random walks.
+             */
 //            void create_random_walks()
 //            {
 //                auto graph          = this->flatten_graph();

@@ -266,3 +266,9 @@ TEST_F(MalinTest, DeleteBatchOfEdges)
 //        file2 << dock.rewalk(i) << std::endl;
 //    }
 //}
+
+TEST_F(MalinTest, Laxman)
+{
+    dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
+    malin.
+}
