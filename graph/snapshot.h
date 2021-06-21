@@ -171,7 +171,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                 parallel_for(0, this->snapshot.size(), [&](auto index)
                 {
-                    total += sizeof(this->snapshot[index]) + (sizeof(this->snapshot[index].neighbors) * this->snapshot[index].degrees);
+                    total += sizeof(this->snapshot[index]) + (sizeof(this->snapshot[index].neighbors) * this->snapshot[index].degree);
                 });
 
                 return total;

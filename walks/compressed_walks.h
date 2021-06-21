@@ -67,7 +67,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         return false;
                 });
 
-                #ifdef DOCK_DEBUG
+                #ifdef MALIN_DEBUG
                     if (!result || next_vertex == -1)
                     {
                         std::cerr << "Dock debug error! CompressedWalks::FindNext::walk_id = "
