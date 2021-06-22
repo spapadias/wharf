@@ -15,7 +15,7 @@ class MalinTest : public testing::Test
         uintE* offsets;
         bool mmap = false;
         bool is_symmetric = true;
-        std::string default_file_path = "data/aspen-paper-graph";
+        std::string default_file_path = "data/email-graph";
 };
 
 void MalinTest::SetUp()
@@ -202,75 +202,30 @@ TEST_F(MalinTest, UpdateRandomWalksOnDeleteEdges)
     }
 }
 
-//TEST_F(DockTest, UpdateRandomWalks)
-//{
-//    // create graph and walks
-//    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
-//    dock.create_random_walks();
-//
-//    // print random walks
-//    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
-//    {
-//        std::cout << dock.rewalk(i) << std::endl;
-//    }
-//
-//    for(int i = 0; i < 10; i++)
-//    {
-//        // geneate edges
-//        auto edges = utility::generate_batch_of_edges(1000000, dock.number_of_vertices(), false, false);
-//        auto generated_edges = edges.first;
-//        auto edges_generated = edges.second;
-//
-//        dock.insert_edges_batch(edges_generated, generated_edges, true, false);
-//        dock.delete_edges_batch(edges_generated, generated_edges, true, false);
-//    }
-//
-//    // print random walks
-//    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
-//    {
-//        std::cout << dock.rewalk(i) << std::endl;
-//    }
-//}
-//
-//TEST_F(DockTest, Laxman)
-//{
-//    // STEPS TO REPRODUCE
-//
-//    // 1. download dataset from https://snap.stanford.edu/data/web-Google.html
-//    // 2. put dataset into experiments/data and name it google-graph
-//    // 3. go to  tests and repload CMakeLists.txt
-//    // 4. run this "test"
-//    // 5. you should get an error: Dock debug error! Dock::Rewalk::Vertex=802292 is not found in the vertex tree!
-//
-//    dygrl::Dock dock = dygrl::Dock(total_vertices, total_edges, offsets, edges);
-//    dock.create_random_walks();
-//
-//    ofstream file1("file1.txt");    // look at cmake-build-debug/tests/file1.txt
-//    // print random walks
-//    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
-//    {
-//        file1 << dock.rewalk(i) << std::endl;
-//    }
-//
-//    auto edges = utility::generate_batch_of_edges(1, dock.number_of_vertices(), false, false);
-//    dock.insert_edges_batch(edges.second, edges.first, true, false);
-//
-//    ofstream file2("file2.txt");    // look at cmake-build-debug/tests/file2.txt
-//    // print random walks
-//    for(int i = 0; i < config::walks_per_vertex * dock.number_of_vertices(); i++)
-//    {
-//        file2 << dock.rewalk(i) << std::endl;
-//    }
-//}
-
-TEST_F(MalinTest, Laxman)
+TEST_F(MalinTest, UpdateRandomWalks)
 {
+    // create graph and walks
     dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
     malin.generate_initial_random_walks();
 
+    // print random walks
     for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
     {
         std::cout << malin.walk(i) << std::endl;
     }
 
+    for(int i = 0; i < 10; i++)
+    {
+        // geneate edges
+        auto edges = utility::generate_batch_of_edges(1000000, malin.number_of_vertices(), false, false);
+
+        malin.insert_edges_batch(edges.second, edges.first, true, false);
+        malin.delete_edges_batch(edges.second, edges.first, true, false);
+    }
+
+    // print random walks
+    for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
+    {
+        std::cout << malin.walk(i) << std::endl;
+    }
 }
