@@ -35,8 +35,13 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
          * @param compressed_walks - compressed tree of walks
          * @param sampler_manager  - manager of MH samplers
          */
-        VertexEntry(const types::CompressedEdges& compressed_edges, const dygrl::CompressedWalks& compressed_walks, dygrl::SamplerManager* sampler_manager)
-            : compressed_edges(compressed_edges), compressed_walks(compressed_walks), sampler_manager(sampler_manager) {};
+        VertexEntry
+        (
+            const types::CompressedEdges& compressed_edges,
+            const dygrl::CompressedWalks& compressed_walks,
+            dygrl::SamplerManager* sampler_manager
+        )
+        : compressed_edges(compressed_edges), compressed_walks(compressed_walks), sampler_manager(sampler_manager) {};
     };
 
     /**
@@ -77,21 +82,23 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
         // copy existing entry
         static entry_t copy_entry(const entry_t& entry)
         {
+            // copy compressed edges
             auto ce_plus = lists::copy_node(entry.second.compressed_edges.plus);         // ce plus part; bumps ref-cnt
             auto ce_root = tree_plus::Tree_GC::inc(entry.second.compressed_edges.root);  // ce root part; bumps ref-cnt
 
+            // copy compressed walks
             auto cw_plus = lists::copy_node(entry.second.compressed_walks.plus);         // cw plus part; bumps ref-cnt
             auto cw_root = tree_plus::Tree_GC::inc(entry.second.compressed_walks.root);  // cw root part; bumps ref-cnt
 
+            // copy sampler manager
             auto sampler = new SamplerManager(entry.second.sampler_manager->size());
-
             for(auto& table_entry : entry.second.sampler_manager->lock_table())
             {
                 sampler->insert(table_entry.first, table_entry.second);
             }
 
-            return std::make_pair(entry.first,
-                VertexEntry(
+            return std::make_pair(entry.first,VertexEntry
+                (
                     types::CompressedEdges(ce_plus, ce_root),
                     dygrl::CompressedWalks(cw_plus, cw_root),
                     sampler
@@ -102,6 +109,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
         // delete an entry
         static void del(entry_t& entry)
         {
+            // delete compressed edges
             if (entry.second.compressed_edges.plus)
             {
                 lists::deallocate(entry.second.compressed_edges.plus);
@@ -116,6 +124,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 entry.second.compressed_edges.root = nullptr;
             }
 
+            // delete compressed walks
             if (entry.second.compressed_walks.plus)
             {
                 lists::deallocate(entry.second.compressed_walks.plus);
@@ -130,6 +139,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 entry.second.compressed_walks.root = nullptr;
             }
 
+            // delete sampler manager
             delete entry.second.sampler_manager;
         }
     };

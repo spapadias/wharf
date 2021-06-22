@@ -13,13 +13,13 @@ namespace config
     auto random_walk_model     = types::RandomWalkModelType::DEEPWALK;
 
     // determines parameter P for node2vec model
-    float paramP              = 0.7;
+    float paramP               = 0.7;
 
     // determines parameter Q for node2vec model
-    float paramQ              = 0.3;
+    float paramQ               = 0.3;
 
     // determines the initialization strategy for metropolis hastings samplers
-    auto sampler_init_strategy = types::SamplerInitStartegy::BURNIN;
+    auto sampler_init_strategy = types::SamplerInitStartegy::RANDOM;
 
     // random number generator
     auto random                = utility::Random(std::time(nullptr));

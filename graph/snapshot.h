@@ -108,7 +108,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
     struct FlatGraphEntry
     {
         types::Vertex* neighbors;
-        types::Degree degrees;
+        types::Degree degree;
         SamplerManager* samplers;
 
         /**
@@ -171,7 +171,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                 parallel_for(0, this->snapshot.size(), [&](auto index)
                 {
-                    total += sizeof(this->snapshot[index]) + (sizeof(this->snapshot[index].neighbors) * this->snapshot[index].degrees);
+                    total += sizeof(this->snapshot[index]) + (sizeof(this->snapshot[index].neighbors) * this->snapshot[index].degree);
                 });
 
                 return total;
@@ -186,7 +186,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             */
             types::Neighbors neighbors(types::Vertex vertex) final
             {
-                return std::make_tuple(snapshot[vertex].neighbors, snapshot[vertex].degrees, false);
+                return std::make_tuple(snapshot[vertex].neighbors, snapshot[vertex].degree, false);
             }
 
         private:

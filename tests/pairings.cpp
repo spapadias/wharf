@@ -35,6 +35,8 @@ TEST_F(PairingsUnitTest, SzudzikPairingFunctionPairs)
 
     ASSERT_EQ(decoded_value.first, 65535);
     ASSERT_EQ(decoded_value.second, 65535);
+
+    std::cout << std::numeric_limits<uint32_t>::max() << std::endl;
 }
 
 TEST_F(PairingsUnitTest, SzudzikPairingFunction10M)

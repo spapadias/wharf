@@ -64,7 +64,7 @@ namespace utility
         bool run_seq = false
     )
     {
-        #ifdef DOCK_TIMER
+        #ifdef MALIN_TIMER
             timer timer("Utility::GenerateBatchOfEdges");
         #endif
 
@@ -125,14 +125,14 @@ namespace utility
 
         pbbs::free_array(edges);
 
-        #ifdef DOCK_DEBUG
+        #ifdef MALIN_DEBUG
             std::cout << edges_generated << " / "
                       << ((directed) ? edges_number : 2 * edges_number)
                       << " distinct edges (direction, duplicate removal and self-loop processing)"
                       << std::endl;
         #endif
 
-        #ifdef DOCK_TIMER
+        #ifdef MALIN_TIMER
             timer.reportTotal("time(seconds)");
         #endif
 
