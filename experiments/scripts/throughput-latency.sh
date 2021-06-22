@@ -25,10 +25,13 @@ for graph in "${graphs[@]}"; do
 done
 
 # create the build directory
-mkdir -p ../../cmake-build; cd ../../cmake-build; cmake -DCMAKE_BUILD_TYPE=Release ..; cd experiments;
+mkdir -p ../../build;
+cd ../../build;
+cmake -DCMAKE_BUILD_TYPE=Release ..;
+cd experiments;
 
 # build the throughput experiment
-make throughput
+make throughput-latency
 
 # execute experiments
 for wpv in "${walks_per_node[@]}"; do
@@ -36,7 +39,7 @@ for wpv in "${walks_per_node[@]}"; do
         for graph in "${graphs[@]}"; do
             printf "\n"
             printf "Graph: ${graph} \n"
-            time ./throughput -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}"
+            time ./throughput-latency -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}"
         done
     done
 done

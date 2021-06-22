@@ -229,3 +229,29 @@ TEST_F(MalinTest, UpdateRandomWalks)
         std::cout << malin.walk(i) << std::endl;
     }
 }
+
+
+//TEST_F(MalinTest, DEV)
+//{
+//    // create graph and walks
+//    dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
+//    malin.generate_initial_random_walks();
+//
+//    // print random walks
+//    for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
+//    {
+//        std::cout << malin.walk(i) << std::endl;
+//    }
+//
+//    // geneate edges
+//    auto edges = utility::generate_batch_of_edges(1000000, malin.number_of_vertices(), false, false);
+//
+//    auto a = malin.insert_edges_batch(edges.second, edges.first, true, false);
+//    auto b = malin.delete_edges_batch(edges.second, edges.first, true, false);
+//
+//    // print random walks
+//    for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
+//    {
+//        std::cout << malin.walk(i) << std::endl;
+//    }
+//}
