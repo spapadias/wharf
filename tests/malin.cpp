@@ -15,7 +15,7 @@ class MalinTest : public testing::Test
         uintE* offsets;
         bool mmap = false;
         bool is_symmetric = true;
-        std::string default_file_path = "data/aspen-paper-graph";
+        std::string default_file_path = "data/email-graph";
 };
 
 void MalinTest::SetUp()
@@ -99,9 +99,9 @@ TEST_F(MalinTest, MalinDestructor)
 {
     dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
 
-    malin.print_memory_pool_stats();
+//    malin.print_memory_pool_stats();
     malin.destroy();
-    malin.print_memory_pool_stats();
+//    malin.print_memory_pool_stats();
 
     // assert vertices and edges
     ASSERT_EQ(malin.number_of_vertices(), 0);
@@ -156,12 +156,12 @@ TEST_F(MalinTest, UpdateRandomWalksOnInsertEdges)
 {
     // create graph and walks
     dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
-    malin.create_random_walks();
+    malin.generate_initial_random_walks();
 
     // print random walks
     for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
     {
-        std::cout << malin.assemble_walk(i) << std::endl;
+        std::cout << malin.walk(i) << std::endl;
     }
 
     // geneate edges
@@ -173,7 +173,7 @@ TEST_F(MalinTest, UpdateRandomWalksOnInsertEdges)
     // print updated random walks
     for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
     {
-        std::cout << malin.assemble_walk(i) << std::endl;
+        std::cout << malin.walk(i) << std::endl;
     }
 }
 
@@ -181,12 +181,12 @@ TEST_F(MalinTest, UpdateRandomWalksOnDeleteEdges)
 {
     // create graph and walks
     dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
-    malin.create_random_walks();
+    malin.generate_initial_random_walks();
 
     // print random walks
     for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
     {
-        std::cout << malin.assemble_walk(i) << std::endl;
+        std::cout << malin.walk(i) << std::endl;
     }
 
     // geneate edges
@@ -198,7 +198,7 @@ TEST_F(MalinTest, UpdateRandomWalksOnDeleteEdges)
     // print updated random walks
     for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
     {
-        std::cout << malin.assemble_walk(i) << std::endl;
+        std::cout << malin.walk(i) << std::endl;
     }
 }
 
@@ -206,12 +206,12 @@ TEST_F(MalinTest, UpdateRandomWalks)
 {
     // create graph and walks
     dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
-    malin.create_random_walks();
+    malin.generate_initial_random_walks();
 
     // print random walks
     for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
     {
-        std::cout << malin.assemble_walk(i) << std::endl;
+        std::cout << malin.walk(i) << std::endl;
     }
 
     for(int i = 0; i < 1; i++)
@@ -220,35 +220,12 @@ TEST_F(MalinTest, UpdateRandomWalks)
         auto edges = utility::generate_batch_of_edges(1, malin.number_of_vertices(), false, false);
 
         malin.insert_edges_batch(edges.second, edges.first, true, false);
-//        malin.delete_edges_batch(edges.second, edges.first, true, false);
+        malin.delete_edges_batch(edges.second, edges.first, true, false);
     }
 
     // print random walks
     for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
     {
-        std::cout << malin.assemble_walk(i) << std::endl;
-    }
-}
-
-TEST_F(MalinTest, DEV)
-{
-    // create graph and walks
-    dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
-    malin.create_random_walks();
-
-    // print random walks
-    for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
-    {
-        std::cout << malin.assemble_walk(i) << std::endl;
-    }
-
-    auto edges = utility::generate_batch_of_edges(100000, malin.number_of_vertices(), false, false);
-    malin.insert_edges_batch(edges.second, edges.first, true, false);
-
-    stringstream stream;
-    // print random walks
-    for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
-    {
-        std::cout << malin.assemble_walk(i) << std::endl;
+        std::cout << malin.walk(i) << std::endl;
     }
 }

@@ -87,7 +87,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         auto walk_id = walk_index_entry.first / config::walk_length;
                         auto position = walk_index_entry.first - (walk_id * config::walk_length);
 
-                        std::cout << "WalkID: " << walk_id << " Position: " << position << " Next: " << walk_index_entry.second << std::endl;
+                        std::cout << "Walk ID: " << walk_id << " , " << position << " , " << walk_index_entry.second << std::endl;
+
                     });
                 }
 

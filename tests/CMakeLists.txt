@@ -76,7 +76,6 @@ option(HOMEGROWN    OFF)
 option(DOCK_DEBUG   OFF)
 option(SERIAL       OFF)
 
-set(SERIAL ON)
 set(MALIN_DEBUG ON)
 
 # build variables
