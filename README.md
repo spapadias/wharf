@@ -1,2 +1,3 @@
-# Dynamic Graph Representation Learning with Metropolis-Hastings Algorithm
+# WharfMH: Unified Streaming Graph Representation Learning with Metropolis-Hastings
+
 
