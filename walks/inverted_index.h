@@ -80,18 +80,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             {
                 auto result = this->find(walk_id*config::walk_length + position);
 
-                if(walk_id == 0)
-                {
-                    this->iter_elms([&](auto& walk_index_entry) {
-
-                        auto walk_id = walk_index_entry.first / config::walk_length;
-                        auto position = walk_index_entry.first - (walk_id * config::walk_length);
-
-                        std::cout << "Walk ID: " << walk_id << " , " << position << " , " << walk_index_entry.second << std::endl;
-
-                    });
-                }
-
                 #ifdef MALIN_DEBUG
                     if (!result.valid)
                     {
