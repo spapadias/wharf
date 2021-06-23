@@ -5,11 +5,11 @@ clean_build=True                         # cleans build folder after the executi
 
 # execution options
 walk_model="deepwalk"                    # deepwalk | node2vec
-paramP=0.2                               # node2vec's paramP
+paramP=0.3                               # node2vec's paramP
 paramQ=0.7                               # node2vec's paramQ
 sampler_init_strategy="random"           # random | burnin | weight
-declare -a graphs=("aspen-paper-graph")  # array of graphs
-declare -a walks_per_vertex=(5 10 15)    # walks per vertex to generate
+declare -a graphs=("email-graph")        # array of graphs
+declare -a walks_per_vertex=(5 10 20)    # walks per vertex to generate
 declare -a walk_length=(20 40 80)        # length of one walk
 
 # 1. convert graphs in adjacency graph format if necessary

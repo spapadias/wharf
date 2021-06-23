@@ -42,7 +42,7 @@ file(COPY bin/to_word2vec.pl DESTINATION .)
 file(COPY bin/inverted_index_pam DESTINATION .)
 
 # experiments executables
-add_executable(throughput src/throughput.cpp)
+add_executable(throughput-latency src/throughput-latency.cpp)
 add_executable(memory-footprint src/memory-footprint.cpp)
 add_executable(vertex-classification src/vertex-classification.cpp)
 
