@@ -99,9 +99,9 @@ TEST_F(MalinTest, MalinDestructor)
 {
     dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
 
-//    malin.print_memory_pool_stats();
+    malin.print_memory_pool_stats();
     malin.destroy();
-//    malin.print_memory_pool_stats();
+    malin.print_memory_pool_stats();
 
     // assert vertices and edges
     ASSERT_EQ(malin.number_of_vertices(), 0);

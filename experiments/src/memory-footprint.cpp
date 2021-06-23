@@ -71,32 +71,9 @@ void memory_footprint(commandLine& command_line)
     uintV* edges;
     std::tie(n, m, offsets, edges) = read_unweighted_graph(fname.c_str(), is_symmetric, mmap);
 
-    dygrl::Dock dock = dygrl::Dock(n, m, offsets, edges);
-    dock.create_random_walks();
-    dock.memory_footprint();
-
-    std::cout << "Writing " << config::walks_per_vertex * dock.number_of_vertices() << " walks to a file" << std::endl;
-
-    parallel_for(0, config::walks_per_vertex * dock.number_of_vertices(), [&](types::WalkID walk_id)
-    {
-        std::ofstream outfile;
-        std::stringstream ss;
-        ss << "data/" << std::this_thread::get_id() << ".txt";
-
-        outfile.open(ss.str(), std::ios::out | std::ios::app);
-        outfile << dock.rewalk(walk_id) << '\n';
-    });
-
-    std::cout << "Concatenating files ..." << std::endl;
-    std::string command = "cat data/*.txt >> data/walks.txt;";
-    system(command.c_str());
-
-    std::cout << "Writing walks into PAM inverted index ..." << std::endl;
-    command = "./inverted_index_pam -f data/walks.txt";
-    system(command.c_str());
-
-    command = "rm -rf data/*.txt";
-    system(command.c_str());
+    dygrl::Malin malin = dygrl::Malin(n, m, offsets, edges);
+    malin.generate_initial_random_walks();
+    malin.memory_footprint();
 }
 
 
