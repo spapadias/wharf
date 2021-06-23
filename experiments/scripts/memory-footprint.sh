@@ -45,6 +45,6 @@ done
 # 4. clean build if necessary
 if [ "$clean_build" = True ] ; then
     cd ../../;
-    rm -rf cmake-build;
+    rm -rf build;
     rm experiments/data/*.adj
 fi

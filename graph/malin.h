@@ -844,7 +844,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 };
 
                 this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, insert_walks.begin(), insert_walks.size(), replaceI, true);
-
         }
 
         /**

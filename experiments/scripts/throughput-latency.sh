@@ -12,7 +12,7 @@ declare -a graphs=("email-graph")
 declare -a walks_per_node=(10)
 declare -a walk_length=(80)
 
-# convert graphs in adjacency graph format if necessary
+# 1. convert graphs in adjacency graph format if necessary
 for graph in "${graphs[@]}"; do
   FILE=../data/"${graph}".adj
   if test -f "$FILE"; then
@@ -24,16 +24,14 @@ for graph in "${graphs[@]}"; do
   fi
 done
 
-# create the build directory
+# 2. build the executable
 mkdir -p ../../build;
 cd ../../build;
 cmake -DCMAKE_BUILD_TYPE=Release ..;
 cd experiments;
-
-# build the throughput experiment
 make throughput-latency
 
-# execute experiments
+# 3. execute experiments
 for wpv in "${walks_per_node[@]}"; do
     for wl in "${walk_length[@]}"; do
         for graph in "${graphs[@]}"; do
@@ -44,7 +42,7 @@ for wpv in "${walks_per_node[@]}"; do
     done
 done
 
-# clean build if necessary
+# 4. clean build if necessary
 if [ "$clean_build" = True ] ; then
     cd ../../;
     rm -rf cmake-build;
