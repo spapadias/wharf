@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # script options
-clean_build=False                           # cleans build folder after the execution
+clean_build=True                            # cleans build folder after the execution
 
 # execution options
 walk_model="deepwalk"                       # deepwalk | node2vec
@@ -10,9 +10,10 @@ paramQ=0.7                                  # node2vec's paramQ
 sampler_init_strategy="random"              # random | burnin | weight
 vector_dimension=5                          # size of learned vectors
 learning_strategy=2                         # 1: online | 2: mini-batch (default)
+parition_size=10                            # size of the edges parition
 declare -a graphs=("wiki-graph")            # array of graphs
-declare -a walks_per_vertex=(2)             # walks per vertex to generate
-declare -a walk_length=(10)                 # length of one walk
+declare -a walks_per_vertex=(10)            # walks per vertex to generate
+declare -a walk_length=(80)                 # length of one walk
 
 # 1. convert graphs in adjacency graph format if necessary
 for graph in "${graphs[@]}"; do
@@ -37,7 +38,7 @@ make vertex-classification
 for wpv in "${walks_per_vertex[@]}"; do
     for wl in "${walk_length[@]}"; do
         for graph in "${graphs[@]}"; do
-            time ./vertex-classification -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}" -d "${vector_dimension}" -le "${learning_strategy}"
+            time ./vertex-classification -s -f "data/${graph}" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}" -d "${vector_dimension}" -le "${learning_strategy}" -p "${parition_size}"
         done
     done
 done

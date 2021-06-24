@@ -55,9 +55,9 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     if (deg > 0)
                         vertices[index] = std::make_pair(index, VertexEntry
                         (
-            types::CompressedEdges(S, index),
-                           dygrl::CompressedWalks(),
-                           new dygrl::SamplerManager(0)
+                            types::CompressedEdges(S, index),
+                            dygrl::CompressedWalks(),
+                            new dygrl::SamplerManager(0)
                         ));
                     else
                         vertices[index] = std::make_pair(index, VertexEntry
