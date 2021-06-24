@@ -8,7 +8,7 @@ walk_model="deepwalk"             # deepwalk | node2vec
 paramP=0.2                        # node2vec paramP
 paramQ=0.7                        # node2vec paramQ
 sampler_init_strategy="random"    # random | burnin | weight
-declare -a graphs=("email-graph")
+declare -a graphs=("cora-graph" "wiki-graph")
 declare -a walks_per_node=(10)
 declare -a walk_length=(80)
 
