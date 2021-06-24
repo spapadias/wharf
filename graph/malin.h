@@ -740,29 +740,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         current_vertex_old_walk = current_vertex_old_walk = affected_walks[index] % this->number_of_vertices();
                     }
 
-                    fork_join_scheduler::Job delete_job = [&] ()
-                    {
-                        types::Position position = current_position;
-
-                        while (current_vertex_old_walk != std::numeric_limits<uint32_t>::max() - 1)
-                        {
-                            auto vertex = this->graph_tree.find(current_vertex_old_walk);
-                            auto next_old_walk = vertex.value.compressed_walks.find_next(affected_walks[index], position, current_vertex_old_walk);
-
-                            types::PairedTriplet hash = pairings::Szudzik<types::Vertex>::pair({affected_walks[index]*config::walk_length + position, next_old_walk});
-
-                            if (!deletes.contains(current_vertex_old_walk)) deletes.insert(current_vertex_old_walk, std::vector<types::PairedTriplet>());
-
-                            deletes.update_fn(current_vertex_old_walk, [&](auto& vector)
-                            {
-                                vector.push_back(hash);
-                            });
-
-                            position++;
-                            current_vertex_old_walk = next_old_walk;
-                        }
-                    }; delete_job();
-
                     fork_join_scheduler::Job insert_job = [&] ()
                     {
                         if (graph[current_vertex_new_walk].degree == 0)
@@ -811,6 +788,29 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         }
 
                     }; insert_job();
+
+                    fork_join_scheduler::Job delete_job = [&] ()
+                    {
+                        types::Position position = current_position;
+
+                        while (current_vertex_old_walk != std::numeric_limits<uint32_t>::max() - 1)
+                        {
+                            auto vertex = this->graph_tree.find(current_vertex_old_walk);
+                            auto next_old_walk = vertex.value.compressed_walks.find_next(affected_walks[index], position, current_vertex_old_walk);
+
+                            types::PairedTriplet hash = pairings::Szudzik<types::Vertex>::pair({affected_walks[index]*config::walk_length + position, next_old_walk});
+
+                            if (!deletes.contains(current_vertex_old_walk)) deletes.insert(current_vertex_old_walk, std::vector<types::PairedTriplet>());
+
+                            deletes.update_fn(current_vertex_old_walk, [&](auto& vector)
+                            {
+                                vector.push_back(hash);
+                            });
+
+                            position++;
+                            current_vertex_old_walk = next_old_walk;
+                        }
+                    }; delete_job();
                 });
 
                 using VertexStruct  = std::pair<types::Vertex, VertexEntry>;
