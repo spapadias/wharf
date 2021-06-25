@@ -11,7 +11,7 @@ set(OMPFLAGS     "-DOPENMP -fopenmp")
 set(CILKFLAGS    "-DCILK -fcilkplus")
 set(HGFLAGS      "-DHOMEGROWN -pthread")
 set(OPTIMIZATION "-O3 -g")
-set(CFLAGS       "-DEDGELONG  -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC -DVERTEXLONG")
+set(CFLAGS       "-DEDGELONG  -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC")
 
 if(CLANG)
     set(CMAKE_CXX_COMPILER "clang++")

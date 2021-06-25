@@ -72,9 +72,10 @@ void throughput(commandLine& command_line)
     uintV* edges;
     std::tie(n, m, offsets, edges) = read_unweighted_graph(fname.c_str(), is_symmetric, mmap);
 
-    std::cout << std::endl;
     dygrl::Malin malin = dygrl::Malin(n, m, offsets, edges);
-    timer init_walk_timer("Initial walk time");
+
+    std::cout << std::endl;
+    timer init_walk_timer("Initial walk timer");
     malin.generate_initial_random_walks();
     init_walk_timer.reportTotal("");
     std::cout << std::endl;
@@ -107,6 +108,8 @@ void throughput(commandLine& command_line)
         auto latency_insert = pbbs::sequence<double>(n_trials);
         auto latency_delete = pbbs::sequence<double>(n_trials);
         auto latency        = pbbs::sequence<double>(n_trials);
+
+        size_t affected_walks_delete = 0;
 
         for (short int trial = 0; trial < n_trials; trial++)
         {

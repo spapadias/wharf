@@ -72,8 +72,8 @@ TEST_F(MalinTest, MalinConstructor)
         ASSERT_EQ(flat_snapshot[i].compressed_edges.degree(), degree);
 
         // assert that compressed_walks_tree is empty
-        ASSERT_EQ(flat_snapshot[i].compressed_walks.root, nullptr);
-        ASSERT_EQ(flat_snapshot[i].compressed_walks.size(), 0);
+        ASSERT_EQ(flat_snapshot[i].inverted_index.root, nullptr);
+        ASSERT_EQ(flat_snapshot[i].inverted_index.size(), 0);
 
         // assert empty samplers
         ASSERT_EQ(flat_snapshot[i].sampler_manager->size(), 0);
@@ -95,7 +95,7 @@ TEST_F(MalinTest, MalinConstructor)
     });
 }
 
-TEST_F(MalinTest, DockDestructor)
+TEST_F(MalinTest, MalinDestructor)
 {
     dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
 
@@ -146,7 +146,7 @@ TEST_F(MalinTest, DeleteBatchOfEdges)
     malin.delete_edges_batch(edges.second, edges.first, true, false, std::numeric_limits<size_t>::max(), false);
 
     std::cout << "Edges before batch delete: " << start_edges << std::endl;
-    std::cout << "Edges after batch delete: "  << malin.number_of_edges() << std::endl;
+    std::cout << "Edges after batch delete: " << malin.number_of_edges() << std::endl;
 
     // assert edge deletion
     ASSERT_LE(malin.number_of_edges(), start_edges);
@@ -229,29 +229,3 @@ TEST_F(MalinTest, UpdateRandomWalks)
         std::cout << malin.walk(i) << std::endl;
     }
 }
-
-
-//TEST_F(MalinTest, DEV)
-//{
-//    // create graph and walks
-//    dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
-//    malin.generate_initial_random_walks();
-//
-//    // print random walks
-//    for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
-//    {
-//        std::cout << malin.walk(i) << std::endl;
-//    }
-//
-//    // geneate edges
-//    auto edges = utility::generate_batch_of_edges(1000000, malin.number_of_vertices(), false, false);
-//
-//    auto a = malin.insert_edges_batch(edges.second, edges.first, true, false);
-//    auto b = malin.delete_edges_batch(edges.second, edges.first, true, false);
-//
-//    // print random walks
-//    for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
-//    {
-//        std::cout << malin.walk(i) << std::endl;
-//    }
-//}

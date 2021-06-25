@@ -84,7 +84,7 @@ set(CILKFLAGS        "-DCILK -fcilkplus")
 set(HGFLAGS          "-DHOMEGROWN -pthread")
 set(OPTIMIZATION     "-O3 -g")
 set(CFLAGS           "-DEDGELONG -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC -DNDEBUG")
-set(DOCK_DEBUG_FLAGS "-DEDGELONG -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC")
+set(MALIN_DEBUG_FLAGS "-DEDGELONG -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC")
 
 if(CLANG)
     set(CMAKE_CXX_COMPILER "clang++")
@@ -108,7 +108,7 @@ endif()
 
 # set compile flags
 if (MALIN_DEBUG)
-    set(CMAKE_CXX_FLAGS "${DOCK_DEBUG_FLAGS} ${PFLAGS} -DMALIN_DEBUG -DMALIN_TIMER -DVERTEXLONG")
+    set(CMAKE_CXX_FLAGS "${MALIN_DEBUG_FLAGS} ${PFLAGS} -DMALIN_DEBUG -DMALIN_TIMER")
 else()
     set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS}")
 endif()
