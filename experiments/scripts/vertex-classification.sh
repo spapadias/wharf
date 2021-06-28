@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # script options
-clean_build=False                    # removes build folder after the execution
+clean_build=True                     # removes build folder after the execution
 
 # execution options
 walk_model="deepwalk"                # deepwalk | node2vec
@@ -10,7 +10,7 @@ paramQ=0.7                           # node2vec's paramQ
 sampler_init_strategy="random"       # random | weight | burnin
 vector_dimension=5                   # size of learned vectors
 learning_strategy=2                  # 1: online | 2: mini-batch (default)
-edge_parition_size=1                 # size of the edges parition
+edge_parition_size=10                # size of the edges parition
 declare -a graphs=("wiki-graph")     # array of graphs
 declare -a walks_per_vertex=(10)     # walks per vertex to generate
 declare -a walk_length=(80)          # length of one walk
@@ -32,6 +32,12 @@ mkdir -p ../../build;
 cd ../../build;
 cmake -DCMAKE_BUILD_TYPE=Release ..;
 cd experiments;
+
+sudo pip3 install virtualenv
+virtualenv venv
+source venv/bin/activate
+pip3 install pandas scikit-learn
+
 make vertex-classification
 
 # 3. execute experiments

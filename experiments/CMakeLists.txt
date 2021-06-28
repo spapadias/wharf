@@ -34,11 +34,12 @@ else()
 endif()
 
 # set compile flags
-set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS} -DMALIN_DEBUG -DMALIN_TIMER")
+set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS}")
 
 file(COPY data DESTINATION .)
 file(COPY bin/SNAPtoAdj DESTINATION .)
 file(COPY bin/to_word2vec.pl DESTINATION .)
+file(COPY bin/vertex-classification.py DESTINATION .)
 
 # experiments executables
 add_executable(throughput-latency src/throughput-latency.cpp)

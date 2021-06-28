@@ -121,52 +121,40 @@ void vertex_classification(commandLine& command_line, const std::vector<std::pai
     size_t n; size_t m;
     uintE* offsets; uintV* edges;
     stringstream ss; ss << fname << ".adj";
-    std::cout << ss.str() << std::endl;
     std::tie(n, m, offsets, edges) = read_unweighted_graph(ss.str().c_str(), is_symmetric, mmap);
 
     pbbs::free_array(offsets);
     pbbs::free_array(edges);
 
+    /******************************************************************************************************************/
+
+    // 1. load all vertices in isolation (every vertex has a degree of 0)
     dygrl::Malin malin = dygrl::Malin(n, m);
     malin.generate_initial_random_walks();
 
-    for (auto& edge_batch : stream)
-    {
-        malin.insert_edges_batch(edge_batch.second, edge_batch.first, false, true);
-    }
+    // 2. train initial embeddings
+    std::cout << "Learning initial embeddings ..." << std::endl;
+    stringstream command;
 
-    std::ofstream file("text");
-    for(int i = 0; i < n; i++)
+    std::ofstream file("walks.txt");
+    for (int i = 0; i < malin.number_of_vertices() * config::walks_per_vertex; i++)
     {
         file << malin.walk(i) << std::endl;
     }
     file.close();
 
-//    // 4. learn emebeddings
-//    std::cout << "Learning embeddings..." << std::endl;
-//    stringstream command;
-////    command << "printf '";
-//
-//    std::ofstream file("file.txt");
-//
-//    for(int i = 0; i < n * walks_per_vertex; i++)
+    command << "yskip walks.txt model; perl to_word2vec.pl < model > model.w2v";
+    system(command.str().c_str());
+
+    command.str(std::string());
+    command << "python3 vertex-classification.py" << std::endl;
+    system(command.str().c_str());
+
+//    for (auto& edge_batch : stream)
 //    {
-//        file << malin.walk(i) << std::endl;
-////        command << dock.rewalk(i) << std::endl;
+//        malin.insert_edges_batch(edge_batch.second, edge_batch.first, false, true);
 //    }
-//
-//    file.close();
-//
-////    command << "' | yskip --thread-num="
-////            << num_workers()
-////            << " -d " << vector_dimension
-////            << " -l " << learning_strategy
-////            << " - model;"
-////            << "perl to_word2vec.pl < model > model.w2v";
-//
-//    command << "yskip file.txt model; perl to_word2vec.pl < model > model.w2v";
-//    auto res = system(command.str().c_str());
-//
+
 ////    // 5.
 ////    for(int i = 0; i < 1; i++)
 ////    {
