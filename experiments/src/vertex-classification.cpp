@@ -124,11 +124,10 @@ void vertex_classification(commandLine& command_line, const std::vector<Edge*>& 
     pbbs::free_array(offsets);
     pbbs::free_array(edges);
 
-    
-    dygrl::Malin malin = dygrl::Malin(n, m);
 
-//    malin.generate_initial_random_walks();
-//
+    dygrl::Malin malin = dygrl::Malin(n, m);
+    malin.generate_initial_random_walks();
+
 //    // 4. learn emebeddings
 //    std::cout << "Learning embeddings..." << std::endl;
 //    stringstream command;
@@ -138,7 +137,7 @@ void vertex_classification(commandLine& command_line, const std::vector<Edge*>& 
 //
 //    for(int i = 0; i < n * walks_per_vertex; i++)
 //    {
-//        file << dock.rewalk(i) << std::endl;
+//        file << malin.walk(i) << std::endl;
 ////        command << dock.rewalk(i) << std::endl;
 //    }
 //
