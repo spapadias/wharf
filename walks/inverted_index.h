@@ -18,10 +18,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
         using entry_t = std::pair<key_t, val_t>;   // entry: ((walk id, position in the walk), next vertex)
 
         // key x key -> key
-        static bool comp(const key_t& keyX, const key_t& keyY)
-        {
-            return keyX < keyY;
-        }
+        static bool comp(const key_t& keyX, const key_t& keyY) { return keyX < keyY; }
 
         // key x value -> augmentation
         static aug_t from_entry(const key_t& key, const val_t& value) { return '\0'; }
@@ -33,17 +30,15 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
         static aug_t get_empty() { return 0; }
 
         // copy existing entry
-        static entry_t copy_entry(const entry_t& entry)
-        {
-            return std::make_pair(entry.first, entry.second);
-        }
+        static entry_t copy_entry(const entry_t& entry) { return std::make_pair(entry.first, entry.second); }
 
         // delete an entry
         static void del(entry_t& entry) {}
     };
 
     /**
-     * @brief TODO:comment
+     * @brief Inverted Index as an augmented parallel balanced binary tree. It stores parts of the walk in the form
+     * of a pair ((walk id, vertex position in a walk), next vertex).
      */
     class InvertedIndex : public aug_map<WalkIndexEntry>
     {
@@ -99,4 +94,4 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
 }
 
-#endif //DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_INVERTED_INDEX_H
+#endif // DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_INVERTED_INDEX_H

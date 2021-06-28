@@ -23,6 +23,29 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
         public:
             using Graph = aug_map<dygrl::Vertex>;
 
+            Malin(long graph_vertices, long graph_edges)
+            {
+                // 1. Initialize memory pools
+                Malin::init_memory_pools(graph_vertices, graph_edges);
+
+                // 2. Create an empty vertex sequence
+                using VertexStruct = std::pair<types::Vertex, VertexEntry>;
+                auto vertices = pbbs::sequence<VertexStruct>(graph_vertices);
+
+                parallel_for(0, graph_vertices, [&](long index)
+                {
+                    vertices[index] = std::make_pair(index, VertexEntry
+                    (
+                            types::CompressedEdges(),
+                            dygrl::InvertedIndex(),
+                            new dygrl::SamplerManager(0)
+                    ));
+                });
+
+                auto replace = [](const VertexEntry& x, const VertexEntry& y) { return y; };
+                this->graph_tree = Graph::Tree::multi_insert_sorted(nullptr, vertices.begin(), vertices.size(), replace, true);
+            }
+
             /**
              * @brief Malin constructor.
              *

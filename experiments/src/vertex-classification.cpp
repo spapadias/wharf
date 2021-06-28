@@ -1,56 +1,52 @@
 #include <malin.h>
 
-using Edge = std::tuple<uintV, uintV>;
+using Edge = std::tuple<types::Vertex, types::Vertex>;
 
-void preprocess(commandLine& command_line, std::vector<Edge*>& stream)
+void create_edge_stream(commandLine& command_line, std::vector<Edge*>& stream)
 {
-    string fname      = string(command_line.getOptionValue("-f", "cora-graph"));
-    int parition_size = (int) command_line.getOptionLongValue("-p", 1000);
-    std::vector<std::vector<Edge>> temp_stream;
+    string fname = string(command_line.getOptionValue("-f", "cora-graph"));
+    size_t edge_parition_size = command_line.getOptionLongValue("-eps", 1000);
 
-    uintV first, second;
-    std::ifstream file(fname);
+    types::Vertex firstV, secondV;
+    std::vector<std::vector<Edge>> temp;
 
-    int i = 0;
-    while (file >> first >> second)
+    std::ifstream file(fname); int iter = 0;
+
+    while (file >> firstV >> secondV)
     {
-        auto index = i % parition_size;
+        auto index = iter % edge_parition_size;
 
         if (index == 0)
         {
-            temp_stream.emplace_back(std::vector<Edge>());
+            temp.emplace_back(std::vector<Edge>());
         }
 
-        temp_stream.back().push_back(std::make_tuple(first, second));
-        i += 1;
+        temp.back().push_back(std::make_tuple(firstV, secondV));
+        iter += 1;
     }
 
-    for(int i = 0; i < temp_stream.size(); i++)
+    for(auto& partition : temp)
     {
-        stream.push_back(new Edge[temp_stream[i].size()]);
+        stream.push_back(new Edge[partition.size()]);
 
-        for(int j = 0; j < temp_stream[i].size(); j++)
+        for(int j = 0; j < partition.size(); j++)
         {
-            stream.back()[j] = temp_stream[i][j];
+            stream.back()[j] = partition[j];
         }
     }
-
-    std::cout << stream.size() << std::endl;
 }
 
 void vertex_classification(commandLine& command_line, const std::vector<Edge*>& stream)
 {
-    // 1. collect command line parameters
     size_t walks_per_vertex  = command_line.getOptionLongValue("-w", config::walks_per_vertex);
     size_t length_of_walks   = command_line.getOptionLongValue("-l", config::walk_length);
     string model             = string(command_line.getOptionValue("-model", "deepwalk"));
     double paramP            = command_line.getOptionDoubleValue("-paramP", config::paramP);
     double paramQ            = command_line.getOptionDoubleValue("-paramQ", config::paramQ);
-    string init_strategy     = string(command_line.getOptionValue("-init", "weight"));
+    string init_strategy     = string(command_line.getOptionValue("-init", "random"));
     size_t vector_dimension  = command_line.getOptionLongValue("-d", 128);
     size_t learning_strategy = command_line.getOptionLongValue("-le", 2);
 
-    // 2. set up command line parameters
     config::walks_per_vertex = walks_per_vertex;
     config::walk_length      = length_of_walks;
 
@@ -116,6 +112,20 @@ void vertex_classification(commandLine& command_line, const std::vector<Edge*>& 
         std::cerr << "Unrecognized sampler init strategy" << std::endl;
         std::exit(1);
     }
+
+    string fname             = string(command_line.getOptionValue("-f", default_file_name));
+    bool mmap                = command_line.getOption("-m");
+    bool is_symmetric        = command_line.getOption("-s");
+
+    size_t n; size_t m;
+    uintE* offsets; uintV* edges;
+    std::tie(n, m, offsets, edges) = read_unweighted_graph(fname.c_str(), is_symmetric, mmap);
+
+    pbbs::free_array(offsets);
+    pbbs::free_array(edges);
+
+    
+    dygrl::Malin malin = dygrl::Malin(n, m);
 
 //    malin.generate_initial_random_walks();
 //
@@ -191,17 +201,13 @@ void vertex_classification(commandLine& command_line, const std::vector<Edge*>& 
 
 int main(int argc, char** argv)
 {
-    std::cout << std::endl
-              << "Running experiment with: "
-              << num_workers()
-              << " threads."
-              << std::endl
-              << std::endl;
+    std::cout << " - Running vertex classification with "
+              << num_workers() << " threads." << std::endl << std::endl;
 
     std::vector<Edge*> stream;
-
     commandLine command_line(argc, argv, "");
-    preprocess(command_line, stream);
+
+    create_edge_stream(command_line, stream);
     vertex_classification(command_line, stream);
 }
 
