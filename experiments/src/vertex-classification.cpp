@@ -2,7 +2,7 @@
 
 using Edge = std::tuple<types::Vertex, types::Vertex>;
 
-void create_edge_stream(commandLine& command_line, std::vector<Edge*>& stream)
+void create_edge_stream(commandLine& command_line, std::vector<std::pair<Edge*, uintV>>& stream)
 {
     string fname = string(command_line.getOptionValue("-f", "cora-graph"));
     size_t edge_parition_size = command_line.getOptionLongValue("-eps", 1000);
@@ -22,21 +22,22 @@ void create_edge_stream(commandLine& command_line, std::vector<Edge*>& stream)
         }
 
         temp.back().push_back(std::make_tuple(firstV, secondV));
+        temp.back().push_back(std::make_tuple(secondV, firstV));
         iter += 1;
     }
 
     for(auto& partition : temp)
     {
-        stream.push_back(new Edge[partition.size()]);
+        stream.emplace_back(new Edge[partition.size()], partition.size());
 
         for(int j = 0; j < partition.size(); j++)
         {
-            stream.back()[j] = partition[j];
+            stream.back().first[j] = partition[j];
         }
     }
 }
 
-void vertex_classification(commandLine& command_line, const std::vector<Edge*>& stream)
+void vertex_classification(commandLine& command_line, const std::vector<std::pair<Edge*, uintV>>& stream)
 {
     size_t walks_per_vertex  = command_line.getOptionLongValue("-w", config::walks_per_vertex);
     size_t length_of_walks   = command_line.getOptionLongValue("-l", config::walk_length);
@@ -119,14 +120,27 @@ void vertex_classification(commandLine& command_line, const std::vector<Edge*>& 
 
     size_t n; size_t m;
     uintE* offsets; uintV* edges;
-    std::tie(n, m, offsets, edges) = read_unweighted_graph(fname.c_str(), is_symmetric, mmap);
+    stringstream ss; ss << fname << ".adj";
+    std::cout << ss.str() << std::endl;
+    std::tie(n, m, offsets, edges) = read_unweighted_graph(ss.str().c_str(), is_symmetric, mmap);
 
     pbbs::free_array(offsets);
     pbbs::free_array(edges);
 
-
     dygrl::Malin malin = dygrl::Malin(n, m);
     malin.generate_initial_random_walks();
+
+    for (auto& edge_batch : stream)
+    {
+        malin.insert_edges_batch(edge_batch.second, edge_batch.first, false, true);
+    }
+
+    std::ofstream file("text");
+    for(int i = 0; i < n; i++)
+    {
+        file << malin.walk(i) << std::endl;
+    }
+    file.close();
 
 //    // 4. learn emebeddings
 //    std::cout << "Learning embeddings..." << std::endl;
@@ -203,7 +217,7 @@ int main(int argc, char** argv)
     std::cout << " - Running vertex classification with "
               << num_workers() << " threads." << std::endl << std::endl;
 
-    std::vector<Edge*> stream;
+    std::vector<std::pair<Edge*, uintV>> stream;
     commandLine command_line(argc, argv, "");
 
     create_edge_stream(command_line, stream);

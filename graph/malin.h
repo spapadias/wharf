@@ -870,7 +870,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 auto replaceD = [&] (const intV& v, const VertexEntry& x, const VertexEntry& y)
                 {
                     auto inv_index = InvertedIndex::map_difference(x.inverted_index, y.inverted_index);
-
                     return VertexEntry(x.compressed_edges, dygrl::InvertedIndex(inv_index), x.sampler_manager);
                 };
 
@@ -879,7 +878,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 auto replaceI = [&] (const intV& v, const VertexEntry& x, const VertexEntry& y)
                 {
                     auto inv_index = InvertedIndex::map_union(x.inverted_index, y.inverted_index);
-
                     return VertexEntry(x.compressed_edges, dygrl::InvertedIndex(inv_index), x.sampler_manager);
                 };
 
