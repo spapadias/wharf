@@ -828,43 +828,44 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 fj.pardo([&]()
                 {
                     auto ind = 0;
+                    auto ins = pbbs::sequence<types::Vertex>(inserts.size());
 
-                    for(auto& item : inserts.lock_table())
+                    for(auto& item : inserts.lock_table()) ins[ind++] = item.first;
+                    pbbs::sample_sort_inplace(pbbs::make_range(ins.begin(), ins.end()), std::less<>());
+
+                    ind = 0;
+                    for(auto& item : ins)
                     {
-                        auto sequence = pbbs::sequence<dygrl::WalkIndexEntry::entry_t>(item.second.size());
+                        auto entry = inserts.find(ins[ind]);
+                        auto sequence = pbbs::sequence<dygrl::WalkIndexEntry::entry_t>(entry.size());
 
-                        for(auto i = 0; i < item.second.size(); i++)
-                            sequence[i] = item.second[i];
+                        for(auto i = 0; i < entry.size(); i++)
+                            sequence[i] = entry[i];
 
-                        pbbs::sample_sort_inplace(pbbs::make_range(sequence.begin(), sequence.end()), std::less<>());
-                        insert_walks[ind++] = std::make_pair(item.first, VertexEntry(types::CompressedEdges(), dygrl::InvertedIndex(sequence), new dygrl::SamplerManager(0)));
+                        insert_walks[ind] = std::make_pair(ins[ind], VertexEntry(types::CompressedEdges(), dygrl::InvertedIndex(sequence), new dygrl::SamplerManager(0)));
+                        ind++;
                     }
                 },
                 [&]()
                 {
                     auto ind = 0;
+                    auto del = pbbs::sequence<types::Vertex>(deletes.size());
 
-                    for(auto& item : deletes.lock_table())
+                    for(auto& item : deletes.lock_table()) del[ind++] = item.first;
+                    pbbs::sample_sort_inplace(pbbs::make_range(del.begin(), del.end()), std::less<>());
+
+                    ind = 0;
+                    for(auto& item : del)
                     {
-                        auto sequence = pbbs::sequence<dygrl::WalkIndexEntry::entry_t>(item.second.size());
+                        auto entry = deletes.find(del[ind]);
+                        auto sequence = pbbs::sequence<dygrl::WalkIndexEntry::entry_t>(entry.size());
 
-                        for(auto i = 0; i < item.second.size(); i++)
-                            sequence[i] = item.second[i];
+                        for(auto i = 0; i < entry.size(); i++)
+                            sequence[i] = entry[i];
 
-                        delete_walks[ind++] = std::make_pair(item.first, VertexEntry(types::CompressedEdges(), dygrl::InvertedIndex(sequence), new dygrl::SamplerManager(0)));
+                        delete_walks[ind] = std::make_pair(del[ind], VertexEntry(types::CompressedEdges(), dygrl::InvertedIndex(sequence), new dygrl::SamplerManager(0)));
+                        ind++;
                     }
-                });
-
-                fj.pardo([&]()
-                {
-                    pbbs::sample_sort_inplace(pbbs::make_range(delete_walks.begin(), delete_walks.end()), [&](auto& x, auto& y) {
-                        return x.first < y.first;
-                    });
-                }, [&]()
-                {
-                    pbbs::sample_sort_inplace(pbbs::make_range(insert_walks.begin(), insert_walks.end()), [&](auto& x, auto& y) {
-                        return x.first < y.first;
-                    });
                 });
 
                 auto replaceD = [&] (const intV& v, const VertexEntry& x, const VertexEntry& y)
@@ -882,7 +883,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 };
 
                 this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, insert_walks.begin(), insert_walks.size(), replaceI, true);
-        }
+            }
 
         /**
          * @brief Prints memory footprint details.

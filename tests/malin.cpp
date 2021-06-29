@@ -15,7 +15,7 @@ class MalinTest : public testing::Test
         uintE* offsets;
         bool mmap = false;
         bool is_symmetric = true;
-        std::string default_file_path = "data/cora-graph";
+        std::string default_file_path = "data/facebook-graph";
 };
 
 void MalinTest::SetUp()
@@ -112,6 +112,13 @@ TEST_F(MalinTest, MalinDestructor)
 
     // assert that flat snapshot does not exits
     ASSERT_EQ(flat_snapshot.size(), 0);
+}
+
+TEST_F(MalinTest, MalinMemoryFootprint)
+{
+    dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
+    malin.generate_initial_random_walks();
+    malin.memory_footprint();
 }
 
 TEST_F(MalinTest, InsertBatchOfEdges)

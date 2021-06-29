@@ -37,8 +37,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
          * @param inverted_index   - parallel inverted index
          * @param sampler_manager  - manager of MH samplers
          */
-        VertexEntry(const types::CompressedEdges& compressed_edges, dygrl::InvertedIndex inverted_index, dygrl::SamplerManager* sampler_manager)
-            : compressed_edges(compressed_edges), inverted_index(std::move(inverted_index)), sampler_manager(sampler_manager) {};
+        VertexEntry(const types::CompressedEdges& compressed_edges, const dygrl::InvertedIndex& inverted_index, dygrl::SamplerManager* sampler_manager)
+            : compressed_edges(compressed_edges), inverted_index(inverted_index), sampler_manager(sampler_manager) {};
     };
 
     /**
