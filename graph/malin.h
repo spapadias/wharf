@@ -803,8 +803,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                             state = graph[state.first].samplers->find(state.second).sample(state, model);
 
                             auto index_entry = (position != config::walk_length - 1) ?
-                                               std::make_pair(affected_walks[index]*config::walk_length + position, state.first) :
-                                               std::make_pair(affected_walks[index]*config::walk_length + position, std::numeric_limits<uint32_t>::max() - 1);
+                                std::make_pair(affected_walks[index]*config::walk_length + position, state.first) :
+                                std::make_pair(affected_walks[index]*config::walk_length + position, std::numeric_limits<uint32_t>::max() - 1);
 
 
                             if (!inserts.contains(current_vertex_new_walk))
@@ -821,7 +821,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     }; insert_job();
                 });
 
-                using VertexStruct  = std::pair<types::Vertex, VertexEntry>;
+                using VertexStruct = std::pair<types::Vertex, VertexEntry>;
                 auto insert_walks  = pbbs::sequence<VertexStruct>(inserts.size());
                 auto delete_walks  = pbbs::sequence<VertexStruct>(deletes.size());
 
