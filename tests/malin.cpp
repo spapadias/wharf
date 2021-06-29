@@ -15,7 +15,7 @@ class MalinTest : public testing::Test
         uintE* offsets;
         bool mmap = false;
         bool is_symmetric = true;
-        std::string default_file_path = "data/facebook-graph";
+        std::string default_file_path = "data/youtube-graph";
 };
 
 void MalinTest::SetUp()
@@ -112,13 +112,6 @@ TEST_F(MalinTest, MalinDestructor)
 
     // assert that flat snapshot does not exits
     ASSERT_EQ(flat_snapshot.size(), 0);
-}
-
-TEST_F(MalinTest, MalinMemoryFootprint)
-{
-    dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
-    malin.generate_initial_random_walks();
-    malin.memory_footprint();
 }
 
 TEST_F(MalinTest, InsertBatchOfEdges)
@@ -234,5 +227,108 @@ TEST_F(MalinTest, UpdateRandomWalks)
     for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
     {
         std::cout << malin.walk(i) << std::endl;
+    }
+}
+
+TEST_F(MalinTest, MalinMemoryFootprint)
+{
+    dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
+    malin.generate_initial_random_walks();
+    malin.memory_footprint();
+}
+
+TEST_F(MalinTest, MalinThroughputLatency)
+{
+    dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
+    malin.generate_initial_random_walks();
+    int n_trials = 5;
+
+    auto batch_sizes = pbbs::sequence<size_t>(7);
+    batch_sizes[0] = std::pow(10, 1);           // 10
+    batch_sizes[1] = std::pow(10, 2);           // 100
+    batch_sizes[2] = std::pow(10, 3);           // 1.000
+    batch_sizes[3] = std::pow(10, 4);           // 10.000
+    batch_sizes[4] = std::pow(10, 5);           // 100.000
+    batch_sizes[5] = std::pow(10, 6);           // 1.000.000
+    batch_sizes[6] = std::pow(10, 7);           // 10.000.000
+
+    for (short int i = 0; i < batch_sizes.size(); i++)
+    {
+        timer insert_timer("InsertTimer");
+        timer delete_timer("DeleteTimer");
+
+        graph_update_time_on_insert.reset();
+        walk_update_time_on_insert.reset();
+        graph_update_time_on_delete.reset();
+        walk_update_time_on_delete.reset();
+
+        std::cout << "Batch size = " << 2*batch_sizes[i] << " | ";
+
+        double last_insert_time = 0;
+        double last_delete_time = 0;
+
+        auto latency_insert = pbbs::sequence<double>(n_trials);
+        auto latency_delete = pbbs::sequence<double>(n_trials);
+        auto latency        = pbbs::sequence<double>(n_trials);
+
+        for (short int trial = 0; trial < n_trials; trial++)
+        {
+            size_t graph_size_pow2 = 1 << (pbbs::log2_up(total_vertices) - 1);
+            auto edges = utility::generate_batch_of_edges(batch_sizes[i], total_vertices, false, false);
+
+            std::cout << edges.second << " ";
+
+            insert_timer.start();
+            auto x = malin.insert_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
+            insert_timer.stop();
+
+            last_insert_time = walk_update_time_on_insert.get_total() - last_insert_time;
+            latency_insert[trial] = last_insert_time / x.size();
+
+            delete_timer.start();
+            auto y = malin.delete_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
+            delete_timer.stop();
+
+            last_delete_time = walk_update_time_on_delete.get_total() - last_delete_time;
+            latency_delete[trial] = last_delete_time / y.size();
+
+            latency[trial] = (last_insert_time + last_delete_time) / (x.size() + y.size());
+
+            // free edges
+            pbbs::free_array(edges.first);
+        }
+
+        std::cout << std::endl;
+
+        std::cout << "Average insert time = " << insert_timer.get_total() / n_trials << std::endl;
+        std::cout << "Average graph update insert time = " << graph_update_time_on_insert.get_total() / n_trials << std::endl;
+        std::cout << "Average walk update insert time = " << walk_update_time_on_insert.get_total() / n_trials << std::endl;
+
+        std::cout << "Average delete time = " << delete_timer.get_total() / n_trials << std::endl;
+        std::cout << "Average graph update delete time = " << graph_update_time_on_delete.get_total() / n_trials << std::endl;
+        std::cout << "Average walk update delete time = " << walk_update_time_on_delete.get_total() / n_trials << std::endl;
+
+        std::cout << "Average walk insert latency = { ";
+        for(int i = 0; i < n_trials; i++)
+        {
+            std::cout << latency_insert[i] << " ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::cout << "Average walk delete latency = { ";
+        for(int i = 0; i < n_trials; i++)
+        {
+            std::cout << latency_delete[i] << " ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::cout << "Average walk update latency = { ";
+        for(int i = 0; i < n_trials; i++)
+        {
+            std::cout << latency[i] << " ";
+        }
+        std::cout << "}" << std::endl;
+
+        std::cout << std::endl;
     }
 }

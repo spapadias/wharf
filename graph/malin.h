@@ -629,7 +629,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                 types::MapOfChanges rewalk_points = types::MapOfChanges(0);
 
-                auto replace = [&,run_seq] (const intV& v, const VertexEntry& a, const VertexEntry& b)
+                auto replace = [&, run_seq] (const intV& v, const VertexEntry& a, const VertexEntry& b)
                 {
                     auto difference_edge_tree = tree_plus::difference(b.compressed_edges, a.compressed_edges, v, run_seq);
 
