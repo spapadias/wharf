@@ -72,23 +72,16 @@ void throughput(commandLine& command_line)
     uintV* edges;
     std::tie(n, m, offsets, edges) = read_unweighted_graph(fname.c_str(), is_symmetric, mmap);
 
-    dygrl::Malin malin = dygrl::Malin(n, m, offsets, edges);
+    dygrl::Malin malin = dygrl::Malin(n, m, offsets, edges, false);
 
-    std::cout << std::endl;
-    timer init_walk_timer("Initial walk timer");
-    malin.generate_initial_random_walks();
-    init_walk_timer.reportTotal("");
-    std::cout << std::endl;
-
-    auto batch_sizes = pbbs::sequence<size_t>(8);
-    batch_sizes[0] = std::pow(10, 1);
-    batch_sizes[1] = std::pow(10, 2);
-    batch_sizes[2] = std::pow(10, 3);
-    batch_sizes[3] = std::pow(10, 4);
-    batch_sizes[4] = std::pow(10, 5);
-    batch_sizes[5] = std::pow(10, 6);
-    batch_sizes[6] = std::pow(10, 7);
-    batch_sizes[7] = std::pow(10, 8);
+    auto batch_sizes = pbbs::sequence<size_t>(7);
+    batch_sizes[0] = std::pow(10, 1);           // 10
+    batch_sizes[1] = std::pow(10, 2);           // 100
+    batch_sizes[2] = std::pow(10, 3);           // 1.000
+    batch_sizes[3] = std::pow(10, 4);           // 10.000
+    batch_sizes[4] = std::pow(10, 5);           // 100.000
+    batch_sizes[5] = std::pow(10, 6);           // 1.000.000
+    batch_sizes[6] = std::pow(10, 7);           // 10.000.000
 
     for (short int i = 0; i < batch_sizes.size(); i++)
     {
@@ -172,7 +165,7 @@ void throughput(commandLine& command_line)
 
 int main(int argc, char** argv)
 {
-    std::cout << "Running experiment with " << num_workers() << " threads" << std::endl;
+    std::cout << " - running throughput-latency experiment with " << num_workers() << " threads" << std::endl;
     commandLine command_line(argc, argv, "");
 
     throughput(command_line);
