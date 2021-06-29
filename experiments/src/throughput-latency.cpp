@@ -72,7 +72,8 @@ void throughput(commandLine& command_line)
     uintV* edges;
     std::tie(n, m, offsets, edges) = read_unweighted_graph(fname.c_str(), is_symmetric, mmap);
 
-    dygrl::Malin malin = dygrl::Malin(n, m, offsets, edges, false);
+    dygrl::Malin malin = dygrl::Malin(n, m, offsets, edges);
+    malin.generate_initial_random_walks();
 
     auto batch_sizes = pbbs::sequence<size_t>(7);
     batch_sizes[0] = std::pow(10, 1);           // 10
