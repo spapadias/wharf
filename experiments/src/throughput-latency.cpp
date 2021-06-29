@@ -103,8 +103,6 @@ void throughput(commandLine& command_line)
         auto latency_delete = pbbs::sequence<double>(n_trials);
         auto latency        = pbbs::sequence<double>(n_trials);
 
-        size_t affected_walks_delete = 0;
-
         for (short int trial = 0; trial < n_trials; trial++)
         {
             size_t graph_size_pow2 = 1 << (pbbs::log2_up(n) - 1);
@@ -127,6 +125,9 @@ void throughput(commandLine& command_line)
             latency_delete[trial] = last_delete_time / y.size();
 
             latency[trial] = (last_insert_time + last_delete_time) / (x.size() + y.size());
+
+            // free edges
+            pbbs::free_array(edges.first);
         }
 
         std::cout << std::endl;
