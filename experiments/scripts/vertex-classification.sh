@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # script options
-clean_build=True                     # removes build folder after the execution
+clean_build=False                     # removes build folder after the execution
 
 # execution options
 walk_model="deepwalk"                # deepwalk | node2vec
 paramP=0.3                           # node2vec's paramP
 paramQ=0.7                           # node2vec's paramQ
 sampler_init_strategy="random"       # random | weight | burnin
-vector_dimension=5                   # size of learned vectors
+vector_dimension=128                 # size of learned vectors
 learning_strategy=2                  # 1: online | 2: mini-batch (default)
-edge_parition_size=10                # size of the edges parition
+edge_parition_size=5000              # size of the edges parition
 declare -a graphs=("wiki-graph")     # array of graphs
 declare -a walks_per_vertex=(10)     # walks per vertex to generate
 declare -a walk_length=(80)          # length of one walk
@@ -19,11 +19,11 @@ declare -a walk_length=(80)          # length of one walk
 for graph in "${graphs[@]}"; do
   FILE=../data/"${graph}".adj
   if test -f "$FILE"; then
-      echo 'Skipping conversion of a graph' "${graph[@]}" 'to adjacency graph format!'
+      echo 'Skipping conversion of a graph' "${graph[@]}" 'to adjacency graph format'
   else
-      echo 'Converting graph' "${graph[@]}" 'to adjacency graph format ...'
+      echo 'Converting graph' "${graph[@]}" 'to adjacency graph format'
       ./../bin/SNAPtoAdj -s -f "../data/${graph}" "../data/${graph}.adj"
-      echo 'Graph' "${graph[@]}" 'converted to adjacency graph format!'
+      echo 'Graph' "${graph[@]}" 'converted to adjacency graph format'
   fi
 done
 
@@ -33,11 +33,13 @@ cd ../../build;
 cmake -DCMAKE_BUILD_TYPE=Release ..;
 cd experiments;
 
+# build python virtual environment
 sudo pip3 install virtualenv
 virtualenv venv
 source venv/bin/activate
 pip3 install pandas scikit-learn
 
+# build executable
 make vertex-classification
 
 # 3. execute experiments

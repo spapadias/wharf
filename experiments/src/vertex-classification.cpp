@@ -5,7 +5,7 @@ using Edge = std::tuple<types::Vertex, types::Vertex>;
 void create_edge_stream(commandLine& command_line, std::vector<std::pair<Edge*, uintV>>& stream)
 {
     string fname = string(command_line.getOptionValue("-f", "cora-graph"));
-    size_t edge_parition_size = command_line.getOptionLongValue("-eps", 1000);
+    size_t edge_parition_size = command_line.getOptionLongValue("-eps", 5000);
 
     types::Vertex firstV, secondV;
     std::vector<std::vector<Edge>> temp;
@@ -121,83 +121,55 @@ void vertex_classification(commandLine& command_line, const std::vector<std::pai
     size_t n; size_t m;
     uintE* offsets; uintV* edges;
     stringstream ss; ss << fname << ".adj";
-    std::tie(n, m, offsets, edges) = read_unweighted_graph(ss.str().c_str(), is_symmetric, mmap);
 
-    pbbs::free_array(offsets);
-    pbbs::free_array(edges);
+    std::tie(n, m, offsets, edges) = read_unweighted_graph(ss.str().c_str(), is_symmetric, mmap);
+//    pbbs::free_array(offsets);
+//    pbbs::free_array(edges);
 
     /******************************************************************************************************************/
 
     // 1. load all vertices in isolation (every vertex has a degree of 0)
-    dygrl::Malin malin = dygrl::Malin(n, m);
+    dygrl::Malin malin = dygrl::Malin(n, m, offsets, edges);
     malin.generate_initial_random_walks();
 
     // 2. train initial embeddings
-    std::cout << "Learning initial embeddings ..." << std::endl;
-    stringstream command;
+    std::cout << "Learning initial embeddings" << std::endl;
+    stringstream command; std::ofstream file("walks.txt");
 
-    std::ofstream file("walks.txt");
-    for (int i = 0; i < malin.number_of_vertices() * config::walks_per_vertex; i++)
+    for (int i = 0; i < n * config::walks_per_vertex; i++)
     {
-        file << malin.walk(i) << std::endl;
+        command << malin.walk(i) << std::endl;
     }
-    file.close();
 
-    command << "yskip walks.txt model; perl to_word2vec.pl < model > model.w2v";
+    file << command.str(); file.close(); command.str(std::string());
+
+    command << "yskip -d 128 walks.txt model; perl to_word2vec.pl < model > model.w2v; python3 vertex-classification.py";
     system(command.str().c_str());
 
-    command.str(std::string());
-    command << "python3 vertex-classification.py" << std::endl;
-    system(command.str().c_str());
-
+//    // 3. train embeddings incrementally
+//    command.str(std::string()); file.open("walks.txt");
 //    for (auto& edge_batch : stream)
 //    {
-//        malin.insert_edges_batch(edge_batch.second, edge_batch.first, false, true);
+//        auto walks = malin.insert_edges_batch(edge_batch.second, edge_batch.first, false, true);
+//
+//        for (auto& walk_id : walks)
+//        {
+//            command << malin.walk(walk_id) << std::endl;
+//        }
+//
+//        file << command.str(); file.close(); command.str(std::string());
+//
+//        command << "yskip --thread-num="
+//                << num_workers()
+//                << " --initial-model=model"
+//                << " -d " << vector_dimension
+//                << " -l " << learning_strategy
+//                << " walks.txt model;"
+//                << "perl to_word2vec.pl < model > model.w2v; python3 vertex-classification.py";
+//
+//        system(command.str().c_str());
+//        command.str(std::string());
 //    }
-
-////    // 5.
-////    for(int i = 0; i < 1; i++)
-////    {
-////        // geneate edges
-////        auto edges = utility::generate_batch_of_edges(10, dock.number_of_vertices(), false, false);
-////        auto map = dock.insert_edges_batch(edges.second, edges.first, true, false);
-////        command << "printf '";
-////
-////        for(auto& entry : map.lock_table())
-////        {
-////            command << dock.rewalk(entry.first) << std::endl;
-////        }
-////
-////        command << "' | yskip --thread-num="
-////                << num_workers()
-////                << " --initial-model=model"
-////                << " -d " << vector_dimension
-////                << " -l " << learning_strategy
-////                << " - model;"
-////                << "perl to_word2vec.pl < model > model.w2v";
-////
-////        system(command.str().c_str());
-////        command.str("");
-////
-////        map = dock.delete_edges_batch(edges.second, edges.first, true, false);
-////        command << "printf '";
-////
-////        for(auto& entry : map.lock_table())
-////        {
-////            command << dock.rewalk(entry.first) << std::endl;
-////        }
-////
-////        command << "' | yskip --thread-num="
-////                << num_workers()
-////                << " --initial-model=model"
-////                << " -d " << vector_dimension
-////                << " -l " << learning_strategy
-////                << " - model;"
-////                << "perl to_word2vec.pl < model > model.w2v";
-////
-////        system(command.str().c_str());
-////        command.str("");
-////    }
 }
 
 int main(int argc, char** argv)
