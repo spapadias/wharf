@@ -104,6 +104,9 @@ void throughput(commandLine& command_line)
         auto latency_delete = pbbs::sequence<double>(n_trials);
         auto latency = pbbs::sequence<double>(n_trials);
 
+        double total_insert_walks_affected = 0;
+        double total_delete_walks_affected = 0;
+
         for (short int trial = 0; trial < n_trials; trial++)
         {
             size_t graph_size_pow2 = 1 << (pbbs::log2_up(n) - 1);
@@ -115,12 +118,16 @@ void throughput(commandLine& command_line)
             auto x = malin.insert_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
             insert_timer.stop();
 
+            total_insert_walks_affected += x.size();
+
             last_insert_time = walk_update_time_on_insert.get_total() - last_insert_time;
             latency_insert[trial] = last_insert_time / x.size();
 
             delete_timer.start();
             auto y = malin.delete_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
             delete_timer.stop();
+
+            total_delete_walks_affected += y.size();
 
             last_delete_time = walk_update_time_on_delete.get_total() - last_delete_time;
             latency_delete[trial] = last_delete_time / y.size();
@@ -134,16 +141,12 @@ void throughput(commandLine& command_line)
         std::cout << std::endl;
 
         std::cout << "Average insert time = " << insert_timer.get_total() / n_trials << std::endl;
-        std::cout << "Average graph update insert time = " << graph_update_time_on_insert.get_total() / n_trials
-                  << std::endl;
-        std::cout << "Average walk update insert time = " << walk_update_time_on_insert.get_total() / n_trials
-                  << std::endl;
+        std::cout << "Average graph update insert time = " << graph_update_time_on_insert.get_total() / n_trials << std::endl;
+        std::cout << "Average walk update insert time = " << walk_update_time_on_insert.get_total() / n_trials << " | Average number of walks affected = " << total_insert_walks_affected / n_trials << std::endl;
 
         std::cout << "Average delete time = " << delete_timer.get_total() / n_trials << std::endl;
-        std::cout << "Average graph update delete time = " << graph_update_time_on_delete.get_total() / n_trials
-                  << std::endl;
-        std::cout << "Average walk update delete time = " << walk_update_time_on_delete.get_total() / n_trials
-                  << std::endl;
+        std::cout << "Average graph update delete time = " << graph_update_time_on_delete.get_total() / n_trials << std::endl;
+        std::cout << "Average walk update delete time = " << walk_update_time_on_delete.get_total() / n_trials << " | Average number of walks affected = " << total_delete_walks_affected / n_trials << std::endl;
 
         std::cout << "Average walk insert latency = { ";
         for (int i = 0; i < n_trials; i++) {
@@ -175,11 +178,10 @@ void throughput(commandLine& command_line)
         malin.destroy_index();
     }
 
-
     std::cout << std::endl
               << "Average time to generate random walks from scratch = "
               << generate_initial_walks.get_total() / n_trials << std::endl;
-    
+
     std::cout << std::endl;
 }
 
