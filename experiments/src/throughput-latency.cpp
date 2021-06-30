@@ -75,14 +75,13 @@ void throughput(commandLine& command_line)
     dygrl::Malin malin = dygrl::Malin(n, m, offsets, edges);
     malin.generate_initial_random_walks();
 
-    auto batch_sizes = pbbs::sequence<size_t>(7);
+    auto batch_sizes = pbbs::sequence<size_t>(6);
     batch_sizes[0] = 5;
     batch_sizes[1] = 50;
     batch_sizes[2] = 500;
     batch_sizes[3] = 5000;
     batch_sizes[4] = 50000;
     batch_sizes[5] = 500000;
-    batch_sizes[6] = 5000000;
 
     for (short int i = 0; i < batch_sizes.size(); i++)
     {
