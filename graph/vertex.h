@@ -121,7 +121,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             // delete inverted index
             if (entry.second.inverted_index.root)
             {
-                entry.second.inverted_index.~InvertedIndex();
+                entry.second.inverted_index.clear();
                 entry.second.inverted_index.root = nullptr;
             }
 

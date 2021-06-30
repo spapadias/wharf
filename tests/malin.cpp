@@ -114,6 +114,28 @@ TEST_F(MalinTest, MalinDestructor)
     ASSERT_EQ(flat_snapshot.size(), 0);
 }
 
+TEST_F(MalinTest, MalinDestroyIndex)
+{
+    dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
+    malin.generate_initial_random_walks();
+
+    malin.print_memory_pool_stats();
+    malin.destroy_index();
+    malin.print_memory_pool_stats();
+
+    // assert vertices and edges
+    ASSERT_EQ(malin.number_of_vertices(), total_vertices);
+    ASSERT_EQ(malin.number_of_edges(), total_edges);
+
+    // construct a flat snapshot of a graph
+    auto flat_snapshot = malin.flatten_vertex_tree();
+
+    parallel_for(0, total_vertices, [&] (long i)
+    {
+        ASSERT_EQ(flat_snapshot[i].inverted_index.size(), 0);
+    });
+}
+
 TEST_F(MalinTest, InsertBatchOfEdges)
 {
     // create wharf instance (vertices & edges)

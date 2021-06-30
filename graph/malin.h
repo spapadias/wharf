@@ -232,6 +232,19 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
+             * @brief Destroys inverted index.
+             */
+            void destroy_index()
+            {
+                auto map_func = [&] (Graph::E& entry, size_t ind)
+                {
+                    entry.second.inverted_index.clear();
+                };
+
+                this->map_vertices(map_func);
+            }
+
+            /**
             * @brief Creates initial set of random walks.
             */
             void generate_initial_random_walks()
@@ -716,6 +729,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 }
 
                 auto graph = this->flatten_graph();
+                auto flat_vertex_tree = this->flatten_vertex_tree();
                 RandomWalkModel* model;
 
                 switch (config::random_walk_model)
@@ -753,8 +767,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                         while (current_vertex_old_walk != std::numeric_limits<uint32_t>::max() - 1)
                         {
-                            auto vertex = this->graph_tree.find(current_vertex_old_walk);
-                            auto next_old_walk = vertex.value.inverted_index.find_next(affected_walks[index], position);
+                            auto next_old_walk = flat_vertex_tree[current_vertex_old_walk].inverted_index.find_next(affected_walks[index], position);
 
                             if (!deletes.contains(current_vertex_old_walk))
                                 deletes.insert(current_vertex_old_walk, std::vector<dygrl::WalkIndexEntry::entry_t>());
