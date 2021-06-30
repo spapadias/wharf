@@ -479,7 +479,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     new_verts[i] = make_pair(v, VertexEntry(types::CompressedEdges(S, v, fl), dygrl::InvertedIndex(), new dygrl::SamplerManager(0)));
                 });
 
-                types::MapOfChanges rewalk_points = types::MapOfChanges(0);
+                types::MapOfChanges rewalk_points = types::MapOfChanges();
 
                 auto replace = [&, run_seq] (const intV& v, const VertexEntry& a, const VertexEntry& b)
                 {
@@ -493,22 +493,22 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                     a.inverted_index.iter_elms([&](auto& walk_index_entry)
                     {
-                        auto walk_id = walk_index_entry.first / config::walk_length;
-                        auto position = walk_index_entry.first - (walk_id * config::walk_length);
+                       auto walk_id = walk_index_entry.first / config::walk_length;
+                       auto position = walk_index_entry.first - (walk_id * config::walk_length);
+                       
+                       if (!rewalk_points.contains(walk_id))
+                       {
+                           rewalk_points.insert(walk_id, std::make_tuple(position, v, false));
+                       }
+                       else
+                       {
+                           types::Position current_min_pos = std::get<0>(rewalk_points.find(walk_id));
 
-                        if (!rewalk_points.template contains(walk_id))
-                        {
-                            rewalk_points.template insert(walk_id, std::make_tuple(position, v, false));
-                        }
-                        else
-                        {
-                            types::Position current_min_pos = std::get<0>(rewalk_points.find(walk_id));
-
-                            if (current_min_pos > position)
-                            {
-                                rewalk_points.template update(walk_id, std::make_tuple(position, v, false));
-                            }
-                        }
+                           if (current_min_pos > position)
+                           {
+                               rewalk_points.template update(walk_id, std::make_tuple(position, v, false));
+                           }
+                       }
                     });
 
                     return VertexEntry(union_edge_tree, a.inverted_index, b.sampler_manager);
@@ -627,7 +627,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     new_verts[i] = make_pair(v, VertexEntry(types::CompressedEdges(S, v, fl), dygrl::InvertedIndex(), new SamplerManager(0)));
                 });
 
-                types::MapOfChanges rewalk_points = types::MapOfChanges(0);
+                types::MapOfChanges rewalk_points = types::MapOfChanges();
 
                 auto replace = [&, run_seq] (const intV& v, const VertexEntry& a, const VertexEntry& b)
                 {
@@ -643,22 +643,22 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                     a.inverted_index.iter_elms([&](auto& walk_index_entry)
                     {
-                        auto walk_id = walk_index_entry.first / config::walk_length;
-                        auto position = walk_index_entry.first - (walk_id * config::walk_length);
+                       auto walk_id = walk_index_entry.first / config::walk_length;
+                       auto position = walk_index_entry.first - (walk_id * config::walk_length);
 
-                        if (!rewalk_points.template contains(walk_id))
-                        {
-                            rewalk_points.template insert(walk_id, std::make_tuple(position, v, should_reset));
-                        }
-                        else
-                        {
-                            types::Position current_min_pos = get<0>(rewalk_points.find(walk_id));
+                       if (!rewalk_points.contains(walk_id))
+                       {
+                           rewalk_points.insert(walk_id, std::make_tuple(position, v, false));
+                       }
+                       else
+                       {
+                           types::Position current_min_pos = std::get<0>(rewalk_points.find(walk_id));
 
-                            if (current_min_pos > position)
-                            {
-                                rewalk_points.template update(walk_id, std::make_tuple(position, v, should_reset));
-                            }
-                        }
+                           if (current_min_pos > position)
+                           {
+                               rewalk_points.template update(walk_id, std::make_tuple(position, v, false));
+                           }
+                       }
                     });
 
                     return VertexEntry(difference_edge_tree, a.inverted_index, b.sampler_manager);

@@ -279,14 +279,14 @@ TEST_F(MalinTest, MalinThroughputLatency)
             std::cout << edges.second << " ";
 
             insert_timer.start();
-            auto x = malin.insert_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
+            auto x = malin.insert_edges_batch(edges.second, edges.first, false, true, graph_size_pow2, false);
             insert_timer.stop();
 
             last_insert_time = walk_update_time_on_insert.get_total() - last_insert_time;
             latency_insert[trial] = last_insert_time / x.size();
 
             delete_timer.start();
-            auto y = malin.delete_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
+            auto y = malin.delete_edges_batch(edges.second, edges.first, false, true, graph_size_pow2, false);
             delete_timer.stop();
 
             last_delete_time = walk_update_time_on_delete.get_total() - last_delete_time;
