@@ -14,7 +14,7 @@ void throughput(commandLine& command_line)
     double paramP           = command_line.getOptionDoubleValue("-paramP", config::paramP);
     double paramQ           = command_line.getOptionDoubleValue("-paramQ", config::paramQ);
     string init_strategy    = string(command_line.getOptionValue("-init", "weight"));
-    size_t n_trials         = command_line.getOptionLongValue("-trials", 5);
+    size_t n_trials         = command_line.getOptionLongValue("-trials", 3);
 
     config::walks_per_vertex = walks_per_vertex;
     config::walk_length      = length_of_walks;

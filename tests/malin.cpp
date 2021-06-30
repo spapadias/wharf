@@ -15,7 +15,7 @@ class MalinTest : public testing::Test
         uintE* offsets;
         bool mmap = false;
         bool is_symmetric = true;
-        std::string default_file_path = "data/youtube-graph";
+        std::string default_file_path = "data/facebook-graph";
 };
 
 void MalinTest::SetUp()
@@ -279,14 +279,14 @@ TEST_F(MalinTest, MalinThroughputLatency)
             std::cout << edges.second << " ";
 
             insert_timer.start();
-            auto x = malin.insert_edges_batch(edges.second, edges.first, false, true, graph_size_pow2, false);
+            auto x = malin.insert_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
             insert_timer.stop();
 
             last_insert_time = walk_update_time_on_insert.get_total() - last_insert_time;
             latency_insert[trial] = last_insert_time / x.size();
 
             delete_timer.start();
-            auto y = malin.delete_edges_batch(edges.second, edges.first, false, true, graph_size_pow2, false);
+            auto y = malin.delete_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
             delete_timer.stop();
 
             last_delete_time = walk_update_time_on_delete.get_total() - last_delete_time;

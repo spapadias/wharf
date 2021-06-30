@@ -327,7 +327,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                 this->graph_tree = Graph::Tree::multi_insert_sorted_with_values(this->graph_tree.root, vertices.begin(), vertices.size(), replace, true);
                 delete model;
-
             }
 
             /**
@@ -495,7 +494,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     {
                        auto walk_id = walk_index_entry.first / config::walk_length;
                        auto position = walk_index_entry.first - (walk_id * config::walk_length);
-                       
+
                        if (!rewalk_points.contains(walk_id))
                        {
                            rewalk_points.insert(walk_id, std::make_tuple(position, v, false));
