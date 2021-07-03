@@ -22,7 +22,7 @@ namespace config
     auto sampler_init_strategy = types::SamplerInitStartegy::BURNIN;
 
     // random number generator
-    auto random                = utility::Random(std::time(nullptr));
+    auto random                = utility::Random(100);
 }
 
 #endif // DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_GLOBALS_H
