@@ -79,7 +79,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             types::Vertex propose_vertex(const types::State& state) final
             {
                 auto neighbors = this->snapshot->neighbors(state.first);
-                auto vertex    = std::get<0>(neighbors)[config::random.irand(std::get<1>(neighbors))];
+//                auto vertex    = std::get<0>(neighbors)[config::random.irand(std::get<1>(neighbors))]; // RETURN BACK!
+                auto vertex    = std::get<0>(neighbors)[config::random.rand() % (std::get<1>(neighbors))];
 
                 if (std::get<2>(neighbors)) pbbs::free_array(std::get<0>(neighbors));
 
