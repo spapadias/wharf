@@ -101,7 +101,7 @@ void throughput(commandLine& command_line)
 
         auto latency_insert = pbbs::sequence<double>(n_trials);
         auto latency_delete = pbbs::sequence<double>(n_trials);
-        auto latency = pbbs::sequence<double>(n_trials);
+        auto latency        = pbbs::sequence<double>(n_trials);
 
         double total_insert_walks_affected = 0;
         double total_delete_walks_affected = 0;

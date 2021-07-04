@@ -518,7 +518,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                            if (current_min_pos > position)
                            {
-                               rewalk_points.template update(walk_id, std::make_tuple(position, v, false));
+                               rewalk_points.update(walk_id, std::make_tuple(position, v, false));
                            }
                        }
                     });
