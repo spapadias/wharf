@@ -37,7 +37,7 @@ for wpv in "${walks_per_vertex[@]}"; do
         for graph in "${graphs[@]}"; do
             printf "\n"
             printf "Graph: ${graph}\n"
-            time ./memory-footprint -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}"
+            ./memory-footprint -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}"
         done
     done
 done
