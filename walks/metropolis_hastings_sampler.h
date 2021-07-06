@@ -118,8 +118,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             bool accept(float previous_weight, float new_weight)
             {
                 if (previous_weight < new_weight) return true;
-                return 0.3 <= (double)(new_weight) / (double)(previous_weight);
-//                return config::random.drand() <= (double)(new_weight) / (double)(previous_weight);    // RETURN BACK!
+                return config::random.drand() <= (double)(new_weight) / (double)(previous_weight);
             }
     };
 }
