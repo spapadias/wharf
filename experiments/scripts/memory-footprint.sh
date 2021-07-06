@@ -5,7 +5,7 @@ clean_build=True                                    # cleans build folder after 
 
 # execution options
 walk_model="deepwalk"                               # deepwalk | node2vec
-paramP=0.2                                          # node2vec's paramP
+paramP=0.3                                          # node2vec's paramP
 paramQ=0.7                                          # node2vec's paramQ
 sampler_init_strategy="random"                      # random | burnin | weight
 declare -a graphs=("email-graph" "facebook-graph")  # array of graphs
