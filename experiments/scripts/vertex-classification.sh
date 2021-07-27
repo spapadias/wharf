@@ -1,17 +1,17 @@
 #!/bin/bash
 
 # script options
-clean_build=False                     # removes build folder after the execution
+clean_build=False                    # removes build folder after the execution
 
 # execution options
 walk_model="deepwalk"                # deepwalk | node2vec
-paramP=0.3                           # node2vec's paramP
-paramQ=0.7                           # node2vec's paramQ
+paramP=0.5                           # node2vec's paramP
+paramQ=2.0                           # node2vec's paramQ
 sampler_init_strategy="random"       # random | weight | burnin
 vector_dimension=128                 # size of learned vectors
-learning_strategy=2                  # 1: online | 2: mini-batch (default)
-edge_parition_size=5000              # size of the edges parition
-declare -a graphs=("wiki-graph")     # array of graphs
+learning_strategy=1                  # 1: online | 2: mini-batch (default)
+edge_parition_size=1000              # size of the edges parition
+declare -a graphs=("cora-graph")     # array of graphs
 declare -a walks_per_vertex=(10)     # walks per vertex to generate
 declare -a walk_length=(80)          # length of one walk
 

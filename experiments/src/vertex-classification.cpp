@@ -123,13 +123,13 @@ void vertex_classification(commandLine& command_line, const std::vector<std::pai
     stringstream ss; ss << fname << ".adj";
 
     std::tie(n, m, offsets, edges) = read_unweighted_graph(ss.str().c_str(), is_symmetric, mmap);
-//    pbbs::free_array(offsets);
-//    pbbs::free_array(edges);
+    pbbs::free_array(offsets);
+    pbbs::free_array(edges);
 
     /******************************************************************************************************************/
 
     // 1. load all vertices in isolation (every vertex has a degree of 0)
-    dygrl::Malin malin = dygrl::Malin(n, m, offsets, edges);
+    dygrl::Malin malin = dygrl::Malin(n, m);
     malin.generate_initial_random_walks();
 
     // 2. train initial embeddings
@@ -143,33 +143,38 @@ void vertex_classification(commandLine& command_line, const std::vector<std::pai
 
     file << command.str(); file.close(); command.str(std::string());
 
-    command << "yskip -d 128 walks.txt model; perl to_word2vec.pl < model > model.w2v; python3 vertex-classification.py";
+    command << "yskip --thread-num="
+            << num_workers()
+            << " -d " << vector_dimension
+            << " -l " << learning_strategy
+            << " walks.txt model;"
+            << "perl to_word2vec.pl < model > model.w2v; python3 vertex-classification.py";
     system(command.str().c_str());
 
-//    // 3. train embeddings incrementally
-//    command.str(std::string()); file.open("walks.txt");
-//    for (auto& edge_batch : stream)
-//    {
-//        auto walks = malin.insert_edges_batch(edge_batch.second, edge_batch.first, false, true);
-//
-//        for (auto& walk_id : walks)
-//        {
-//            command << malin.walk(walk_id) << std::endl;
-//        }
-//
-//        file << command.str(); file.close(); command.str(std::string());
-//
-//        command << "yskip --thread-num="
-//                << num_workers()
-//                << " --initial-model=model"
-//                << " -d " << vector_dimension
-//                << " -l " << learning_strategy
-//                << " walks.txt model;"
-//                << "perl to_word2vec.pl < model > model.w2v; python3 vertex-classification.py";
-//
-//        system(command.str().c_str());
-//        command.str(std::string());
-//    }
+    // 3. train embeddings incrementally
+    command.str(std::string()); file.open("walks.txt");
+    for (auto& edge_batch : stream)
+    {
+        auto walks = malin.insert_edges_batch(edge_batch.second, edge_batch.first, false, true);
+
+        for (auto& walk_id : walks)
+        {
+            command << malin.walk(walk_id) << std::endl;
+        }
+
+        file << command.str(); file.close(); command.str(std::string());
+
+        command << "yskip --thread-num="
+                << num_workers()
+                << " --initial-model=model"
+                << " -d " << vector_dimension
+                << " -l " << learning_strategy
+                << " walks.txt model;"
+                << "perl to_word2vec.pl < model > model.w2v; python3 vertex-classification.py";
+
+        system(command.str().c_str());
+        command.str(std::string());
+    }
 }
 
 int main(int argc, char** argv)
