@@ -13,10 +13,10 @@ namespace config
     auto random_walk_model     = types::RandomWalkModelType::DEEPWALK;
 
     // determines parameter P for node2vec model
-    float paramP               = 0.7;
+    float paramP               = 0.5;
 
     // determines parameter Q for node2vec model
-    float paramQ               = 0.3;
+    float paramQ               = 2.0;
 
     // determines the initialization strategy for metropolis hastings samplers
     auto sampler_init_strategy = types::SamplerInitStartegy::BURNIN;
