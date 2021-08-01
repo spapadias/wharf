@@ -5,8 +5,8 @@ clean_build=True
 
 # execution options
 walk_model="deepwalk"                             # deepwalk | node2vec
-paramP=0.3                                        # node2vec paramP
-paramQ=0.7                                        # node2vec paramQ
+paramP=0.5                                        # node2vec paramP
+paramQ=2.0                                        # node2vec paramQ
 sampler_init_strategy="random"                    # random | burnin | weight
 declare -a graphs=("facebook-graph" "cora-graph")
 declare -a walks_per_node=(10)
