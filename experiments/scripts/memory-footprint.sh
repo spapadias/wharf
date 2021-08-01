@@ -4,7 +4,7 @@
 clean_build=True                                    # cleans build folder after the execution
 
 # execution options
-walk_model="deepwalk"                               # deepwalk | node2vec
+walk_model="node2vec"                               # deepwalk | node2vec
 paramP=0.5                                          # node2vec's paramP
 paramQ=2.0                                          # node2vec's paramQ
 sampler_init_strategy="random"                      # random | burnin | weight

@@ -381,20 +381,3 @@ TEST_F(MalinTest, MalinThroughputLatency)
 
     std::cout << std::endl;
 }
-
-//TEST_F(MalinTest, D)
-//{
-//    // create graph and walks
-//    dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
-//    malin.generate_initial_random_walks();
-//
-//    ofstream file("walk.txt");
-//
-//    // print random walks
-//    for(int i = 0; i < config::walks_per_vertex * malin.number_of_vertices(); i++)
-//    {
-//        file << malin.walk(i) << std::endl;
-//    }
-//
-//    file.close();
-//}
