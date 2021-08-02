@@ -149,12 +149,14 @@ void vertex_classification(commandLine& command_line, const std::vector<std::pai
             << " -l " << learning_strategy
             << " walks.txt model;"
             << "perl to_word2vec.pl < model > model.w2v; python3 vertex-classification.py";
+
     system(command.str().c_str());
 
     // 3. train embeddings incrementally
-    command.str(std::string()); file.open("walks.txt");
+    command.str(std::string());
     for (auto& edge_batch : stream)
     {
+        file.open("walks.txt");
         auto walks = malin.insert_edges_batch(edge_batch.second, edge_batch.first, false, true);
 
         for (auto& walk_id : walks)
