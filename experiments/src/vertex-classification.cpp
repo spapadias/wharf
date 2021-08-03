@@ -315,9 +315,9 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
     system(command.str().c_str());
     static_timer.stop();
 
-//    command.str(std::string());
-//    command << "perl to_word2vec.pl < model > model.w2v; python3 vertex-classification.py";
-//    system(command.str().c_str());
+    command.str(std::string());
+    command << "perl to_word2vec.pl < model > model.w2v; python3 vertex-classification.py";
+    system(command.str().c_str());
 
     // 3. train embeddings incrementally
     command.str(std::string());
@@ -347,9 +347,9 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
 
         static_timer.stop();
 
-//        command.str(std::string());
-//        command << "perl to_word2vec.pl < model > model.w2v; python3 vertex-classification.py";
-//        system(command.str().c_str());
+        command.str(std::string());
+        command << "perl to_word2vec.pl < model > model.w2v; python3 vertex-classification.py";
+        system(command.str().c_str());
         command.str(std::string());
     }
 
