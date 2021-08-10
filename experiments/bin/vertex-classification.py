@@ -7,7 +7,7 @@ from sklearn.metrics import accuracy_score, f1_score
 embeddings = pd.read_csv('model.w2v', header=None, delim_whitespace=True, skiprows=[0])
 embeddings.set_index(0, inplace=True)
 
-labels = pd.read_csv("data/labels/wiki-labels", header=None, delim_whitespace=True)
+labels = pd.read_csv("data/labels/cora-labels", header=None, delim_whitespace=True)
 labels.set_index(0, inplace=True)
 labels.rename({1: 'label'}, axis=1, inplace=True)
 
