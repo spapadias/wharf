@@ -57,5 +57,6 @@ done
 if [ "$clean_build" = True ] ; then
     cd ../../;
     rm -rf build;
+    rm -rf yskip;
     rm experiments/data/*.adj
 fi
