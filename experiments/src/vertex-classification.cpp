@@ -337,7 +337,7 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
 
         file << command.str(); file.close(); command.str(std::string());
 
-        command << "../yskip/src/yskip --thread-num="
+        command << "yskip --thread-num="
                 << num_workers()
                 << " --initial-model=model"
                 << " -d " << vector_dimension

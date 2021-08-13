@@ -8,6 +8,7 @@ cd yskip
 ## 2. install yskip
 ./configure
 make
+sudo make install
 
 ## 3. remove repository
-#rm -rf ../yskip
+rm -rf ../yskip
