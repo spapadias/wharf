@@ -10,16 +10,16 @@ namespace config
     uint8_t walk_length        = 80;
 
     // determines the type of random walk model to use
-    auto random_walk_model     = types::RandomWalkModelType::DEEPWALK;
+    auto random_walk_model     = types::RandomWalkModelType::NODE2VEC;
 
     // determines parameter P for node2vec model
-    float paramP               = 0.5;
+    float paramP               = 1.0;
 
     // determines parameter Q for node2vec model
-    float paramQ               = 2.0;
+    float paramQ               = 4.0;
 
     // determines the initialization strategy for metropolis hastings samplers
-    auto sampler_init_strategy = types::SamplerInitStartegy::BURNIN;
+    auto sampler_init_strategy = types::SamplerInitStartegy::WEIGHT;
 
     // random number generator
     auto random                = utility::Random(std::time(nullptr));

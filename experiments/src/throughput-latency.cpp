@@ -1,4 +1,4 @@
-#include <malin.h>
+#include <wharfmh.h>
 
 void throughput(commandLine& command_line)
 {
@@ -72,8 +72,8 @@ void throughput(commandLine& command_line)
     uintV* edges;
     std::tie(n, m, offsets, edges) = read_unweighted_graph(fname.c_str(), is_symmetric, mmap);
 
-    dygrl::Malin malin = dygrl::Malin(n, m, offsets, edges);
-    malin.generate_initial_random_walks();
+    dygrl::WharfMH WharfMH = dygrl::WharfMH(n, m, offsets, edges);
+    WharfMH.generate_initial_random_walks();
 
     auto batch_sizes = pbbs::sequence<size_t>(6);
     batch_sizes[0] = 5;
@@ -114,7 +114,7 @@ void throughput(commandLine& command_line)
             std::cout << edges.second << " ";
 
             insert_timer.start();
-            auto x = malin.insert_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
+            auto x = WharfMH.insert_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
             insert_timer.stop();
 
             total_insert_walks_affected += x.size();
@@ -123,7 +123,7 @@ void throughput(commandLine& command_line)
             latency_insert[trial] = last_insert_time / x.size();
 
             delete_timer.start();
-            auto y = malin.delete_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
+            auto y = WharfMH.delete_edges_batch(edges.second, edges.first, false, true, graph_size_pow2);
             delete_timer.stop();
 
             total_delete_walks_affected += y.size();
@@ -166,15 +166,15 @@ void throughput(commandLine& command_line)
         std::cout << "}" << std::endl;
     }
 
-    malin.destroy_index();
+    WharfMH.destroy_index();
     timer generate_initial_walks("Generate Initial Random Walks", false);
     for (int i = 0; i < n_trials; i++)
     {
         generate_initial_walks.start();
-        malin.generate_initial_random_walks();
+        WharfMH.generate_initial_random_walks();
         generate_initial_walks.stop();
 
-        malin.destroy_index();
+        WharfMH.destroy_index();
     }
 
     std::cout << std::endl

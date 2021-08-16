@@ -126,6 +126,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             // delete samplers
+            entry.second.sampler_manager->clear();
             delete entry.second.sampler_manager;
         }
     };

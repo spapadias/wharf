@@ -1,5 +1,5 @@
-#ifndef DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_MALIN_H
-#define DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_MALIN_H
+#ifndef DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_WHARFMH_H
+#define DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_WHARFMH_H
 
 #include <graph/api.h>
 #include <cuckoohash_map.hh>
@@ -15,18 +15,18 @@
 namespace dynamic_graph_representation_learning_with_metropolis_hastings
 {
     /**
-     * @brief Malin represents a structure that stores a graph as an augmented parallel balanced binary tree.
+     * @brief WharfMH represents a structure that stores a graph as an augmented parallel balanced binary tree.
      * Keys in this tree are graph vertices and values are compressed edges, parallel inverted index, and metropolis hastings samplers.
      */
-    class Malin
+    class WharfMH
     {
         public:
             using Graph = aug_map<dygrl::Vertex>;
 
-            Malin(long graph_vertices, long graph_edges)
+            WharfMH(long graph_vertices, long graph_edges)
             {
                 // 1. Initialize memory pools
-                Malin::init_memory_pools(graph_vertices, graph_edges);
+                WharfMH::init_memory_pools(graph_vertices, graph_edges);
 
                 // 2. Create an empty vertex sequence
                 using VertexStruct = std::pair<types::Vertex, VertexEntry>;
@@ -47,7 +47,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-             * @brief Malin constructor.
+             * @brief WharfMH constructor.
              *
              * @param graph_vertices - total vertices in a graph
              * @param graph_edges    - total edges in a graph
@@ -55,14 +55,14 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
              * @param edges          - edges
              * @param free_memory    - free memory excess after graph is loaded
              */
-            Malin(long graph_vertices, long graph_edges, uintE* offsets, uintV* edges, bool free_memory = true)
+            WharfMH(long graph_vertices, long graph_edges, uintE* offsets, uintV* edges, bool free_memory = true)
             {
-                #ifdef MALIN_TIMER
-                    timer timer("Malin::Constructor");
+                #ifdef WharfMH_TIMER
+                    timer timer("WharfMH::Constructor");
                 #endif
 
                 // 1. Initialize memory pools
-                Malin::init_memory_pools(graph_vertices, graph_edges);
+                WharfMH::init_memory_pools(graph_vertices, graph_edges);
 
                 // 2. Create an empty vertex sequence
                 using VertexStruct = std::pair<types::Vertex, VertexEntry>;
@@ -104,7 +104,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                 vertices.clear();
 
-                #ifdef MALIN_TIMER
+                #ifdef WharfMH_TIMER
                     timer.reportTotal("time(seconds)");
                 #endif
             }
@@ -139,8 +139,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
              */
             [[nodiscard]] FlatVertexTree flatten_vertex_tree() const
             {
-                #ifdef MALIN_TIMER
-                    timer timer("Malin::FlattenVertexTree");
+                #ifdef WharfMH_TIMER
+                    timer timer("WharfMH::FlattenVertexTree");
                 #endif
 
                 types::Vertex n_vertices = this->number_of_vertices();
@@ -155,7 +155,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                 this->map_vertices(map_func);
 
-                #ifdef MALIN_TIMER
+                #ifdef WharfMH_TIMER
                     timer.reportTotal("time(seconds)");
 
                     std::cout << "Flat vertex tree memory footprint: "
@@ -174,8 +174,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             */
             [[nodiscard]] FlatGraph flatten_graph() const
             {
-                #ifdef MALIN_TIMER
-                    timer timer("Malin::FlattenGraph");
+                #ifdef WharfMH_TIMER
+                    timer timer("WharfMH::FlattenGraph");
                 #endif
 
                 size_t n_vertices = this->number_of_vertices();
@@ -193,12 +193,12 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                 this->map_vertices(map_func);
 
-                #ifdef MALIN_TIMER
+                #ifdef WharfMH_TIMER
                     timer.reportTotal("time(seconds)");
 
                     auto size = flat_graph.size_in_bytes();
 
-                    std::cout << "Malin::FlattenGraph: Flat graph memory footprint: "
+                    std::cout << "WharfMH::FlattenGraph: Flat graph memory footprint: "
                               << utility::MB(size)
                               << " MB = " << utility::GB(size)
                               << " GB" << std::endl;
@@ -223,7 +223,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             }
 
             /**
-             * @brief Destroys Malin instance.
+             * @brief Destroys WharfMH instance.
              */
             void destroy()
             {
@@ -365,10 +365,10 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                     auto tree_node = this->graph_tree.find(current_vertex);
 
-                    #ifdef MALIN_DEBUG
+                    #ifdef WharfMH_DEBUG
                         if (!tree_node.valid)
                         {
-                            std::cerr << "Malin debug error! Malin::Walk::Vertex="
+                            std::cerr << "WharfMH debug error! WharfMH::Walk::Vertex="
                                       << current_vertex << " is not found in the vertex tree!"
                                       << std::endl;
 
@@ -398,10 +398,10 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 {
                     auto tree_node = this->graph_tree.find(current_vertex);
 
-                    #ifdef MALIN_DEBUG
+                    #ifdef WharfMH_DEBUG
                         if (!tree_node.valid)
                         {
-                            std::cerr << "Malin debug error! Malin::Walk::Vertex="
+                            std::cerr << "WharfMH debug error! WharfMH::Walk::Vertex="
                                   << current_vertex << " is not found in the vertex tree!"
                                   << std::endl;
 
@@ -438,7 +438,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 // 2. Sort the edges in the batch (by source)
                 if (!sorted)
                 {
-                    Malin::sort_edge_batch_by_source(edges, m, nn);
+                    WharfMH::sort_edge_batch_by_source(edges, m, nn);
                 }
 
                 // 3. Remove duplicate edges
@@ -541,7 +541,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 if (num_starts > stack_size) pbbs::free_array(new_verts);
                 if (edges_deduped)           pbbs::free_array(edges_deduped);
 
-                #ifdef MALIN_DEBUG
+                #ifdef WharfMH_DEBUG
                     std::cout << "Rewalk points (MapOfChanges): " << std::endl;
 
                     auto table = rewalk_points.lock_table();
@@ -587,7 +587,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 // 2. Sort the edges in the batch (by source)
                 if (!sorted)
                 {
-                    Malin::sort_edge_batch_by_source(edges, m, nn);
+                    WharfMH::sort_edge_batch_by_source(edges, m, nn);
                 }
 
                 // 3. Remove duplicate edges
@@ -691,7 +691,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 if (num_starts > stack_size) pbbs::free_array(new_verts);
                 if (edges_deduped) pbbs::free_array(edges_deduped);
 
-                #ifdef MALIN_DEBUG
+                #ifdef WharfMH_DEBUG
                     std::cout << "Rewalk points (MapOfChanges): " << std::endl;
 
                     auto table = rewalk_points.lock_table();
@@ -1034,8 +1034,8 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
             */
             static void sort_edge_batch_by_source(std::tuple<uintV, uintV>* edges, size_t batch_edges, size_t nn = std::numeric_limits<size_t>::max())
             {
-                #ifdef MALIN_TIMER
-                    timer timer("Malin::SortEdgeBatchBySource");
+                #ifdef WharfMH_TIMER
+                    timer timer("WharfMH::SortEdgeBatchBySource");
                 #endif
 
                 // 1. Set up
@@ -1077,11 +1077,11 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     pbbs::sample_sort_inplace(edges_original, std::less<>());
                 }
 
-                #ifdef MALIN_TIMER
+                #ifdef WharfMH_TIMER
                     timer.reportTotal("time (seconds)");
                 #endif
             }
     };
 }
 
-#endif // DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_MALIN_H
+#endif // DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_WharfMH_H

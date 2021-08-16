@@ -1,4 +1,4 @@
-#include <malin.h>
+#include <wharfmh.h>
 
 using Edge = std::tuple<types::Vertex, types::Vertex>;
 
@@ -133,8 +133,8 @@ void vertex_classification_incremental(commandLine& command_line, const std::vec
 
     // 1. load all vertices in isolation (every vertex has a degree of 0)
     incremental_timer.start();
-    dygrl::Malin malin = dygrl::Malin(n, m);
-    malin.generate_initial_random_walks();
+    dygrl::WharfMH WharfMH = dygrl::WharfMH(n, m);
+    WharfMH.generate_initial_random_walks();
     incremental_timer.stop();
 
     // 2. train initial embeddings
@@ -144,7 +144,7 @@ void vertex_classification_incremental(commandLine& command_line, const std::vec
     incremental_timer.start();
     for (int i = 0; i < n * config::walks_per_vertex; i++)
     {
-        command << malin.walk(i) << std::endl;
+        command << WharfMH.walk(i) << std::endl;
     }
 
     file << command.str(); file.close(); command.str(std::string());
@@ -167,11 +167,11 @@ void vertex_classification_incremental(commandLine& command_line, const std::vec
     {
         incremental_timer.start();
         file.open("walks.txt");
-        auto walks = malin.insert_edges_batch(edge_batch.second, edge_batch.first, false, true);
+        auto walks = WharfMH.insert_edges_batch(edge_batch.second, edge_batch.first, false, true);
 
         for (auto& walk_id : walks)
         {
-            command << malin.walk(walk_id) << std::endl;
+            command << WharfMH.walk(walk_id) << std::endl;
         }
 
         file << command.str(); file.close(); command.str(std::string());
@@ -192,7 +192,7 @@ void vertex_classification_incremental(commandLine& command_line, const std::vec
     }
 
     incremental_timer.reportTotal("Total");
-    malin.destroy();
+    WharfMH.destroy();
 }
 
 void vertex_classification_static(commandLine& command_line, const std::vector<std::pair<Edge*, uintV>>& stream)
@@ -291,8 +291,8 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
 
     // 1. load all vertices in isolation (every vertex has a degree of 0)
     static_timer.start();
-    dygrl::Malin malin = dygrl::Malin(n, m);
-    malin.generate_initial_random_walks();
+    dygrl::WharfMH WharfMH = dygrl::WharfMH(n, m);
+    WharfMH.generate_initial_random_walks();
     static_timer.stop();
 
     // 2. train initial embeddings
@@ -302,7 +302,7 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
     static_timer.start();
     for (int i = 0; i < n * config::walks_per_vertex; i++)
     {
-        command << malin.walk(i) << std::endl;
+        command << WharfMH.walk(i) << std::endl;
     }
 
     file << command.str(); file.close(); command.str(std::string());
@@ -323,16 +323,16 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
     command.str(std::string());
     for (auto& edge_batch : stream)
     {
-        malin.destroy_index();
+        WharfMH.destroy_index();
 
         static_timer.start();
         file.open("walks.txt");
-        malin.insert_edges_batch(edge_batch.second, edge_batch.first, false, true, std::numeric_limits<size_t>::max(), false);
-        malin.generate_initial_random_walks();
+        WharfMH.insert_edges_batch(edge_batch.second, edge_batch.first, false, true, std::numeric_limits<size_t>::max(), false);
+        WharfMH.generate_initial_random_walks();
 
         for (int i = 0; i < n * config::walks_per_vertex; i++)
         {
-            command << malin.walk(i) << std::endl;
+            command << WharfMH.walk(i) << std::endl;
         }
 
         file << command.str(); file.close(); command.str(std::string());

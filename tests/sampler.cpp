@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <malin.h>
+#include <wharfmh.h>
 #include <math.h>
 
 class SamplerTest : public testing::Test
@@ -42,8 +42,8 @@ void SamplerTest::TearDown()
 
 TEST_F(SamplerTest, DeepWalk)
 {
-    dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
-    dygrl::FlatGraph graph = malin.flatten_graph();
+    dygrl::WharfMH WharfMH = dygrl::WharfMH(total_vertices, total_edges, offsets, edges);
+    dygrl::FlatGraph graph = WharfMH.flatten_graph();
     dygrl::RandomWalkModel* model = new dygrl::DeepWalk(&graph);
     std::map<types::Vertex, std::pair<float, int>> hash_table;
 
@@ -85,8 +85,8 @@ TEST_F(SamplerTest, DeepWalk)
 
 TEST_F(SamplerTest, Node2Vec)
 {
-    dygrl::Malin malin = dygrl::Malin(total_vertices, total_edges, offsets, edges);
-    dygrl::FlatGraph graph = malin.flatten_graph();
+    dygrl::WharfMH WharfMH = dygrl::WharfMH(total_vertices, total_edges, offsets, edges);
+    dygrl::FlatGraph graph = WharfMH.flatten_graph();
     dygrl::RandomWalkModel* model = new dygrl::Node2Vec(&graph, 0.7, 0.2);
     std::map<types::Vertex, std::pair<float, int>> hash_table;
 

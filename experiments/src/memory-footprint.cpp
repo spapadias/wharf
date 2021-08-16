@@ -1,4 +1,4 @@
-#include <malin.h>
+#include <wharfmh.h>
 
 void memory_footprint(commandLine& command_line)
 {
@@ -71,9 +71,9 @@ void memory_footprint(commandLine& command_line)
     uintV* edges;
     std::tie(n, m, offsets, edges) = read_unweighted_graph(fname.c_str(), is_symmetric, mmap);
 
-    dygrl::Malin malin = dygrl::Malin(n, m, offsets, edges);
-    malin.generate_initial_random_walks();
-    malin.memory_footprint();
+    dygrl::WharfMH WharfMH = dygrl::WharfMH(n, m, offsets, edges);
+    WharfMH.generate_initial_random_walks();
+    WharfMH.memory_footprint();
 }
 
 

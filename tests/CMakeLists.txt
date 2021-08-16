@@ -76,7 +76,7 @@ option(HOMEGROWN  OFF)
 option(DOCK_DEBUG OFF)
 option(SERIAL     OFF)
 
-set(MALIN_DEBUG ON)
+set(WHARFMH_DEBUG ON)
 
 # build variables
 set(OMPFLAGS         "-DOPENMP -fopenmp")
@@ -84,7 +84,7 @@ set(CILKFLAGS        "-DCILK -fcilkplus")
 set(HGFLAGS          "-DHOMEGROWN -pthread")
 set(OPTIMIZATION     "-O3 -g")
 set(CFLAGS           "-DEDGELONG -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC -DNDEBUG")
-set(MALIN_DEBUG_FLAGS "-DEDGELONG -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC")
+set(WHARFMH_DEBUG_FLAGS "-DEDGELONG -mcx16 ${OPTIMIZATION} -ldl -std=c++17 -march=native -Wall -Wno-subobject-linkage -DUSEMALLOC")
 
 if(CLANG)
     set(CMAKE_CXX_COMPILER "clang++")
@@ -107,18 +107,18 @@ else()
 endif()
 
 # set compile flags
-if (MALIN_DEBUG)
-    set(CMAKE_CXX_FLAGS "${MALIN_DEBUG_FLAGS} ${PFLAGS} -DMALIN_DEBUG -DMALIN_TIMER")
+if (WHARFMH_DEBUG)
+    set(CMAKE_CXX_FLAGS "${WHARFMH_DEBUG_FLAGS} ${PFLAGS} -DWHARFMH_DEBUG -DWHARFMH_TIMER")
 else()
     set(CMAKE_CXX_FLAGS "${CFLAGS} ${PFLAGS}")
 endif()
 
 # ------------------------------------------------------ TESTS ---------------------------------------------------------
 
-# Dock tests
-add_executable(malin malin.cpp)
-target_link_libraries(malin ${GTEST_LIBRARIES})
-add_test(NAME malin COMMAND malin)
+# WharfMH tests
+add_executable(wharfmh wharfmh.cpp)
+target_link_libraries(wharfmh ${GTEST_LIBRARIES})
+add_test(NAME wharfmh COMMAND wharfmh)
 
 # Pairing function tests
 add_executable(pairings pairings.cpp)
