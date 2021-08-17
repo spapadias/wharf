@@ -178,7 +178,6 @@ void vertex_classification_incremental(commandLine& command_line, const std::vec
 
         command << "yskip --thread-num="
                 << num_workers()
-                << " --initial-model=model"
                 << " -d " << vector_dimension
                 << " -l " << learning_strategy
                 << " walks.txt model;";
@@ -204,7 +203,7 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
     double paramQ            = command_line.getOptionDoubleValue("-paramQ", config::paramQ);
     string init_strategy     = string(command_line.getOptionValue("-init", "random"));
     size_t vector_dimension  = command_line.getOptionLongValue("-d", 128);
-    size_t learning_strategy = command_line.getOptionLongValue("-le", 2);
+    size_t learning_strategy = 0;
 
     config::walks_per_vertex = walks_per_vertex;
     config::walk_length      = length_of_walks;
@@ -215,7 +214,11 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
     std::cout << "Vector dimension: " << vector_dimension << std::endl;
     std::cout << "Learning strategy: ";
 
-    if(learning_strategy == 1)
+    if(learning_strategy == 0)
+    {
+        std::cout << "BATCH" << std::endl;
+    }
+    else if(learning_strategy == 1)
     {
         std::cout << "ONLINE" << std::endl;
     }
@@ -306,7 +309,7 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
     }
 
     file << command.str(); file.close(); command.str(std::string());
-    command << "../yskip/src/yskip --thread-num="
+    command << "yskip --thread-num="
     << num_workers()
     << " -d " << vector_dimension
     << " -l " << learning_strategy

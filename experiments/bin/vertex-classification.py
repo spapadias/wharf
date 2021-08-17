@@ -1,8 +1,9 @@
 import pandas as pd
 
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegressionCV
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, f1_score
+from sklearn.preprocessing import MinMaxScaler
 
 embeddings = pd.read_csv('model.w2v', header=None, delim_whitespace=True, skiprows=[0])
 embeddings.set_index(0, inplace=True)
@@ -15,9 +16,12 @@ dataset = embeddings.join(labels)
 X = dataset.drop('label', axis=1)
 y = dataset.label
 
+norm = MinMaxScaler().fit(X)
+X = norm.transform(X)
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
 
-clf = LogisticRegressionCV(Cs=10, cv=5, scoring="accuracy", verbose=False, max_iter=5000, solver='newton-cg')
+clf = LogisticRegression(max_iter=500, solver='newton-cg', n_jobs=-1)
 clf.fit(X_train, y_train)
 y_pred = clf.predict(X_test)
 
