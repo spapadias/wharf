@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # script options
-clean_build=False                    # removes build folder after the execution
+clean_build=True                    # removes build folder after the execution
 
 # execution options
 walk_model="deepwalk"                # deepwalk | node2vec
@@ -10,19 +10,24 @@ paramQ=4.0                           # node2vec's paramQ
 sampler_init_strategy="weight"       # random | weight | burnin
 vector_dimension=128                 # size of learned vectors
 learning_strategy=1                  # 1: online | 2: mini-batch (default)
-edge_parition_size=5000              # size of the edges parition
+edge_parition_size=500               # size of the edges parition
 declare -a graphs=("cora-graph")     # array of graphs
 declare -a walks_per_vertex=(10)     # walks per vertex to generate
 declare -a walk_length=(80)          # length of one walk
 
+# TEMP AREA
+num_of_lines=$(< "../data/${graphs[0]}" wc -l)
+head -n 2714 "../data/${graphs[0]}" > "../data/preload"
+tail -n +2714 "../data/${graphs[0]}" > "../data/stream"
+
 # 1. convert graphs in adjacency graph format if necessary
 for graph in "${graphs[@]}"; do
-  FILE=../data/"${graph}".adj
+  FILE=../data/preload.adj
   if test -f "$FILE"; then
       echo 'Skipping conversion of a graph' "${graph[@]}" 'to adjacency graph format'
   else
       echo 'Converting graph' "${graph[@]}" 'to adjacency graph format'
-      ./../bin/SNAPtoAdj -s -f "../data/${graph}" "../data/${graph}.adj"
+      ./../bin/SNAPtoAdj -s -f "../data/preload" "../data/preload.adj"
       echo 'Graph' "${graph[@]}" 'converted to adjacency graph format'
   fi
 done
@@ -48,7 +53,7 @@ for wpv in "${walks_per_vertex[@]}"; do
         for graph in "${graphs[@]}"; do
           printf "\n"
           printf "${graph}"
-          ./vertex-classification -s -f "data/${graph}" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}" -d "${vector_dimension}" -le "${learning_strategy}" -eps "${edge_parition_size}"
+          ./vertex-classification -s -f "data/preload" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}" -d "${vector_dimension}" -le "${learning_strategy}" -eps "${edge_parition_size}"
         done
     done
 done
@@ -59,4 +64,6 @@ if [ "$clean_build" = True ] ; then
     rm -rf build;
     rm -rf yskip;
     rm experiments/data/*.adj
+    rm experiments/data/preload*
+    rm experiments/data/stream*
 fi
