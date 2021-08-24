@@ -288,8 +288,8 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
     stringstream ss; ss << fname << ".adj";
 
     std::tie(n, m, offsets, edges) = read_unweighted_graph(ss.str().c_str(), is_symmetric, mmap);
-//    pbbs::free_array(offsets);
-//    pbbs::free_array(edges);
+    pbbs::free_array(offsets);
+    pbbs::free_array(edges);
 
     timer static_timer("StaticTimer", false);
 
@@ -346,6 +346,7 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
 
         command << "../../yskip/src/yskip --thread-num="
                 << num_workers()
+                << " --initial-model=model"
                 << " -d " << vector_dimension
                 << " -l " << learning_strategy
                 << " walks.txt model;";
