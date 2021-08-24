@@ -64,7 +64,7 @@ namespace utility
         bool run_seq = false
     )
     {
-        #ifdef MALIN_TIMER
+        #ifdef WHARFMH_TIMER
             timer timer("Utility::GenerateBatchOfEdges");
         #endif
 
@@ -126,14 +126,14 @@ namespace utility
 
         pbbs::free_array(edges);
 
-        #ifdef MALIN_DEBUG
+        #ifdef WHARFMH_DEBUG
             std::cout << edges_generated << " / "
                       << ((directed) ? edges_number : 2 * edges_number)
                       << " distinct edges (direction, duplicate removal and self-loop processing)"
                       << std::endl;
         #endif
 
-        #ifdef MALIN_TIMER
+        #ifdef WHARFMH_TIMER
             timer.reportTotal("time(seconds)");
         #endif
 

@@ -4,8 +4,7 @@ using Edge = std::tuple<types::Vertex, types::Vertex>;
 
 void create_edge_stream(commandLine& command_line, std::vector<std::pair<Edge*, uintV>>& stream)
 {
-//    string fname = string(command_line.getOptionValue("-f", "stream"));
-    string fname = "data/stream";
+    string fname = string(command_line.getOptionValue("-f", "stream"));
     size_t edge_parition_size = command_line.getOptionLongValue("-eps", 5000);
 
     types::Vertex firstV, secondV;
@@ -47,7 +46,7 @@ void vertex_classification_incremental(commandLine& command_line, const std::vec
     double paramQ            = command_line.getOptionDoubleValue("-paramQ", config::paramQ);
     string init_strategy     = string(command_line.getOptionValue("-init", "random"));
     size_t vector_dimension  = command_line.getOptionLongValue("-d", 128);
-    size_t learning_strategy = command_line.getOptionLongValue("-le", 2);
+    size_t learning_strategy = command_line.getOptionLongValue("-le", 1);
 
     config::walks_per_vertex = walks_per_vertex;
     config::walk_length      = length_of_walks;
@@ -125,8 +124,8 @@ void vertex_classification_incremental(commandLine& command_line, const std::vec
     stringstream ss; ss << fname << ".adj";
 
     std::tie(n, m, offsets, edges) = read_unweighted_graph(ss.str().c_str(), is_symmetric, mmap);
-//    pbbs::free_array(offsets);
-//    pbbs::free_array(edges);
+    pbbs::free_array(offsets);
+    pbbs::free_array(edges);
 
     timer incremental_timer("IncrementalTimer", false);
 
@@ -134,7 +133,7 @@ void vertex_classification_incremental(commandLine& command_line, const std::vec
 
     // 1. load all vertices in isolation (every vertex has a degree of 0)
     incremental_timer.start();
-    dygrl::WharfMH WharfMH = dygrl::WharfMH(n, m, offsets, edges);
+    dygrl::WharfMH WharfMH = dygrl::WharfMH(n, m);
     WharfMH.generate_initial_random_walks();
     incremental_timer.stop();
 
@@ -149,7 +148,8 @@ void vertex_classification_incremental(commandLine& command_line, const std::vec
     }
 
     file << command.str(); file.close(); command.str(std::string());
-    command << "yskip --thread-num="
+
+    command << "../../yskip/src/yskip --thread-num="
             << num_workers()
             << " -d " << vector_dimension
             << " -l " << learning_strategy
@@ -177,11 +177,13 @@ void vertex_classification_incremental(commandLine& command_line, const std::vec
 
         file << command.str(); file.close(); command.str(std::string());
 
-        command << "yskip --thread-num="
+        command << "../../yskip/src/yskip --thread-num="
                 << num_workers()
+                << " --initial-model=model"
                 << " -d " << vector_dimension
                 << " -l " << learning_strategy
                 << " walks.txt model;";
+
         system(command.str().c_str());
         incremental_timer.stop();
 
@@ -295,7 +297,7 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
 
     // 1. load all vertices in isolation (every vertex has a degree of 0)
     static_timer.start();
-    dygrl::WharfMH WharfMH = dygrl::WharfMH(n, m, offsets, edges);
+    dygrl::WharfMH WharfMH = dygrl::WharfMH(n, m);
     WharfMH.generate_initial_random_walks();
     static_timer.stop();
 
@@ -310,11 +312,12 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
     }
 
     file << command.str(); file.close(); command.str(std::string());
-    command << "yskip --thread-num="
-    << num_workers()
-    << " -d " << vector_dimension
-    << " -l " << learning_strategy
-    << " walks.txt model;";
+
+    command << "../../yskip/src/yskip --thread-num="
+            << num_workers()
+            << " -d " << vector_dimension
+            << " -l " << learning_strategy
+            << " walks.txt model;";
 
     system(command.str().c_str());
     static_timer.stop();
@@ -341,14 +344,13 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
 
         file << command.str(); file.close(); command.str(std::string());
 
-        command << "yskip --thread-num="
+        command << "../../yskip/src/yskip --thread-num="
                 << num_workers()
-                << " --initial-model=model"
                 << " -d " << vector_dimension
                 << " -l " << learning_strategy
                 << " walks.txt model;";
-                system(command.str().c_str());
 
+        system(command.str().c_str());
         static_timer.stop();
 
         command.str(std::string());

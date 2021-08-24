@@ -5,9 +5,9 @@ clean_build=True                                    # cleans build folder after 
 
 # execution options
 walk_model="deepwalk"                               # deepwalk | node2vec
-paramP=1.0                                          # node2vec's paramP
-paramQ=4.0                                          # node2vec's paramQ
-sampler_init_strategy="random"                      # random | burnin | weight
+paramP=4.0                                          # node2vec's paramP
+paramQ=1.0                                          # node2vec's paramQ
+sampler_init_strategy="weight"                      # random | burnin | weight
 declare -a graphs=("cora-graph")                    # array of graphs
 declare -a walks_per_vertex=(10 15)                 # walks per vertex to generate
 declare -a walk_length=(40 80)                      # length of one walk
