@@ -11,6 +11,8 @@ sampler_init_strategy="weight"                      # random | burnin | weight
 declare -a graphs=("cora-graph")                    # array of graphs
 declare -a walks_per_vertex=(10 15)                 # walks per vertex to generate
 declare -a walk_length=(40 80)                      # length of one walk
+range_search="true"                                 # range search mode
+determinism="true"                                  # determinism
 
 # 1. convert graphs in adjacency graph format if necessary
 for graph in "${graphs[@]}"; do
