@@ -286,6 +286,9 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     }
 
 //                    auto random = utility::Random(walk_id / total_vertices);
+                    auto random = config::random; // By default random initialization
+                    if (config::deterministic_mode)
+                        random = utility::Random(walk_id / total_vertices);
                     types::State state  = model->initial_state(walk_id % total_vertices);
 
                     for(types::Position position = 0; position < config::walk_length; position++)
@@ -800,6 +803,9 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         }
 
 //                        auto random = utility::Random(affected_walks[index] / this->number_of_vertices());
+                        auto random = config::random; // By default random initialization
+                        if (config::deterministic_mode)
+                            random = utility::Random(affected_walks[index] / this->number_of_vertices());
                         auto state = model->initial_state(current_vertex_new_walk);
 
                         if (config::random_walk_model == types::NODE2VEC && current_position > 0)

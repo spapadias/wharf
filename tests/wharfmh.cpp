@@ -15,7 +15,9 @@ class WharfMHTest : public testing::Test
         uintE* offsets;
         bool mmap = false;
         bool is_symmetric = true;
-        std::string default_file_path = "data/wiki-graph";
+//        std::string default_file_path = "data/wiki-graph";
+        std::string default_file_path = "data/cora-graph";
+
 };
 
 void WharfMHTest::SetUp()
