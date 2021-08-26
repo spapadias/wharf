@@ -15,6 +15,9 @@ void memory_footprint(commandLine& command_line)
     double paramQ           = command_line.getOptionDoubleValue("-paramQ", config::paramQ);
     string init_strategy    = string(command_line.getOptionValue("-init", "weight"));
 
+    string determinism      = string(command_line.getOptionValue("-d", "false"));
+    string range_search     = string(command_line.getOptionValue("-rs", "true"));
+
     config::walks_per_vertex = walks_per_vertex;
     config::walk_length      = length_of_walks;
 
