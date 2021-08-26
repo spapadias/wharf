@@ -7,7 +7,7 @@ clean_build=True                                    # cleans build folder after 
 walk_model="deepwalk"                               # deepwalk | node2vec
 paramP=4.0                                          # node2vec's paramP
 paramQ=1.0                                          # node2vec's paramQ
-sampler_init_strategy="weight"                      # random | burnin | weight
+sampler_init_strategy="random"                      # random | burnin | weight
 declare -a graphs=("cora-graph")                    # array of graphs
 declare -a walks_per_vertex=(10 15)                 # walks per vertex to generate
 declare -a walk_length=(40 80)                      # length of one walk
@@ -39,7 +39,7 @@ for wpv in "${walks_per_vertex[@]}"; do
         for graph in "${graphs[@]}"; do
             printf "\n"
             printf "Graph: ${graph}\n"
-            ./memory-footprint -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}"
+            ./memory-footprint -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}"  -rs "${range_search}" -d "${determinism}"
         done
     done
 done
@@ -48,5 +48,5 @@ done
 if [ "$clean_build" = True ] ; then
     cd ../../;
     rm -rf build;
-    rm experiments/data/*.adj
+#    rm experiments/data/*.adj
 fi
