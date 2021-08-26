@@ -5,13 +5,12 @@ clean_build=True                                    # cleans build folder after 
 
 # execution options
 walk_model="deepwalk"                               # deepwalk | node2vec
-paramP=4.0                                          # node2vec's paramP
-paramQ=1.0                                          # node2vec's paramQ
+paramP=2.0                                          # node2vec's paramP
+paramQ=0.5                                          # node2vec's paramQ
 sampler_init_strategy="random"                      # random | burnin | weight
 declare -a graphs=("cora-graph")                    # array of graphs
-declare -a walks_per_vertex=(10 15)                 # walks per vertex to generate
-declare -a walk_length=(40 80)                      # length of one walk
-range_search="true"                                 # range search mode
+declare -a walks_per_vertex=(10)                    # walks per vertex to generate
+declare -a walk_length=(80)                         # length of one walk
 determinism="true"                                  # determinism
 
 # 1. convert graphs in adjacency graph format if necessary
@@ -39,7 +38,7 @@ for wpv in "${walks_per_vertex[@]}"; do
         for graph in "${graphs[@]}"; do
             printf "\n"
             printf "Graph: ${graph}\n"
-            ./memory-footprint -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}"  -rs "${range_search}" -d "${determinism}"
+            ./memory-footprint -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}"  -d "${determinism}"
         done
     done
 done
