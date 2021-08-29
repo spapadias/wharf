@@ -73,6 +73,8 @@ void throughput(commandLine& command_line)
     else
         config::deterministic_mode = false;
 
+    cout << "determinism=" << config::deterministic_mode << endl;
+
     size_t n;
     size_t m;
     uintE* offsets;
@@ -82,12 +84,12 @@ void throughput(commandLine& command_line)
     dygrl::WharfMH WharfMH = dygrl::WharfMH(n, m, offsets, edges);
     WharfMH.generate_initial_random_walks();
 
-    auto batch_sizes = pbbs::sequence<size_t>(6);
+    auto batch_sizes = pbbs::sequence<size_t>(5);
     batch_sizes[0] = 5;
     batch_sizes[1] = 50;
     batch_sizes[2] = 500;
     batch_sizes[3] = 5000;
-    batch_sizes[4] = 50000;
+    batch_sizes[4] = 50000; // up to 10^5 edges in each batch
 //    batch_sizes[5] = 500000;
 
     for (short int i = 0; i < batch_sizes.size(); i++)
