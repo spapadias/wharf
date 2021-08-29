@@ -15,6 +15,7 @@ void throughput(commandLine& command_line)
     double paramQ           = command_line.getOptionDoubleValue("-paramQ", config::paramQ);
     string init_strategy    = string(command_line.getOptionValue("-init", "weight"));
     size_t n_trials         = command_line.getOptionLongValue("-trials", 3);
+    string determinism      = string(command_line.getOptionValue("-det", "true"));
 
     config::walks_per_vertex = walks_per_vertex;
     config::walk_length      = length_of_walks;
@@ -66,6 +67,12 @@ void throughput(commandLine& command_line)
         std::exit(1);
     }
 
+    // set the deterministic mode
+    if (determinism == "true")
+        config::deterministic_mode = true;
+    else
+        config::deterministic_mode = false;
+
     size_t n;
     size_t m;
     uintE* offsets;
@@ -81,7 +88,7 @@ void throughput(commandLine& command_line)
     batch_sizes[2] = 500;
     batch_sizes[3] = 5000;
     batch_sizes[4] = 50000;
-    batch_sizes[5] = 500000;
+//    batch_sizes[5] = 500000;
 
     for (short int i = 0; i < batch_sizes.size(); i++)
     {

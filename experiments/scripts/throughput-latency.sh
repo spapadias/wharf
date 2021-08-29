@@ -7,10 +7,11 @@ clean_build=True
 walk_model="deepwalk"                             # deepwalk | node2vec
 paramP=4.0                                        # node2vec paramP
 paramQ=1.0                                        # node2vec paramQ
-sampler_init_strategy="weight"                    # random | burnin | weight
-declare -a graphs=("cora-graph")
+sampler_init_strategy="random"                    # random | burnin | weight
+declare -a graphs=("livejournal-graph")
 declare -a walks_per_node=(10)
 declare -a walk_length=(80)
+determinism="true"
 
 # 1. convert graphs in adjacency graph format if necessary
 for graph in "${graphs[@]}"; do
@@ -36,7 +37,7 @@ for wpv in "${walks_per_node[@]}"; do
     for wl in "${walk_length[@]}"; do
         for graph in "${graphs[@]}"; do
             printf "${graph}"
-            ./throughput-latency -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}"
+            ./throughput-latency -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}" -det "${determinism}"
         done
     done
 done
@@ -45,5 +46,5 @@ done
 if [ "$clean_build" = True ] ; then
     cd ../../;
     rm -rf build;
-    rm experiments/data/*.adj
+#    rm experiments/data/*.adj
 fi
