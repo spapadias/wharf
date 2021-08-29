@@ -7,8 +7,8 @@ clean_build=True
 walk_model="deepwalk"                             # deepwalk | node2vec
 paramP=4.0                                        # node2vec paramP
 paramQ=1.0                                        # node2vec paramQ
-sampler_init_strategy="weight"                    # random | burnin | weight
-declare -a graphs=("cora-graph")
+sampler_init_strategy="random"                    # random | burnin | weight
+declare -a graphs=("livejournal-graph")
 declare -a walks_per_node=(10)
 declare -a walk_length=(80)
 
