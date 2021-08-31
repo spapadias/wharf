@@ -299,7 +299,14 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         }
 
                         auto new_state = graph[state.first].samplers->find(state.second).sample(state, model);
-//                        new_state = model->new_state(state, graph[state.first].neighbors[random.irand(graph[state.first].degree)]);
+                        // ---------------------------------------------------------------
+                        // todo: added for deterministic walks ----------------------
+                        if (config::deterministic_mode)
+                        {
+                            new_state = model->new_state(state,graph[state.first].neighbors[random.irand(graph[state.first].degree)]);
+//                            cout << "SKATA, it is deterministic mode" << endl;
+                        }
+                        // ---------------------------------------------------------------
 
                         if (!cuckoo.contains(state.first))
                             cuckoo.insert(state.first, std::vector<dygrl::WalkIndexEntry::entry_t>());
@@ -822,7 +829,13 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                             }
 
                             state = graph[state.first].samplers->find(state.second).sample(state, model);
-//                            state = model->new_state(state, graph[state.first].neighbors[random.irand(graph[state.first].degree)]);
+                            // --------------------------------------------
+                            // todo: this is for deterministic walks ------
+                            if (config::deterministic_mode)
+                            {
+//                                cout << "SKATA 2, deterministic walks" << endl;
+                                state = model->new_state(state, graph[state.first].neighbors[random.irand(graph[state.first].degree)]);
+                            }
 
                             auto index_entry = (position != config::walk_length - 1) ?
                                 std::make_pair(affected_walks[index]*config::walk_length + position, state.first) :
