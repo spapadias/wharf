@@ -828,7 +828,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                                 graph[state.first].samplers->insert(state.second, MetropolisHastingsSampler(state, model));
                             }
 
-                            state = graph[state.first].samplers->find(state.second).sample(state, model);
+//                            state = graph[state.first].samplers->find(state.second).sample(state, model); //todo: quick fix! modify it properly
                             // --------------------------------------------
                             // todo: this is for deterministic walks ------
                             if (config::deterministic_mode)
