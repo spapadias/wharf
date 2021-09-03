@@ -829,13 +829,13 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                             }
 
 //                            state = graph[state.first].samplers->find(state.second).sample(state, model); //todo: quick fix! modify it properly
+                            auto temp_state = graph[state.first].samplers->find(state.second).sample(state, model);
                             // --------------------------------------------
                             // todo: this is for deterministic walks ------
                             if (config::deterministic_mode)
-                            {
-//                                cout << "SKATA 2, deterministic walks" << endl;
                                 state = model->new_state(state, graph[state.first].neighbors[random.irand(graph[state.first].degree)]);
-                            }
+                            else
+                                state = temp_state;
 
                             auto index_entry = (position != config::walk_length - 1) ?
                                 std::make_pair(affected_walks[index]*config::walk_length + position, state.first) :

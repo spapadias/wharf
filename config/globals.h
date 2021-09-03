@@ -25,7 +25,7 @@ namespace config
     auto random                = utility::Random(std::time(nullptr));
 
     // determines whether to produce and update the walks in a deterministic way
-    auto deterministic_mode    = true;
+    auto deterministic_mode    = false;
 }
 
 #endif // DYNAMIC_GRAPH_REPRESENTATION_LEARNING_WITH_METROPOLIS_HASTINGS_GLOBALS_H
