@@ -145,11 +145,19 @@ TEST_F(WharfMHTest, InsertBatchOfEdges)
     dygrl::WharfMH WharfMH = dygrl::WharfMH(total_vertices, total_edges, offsets, edges);
     auto start_edges = WharfMH.number_of_edges();
 
+//    // print random walks
+//    for(int i = 0; i < config::walks_per_vertex * WharfMH.number_of_vertices(); i++)
+//        std::cout << WharfMH.walk(i) << std::endl;
+
     // geneate edges
-    auto edges = utility::generate_batch_of_edges(1000000, WharfMH.number_of_vertices(), false, false);
+    auto edges = utility::generate_batch_of_edges(100, WharfMH.number_of_vertices(), false, false);
 
     // insert batch of edges
     WharfMH.insert_edges_batch(edges.second, edges.first, true, false, std::numeric_limits<size_t>::max(), false);
+
+//    // print random walks
+//    for(int i = 0; i < config::walks_per_vertex * WharfMH.number_of_vertices(); i++)
+//        std::cout << WharfMH.walk(i) << std::endl;
 
     std::cout << "Edges before batch insert: " << start_edges << std::endl;
     std::cout << "Edges after batch insert: "  << WharfMH.number_of_edges() << std::endl;
