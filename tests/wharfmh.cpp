@@ -198,7 +198,7 @@ TEST_F(WharfMHTest, UpdateRandomWalksOnInsertEdges)
     }
 
     // geneate edges
-    auto edges = utility::generate_batch_of_edges(1000000, WharfMH.number_of_vertices(), false, false);
+    auto edges = utility::generate_batch_of_edges(1000, WharfMH.number_of_vertices(), false, false);
 
     // insert batch of edges
     WharfMH.insert_edges_batch(edges.second, edges.first, true, false);
@@ -223,7 +223,7 @@ TEST_F(WharfMHTest, UpdateRandomWalksOnDeleteEdges)
     }
 
     // geneate edges
-    auto edges = utility::generate_batch_of_edges(1000000, WharfMH.number_of_vertices(), false, false);
+    auto edges = utility::generate_batch_of_edges(1000, WharfMH.number_of_vertices(), false, false);
 
     // insert batch of edges
     WharfMH.delete_edges_batch(edges.second, edges.first, true, false);
@@ -250,7 +250,7 @@ TEST_F(WharfMHTest, UpdateRandomWalks)
     for(int i = 0; i < 10; i++)
     {
         // geneate edges
-        auto edges = utility::generate_batch_of_edges(1000000, WharfMH.number_of_vertices(), false, false);
+        auto edges = utility::generate_batch_of_edges(1000, WharfMH.number_of_vertices(), false, false);
 
         WharfMH.insert_edges_batch(edges.second, edges.first, true, false);
         WharfMH.delete_edges_batch(edges.second, edges.first, true, false);
