@@ -303,6 +303,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                         // todo: added for deterministic walks ----------------------
                         if (config::deterministic_mode)
                         {
+//                            new_state = model->new_state(state,graph[state.first].neighbors[0]); // fix this for determinism
                             new_state = model->new_state(state,graph[state.first].neighbors[random.irand(graph[state.first].degree)]);
 //                            cout << "SKATA, it is deterministic mode" << endl;
                         }
