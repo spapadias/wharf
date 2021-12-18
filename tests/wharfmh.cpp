@@ -16,8 +16,8 @@ class WharfMHTest : public testing::Test
         bool mmap = false;
         bool is_symmetric = true;
 //        std::string default_file_path = "data/wiki-graph";
-//        std::string default_file_path = "data/cora-graph";
-        std::string default_file_path = "data/aspen-paper-graph";
+        std::string default_file_path = "data/flickr-graph";
+//        std::string default_file_path = "data/aspen-paper-graph";
 
 };
 
@@ -399,16 +399,16 @@ TEST_F(WharfMHTest, WharfMHThroughputLatency2)
 	WharfMH.generate_initial_random_walks();
 	int n_trials = 1; //3;
 
-	cout << "WALK CORPUS" << endl;
-	for (auto i = 0; i < total_vertices; i++)
-		cout << WharfMH.walk(i) << endl;
+//	cout << "WALK CORPUS" << endl;
+//	for (auto i = 0; i < total_vertices; i++)
+//		cout << WharfMH.walk(i) << endl;
 
-	auto batch_sizes = pbbs::sequence<size_t>(1);
+	auto batch_sizes = pbbs::sequence<size_t>(5);
 	batch_sizes[0] = 5;
-//	batch_sizes[1] = 50;
-//	batch_sizes[2] = 500;
-//	batch_sizes[3] = 5000;
-//	batch_sizes[4] = 50000;
+	batch_sizes[1] = 50;
+	batch_sizes[2] = 500;
+	batch_sizes[3] = 5000;
+	batch_sizes[4] = 50000;
 //	batch_sizes[5] = 500000;
 
 	for (short int i = 0; i < batch_sizes.size(); i++)
