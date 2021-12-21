@@ -76,7 +76,7 @@ option(HOMEGROWN  OFF)
 option(DOCK_DEBUG OFF)
 option(SERIAL     OFF)
 
-#set(WHARFMH_DEBUG ON)
+set(WHARFMH_DEBUG ON)
 
 # build variables
 set(OMPFLAGS         "-DOPENMP -fopenmp")
