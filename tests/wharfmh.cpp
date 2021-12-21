@@ -436,6 +436,9 @@ TEST_F(WharfMHTest, WharfMHThroughputLatency2)
 		for (short int trial = 0; trial < n_trials; trial++)
 		{
 			size_t graph_size_pow2 = 1 << (pbbs::log2_up(total_vertices) - 1);
+			cout << "graph size pow: " << graph_size_pow2 << endl;
+			cout << "batch size: " << batch_sizes[i] << endl;
+			cout << "total V: " << total_vertices << endl;
 			auto edges = utility::generate_batch_of_edges(batch_sizes[i], total_vertices, false, false);
 			// ---
 			for (auto i = 0; i < edges.second; i++)
