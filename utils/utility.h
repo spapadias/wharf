@@ -82,6 +82,7 @@ namespace utility
         parallel_for(0, edges_number, [&] (size_t i)
         {
             edges[i] = rmat(i);
+			cout << "*** [" << get<0>(edges[i]) << ", " << get<1>(edges[i]) << "]" << endl;
         });
 
         if (!directed)
