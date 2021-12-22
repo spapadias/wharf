@@ -19,7 +19,9 @@ struct rMat {
 
 
   double hashDouble(intT i) {
-    return ((double) (pbbs::hash32((intT)i))/((double) std::numeric_limits<intV>::max()));}
+//    return ((double) (pbbs::hash32((intT)i))/((double) std::numeric_limits<intV>::max()));
+    return ((double) (pbbs::hash32((intT)i))/((double) std::numeric_limits<intT>::max()));
+  }
 
   std::pair<intT, intT> rMatRec(intT nn, intT randStart, intT randStride) {
     if (nn==1) return std::make_pair<intT, intT>(0,0);
