@@ -7,7 +7,7 @@ namespace config
     uint8_t walks_per_vertex   = 1;
 
     // determines the length of one random walk
-    uint8_t walk_length        = 5;
+    uint8_t walk_length        = 10;
 
     // determines the type of random walk model to use
     auto random_walk_model     = types::RandomWalkModelType::DEEPWALK;
