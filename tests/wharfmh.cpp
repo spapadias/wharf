@@ -400,7 +400,7 @@ TEST_F(WharfMHTest, WharfMHThroughputLatency2)
 	int n_trials = 1; //3;
 
 	cout << "WALK CORPUS" << endl;
-	for (auto i = 0; i < total_vertices; i++)
+	for (auto i = 0; i < total_vertices * config::walks_per_vertex; i++)
 		cout << WharfMH.walk(i) << endl;
 
 	auto batch_sizes = pbbs::sequence<size_t>(1);
@@ -508,7 +508,7 @@ TEST_F(WharfMHTest, WharfMHThroughputLatency2)
 	}
 
 	cout << "(NEW) WALK CORPUS" << endl;
-	for (auto i = 0; i < total_vertices; i++)
+	for (auto i = 0; i < total_vertices * config::walks_per_vertex; i++)
 		cout << WharfMH.walk(i) << endl;
 
 	WharfMH.destroy_index();
