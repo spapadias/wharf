@@ -74,7 +74,7 @@ namespace utility
         auto rand              = pbbs::random(0);
 //        auto rand              = pbbs::random(std::time(nullptr));
         size_t graph_size_pow2 = 1 << (pbbs::log2_up(vertices_number) - 1);
-		cout << "ith random: " << rand.ith_rand(0) << endl;
+//		cout << "ith random: " << rand.ith_rand(0) << endl;
         auto rmat              = rMat<unsigned int>(graph_size_pow2, rand.ith_rand(0), a, b, c);
 //        auto rmat              = rMat<uintV>(graph_size_pow2, rand.ith_rand(0), a, b, c);
         auto edges             = (directed) ? pbbs::new_array<Edge>(edges_number) : pbbs::new_array<Edge>(2 * edges_number);
@@ -83,7 +83,7 @@ namespace utility
         parallel_for(0, edges_number, [&] (size_t i)
         {
             edges[i] = rmat(i);
-			cout << "*** [" << get<0>(edges[i]) << ", " << get<1>(edges[i]) << "]" << endl;
+//			cout << "*** [" << get<0>(edges[i]) << ", " << get<1>(edges[i]) << "]" << endl;
         });
 
         if (!directed)
