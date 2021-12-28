@@ -56,6 +56,7 @@ namespace utility
     (
         size_t edges_number,
         size_t vertices_number,
+		size_t batch_seed,
         bool self_loops = false,
         bool directed = true,
         double a = 0.5,
@@ -71,7 +72,8 @@ namespace utility
         using Edge = std::tuple<uintV, uintV>;  // (vertex1, vertex2)
 
         // 1. Set up for the edge generation
-        auto rand              = pbbs::random(0);
+//        auto rand              = pbbs::random(0);
+        auto rand              = pbbs::random(batch_seed);
 //        auto rand              = pbbs::random(std::time(nullptr));
         size_t graph_size_pow2 = 1 << (pbbs::log2_up(vertices_number) - 1);
 //		cout << "ith random: " << rand.ith_rand(0) << endl;
