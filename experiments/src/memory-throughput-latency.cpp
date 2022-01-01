@@ -87,14 +87,15 @@ void throughput(commandLine& command_line)
     dygrl::WharfMH WharfMH = dygrl::WharfMH(n, m, offsets, edges);
     WharfMH.generate_initial_random_walks();
 	// --- add memory measurements here
-	WharfMH.memory_footprint();
+//	WharfMH.memory_footprint();
 	// ----
 
 	// continue with the throughput-latency experiment
-    auto batch_sizes = pbbs::sequence<size_t>(3);
-    batch_sizes[0] = 5;
-    batch_sizes[1] = 50;
-    batch_sizes[2] = 500;
+    auto batch_sizes = pbbs::sequence<size_t>(1);
+    batch_sizes[0] = 500;
+//    batch_sizes[0] = 5;
+//    batch_sizes[1] = 50;
+//    batch_sizes[2] = 500;
 //    batch_sizes[3] = 5000;
 //    batch_sizes[4] = 50000; // up to 10^5 edges in each batch
 //    batch_sizes[5] = 500000;
@@ -185,6 +186,10 @@ void throughput(commandLine& command_line)
             std::cout << latency[i] << " ";
         }
         std::cout << "}" << std::endl;
+
+	    // --- add memory measurements here
+	    WharfMH.memory_footprint();
+	    // ----
     }
 
     WharfMH.destroy_index();
