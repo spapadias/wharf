@@ -16,8 +16,8 @@ class WharfMHTest : public testing::Test
         bool mmap = false;
         bool is_symmetric = true;
 //        std::string default_file_path = "data/wiki-graph";
-//        std::string default_file_path = "data/flickr-graph";
-        std::string default_file_path = "data/aspen-paper-graph";
+        std::string default_file_path = "data/flickr-graph";
+//        std::string default_file_path = "data/aspen-paper-graph";
 
 };
 
@@ -529,4 +529,188 @@ TEST_F(WharfMHTest, WharfMHThroughputLatency2)
 	          << generate_initial_walks.get_total() / n_trials << std::endl;
 
 	std::cout << std::endl;
+}
+
+// ----------------------------
+// --- INSERT ONLY WORKLOAD ---
+// ----------------------------
+
+TEST_F(WharfMHTest, WharfInsertOnlyWorkload) {
+	dygrl::WharfMH malin = dygrl::WharfMH(total_vertices, total_edges, offsets, edges);
+	malin.generate_initial_random_walks();
+	int n_batches = 1; // todo: how many batches per batch size?
+
+	auto batch_sizes = pbbs::sequence<size_t>(1);
+	batch_sizes[0] = 5; //5;
+//	batch_sizes[1] = 50;
+//	batch_sizes[2] = 500;
+//	batch_sizes[3] = 5000;
+//	batch_sizes[4] = 50000;
+//  batch_sizes[5] = 500000;
+
+	for (short int i = 0; i < batch_sizes.size(); i++)
+	{
+		timer insert_timer("InsertTimer");
+		timer delete_timer("DeleteTimer");
+
+		graph_update_time_on_insert.reset();
+		walk_update_time_on_insert.reset();
+		graph_update_time_on_delete.reset();
+		walk_update_time_on_delete.reset();
+//		// --- profiling initialization
+//		walk_insert_init.reset();
+//		walk_insert_2jobs.reset();
+//		walk_insert_2accs.reset();
+//		ij.reset();
+//		dj.reset();
+//		walk_find_in_vertex_tree.reset();
+//		walk_find_next_tree.reset();
+//		szudzik_hash.reset();
+//		fnir_tree_search.reset();
+//		MAV_time.reset();
+//		// ---
+
+		std::cout << "Batch size = " << 2 * batch_sizes[i] << " | ";
+
+		double last_insert_time = 0;
+
+		auto latency_insert = pbbs::sequence<double>(n_batches);
+		auto latency = pbbs::sequence<double>(n_batches);
+
+		double total_insert_walks_affected = 0;
+		double total_delete_walks_affected = 0;
+
+		int batch_seed[n_batches];
+		for (auto i = 0; i < n_batches; i++)
+			batch_seed[i] = i; // say the seed equals to the #batch todo: produce a different batch each time
+
+		for (short int b = 0; b < n_batches; b++)
+		{
+			cout << "batch-" << b << " and batch_seed-" << batch_seed[b] << endl;
+
+			size_t graph_size_pow2 = 1 << (pbbs::log2_up(total_vertices) - 1);
+			auto edges = utility::generate_batch_of_edges(batch_sizes[i], total_vertices, batch_seed[b], false, false);
+
+			std::cout << edges.second << " ";
+			for (auto i = 0; i < edges.second; i++)
+				cout << "edge-" << i + 1 << " is [" << get<0>(edges.first[i]) << ", " << get<1>(edges.first[i]) << "]" << endl;
+
+			insert_timer.start();
+			auto x = malin.insert_edges_batch(edges.second, edges.first, b+1, false, true, graph_size_pow2); // pass the batch number as well
+			insert_timer.stop();
+
+			total_insert_walks_affected += x.size();
+
+			last_insert_time = walk_update_time_on_insert.get_total() - last_insert_time;
+			latency_insert[b] = (double) last_insert_time / x.size();
+
+			latency[b] = latency_insert[b];
+
+			// free edges
+			pbbs::free_array(edges.first);
+		}
+
+		std::cout << std::endl;
+
+		std::cout << "Average insert time = "
+		          << insert_timer.get_total() / n_batches << std::endl;
+		std::cout << "Average graph update insert time = "
+		          << graph_update_time_on_insert.get_total() / n_batches
+		          << std::endl;
+		std::cout << "Average walk update insert time = "
+		          << walk_update_time_on_insert.get_total() / n_batches
+		          << ", average walk affected = "
+		          << total_insert_walks_affected / n_batches << std::endl;
+
+		std::cout << "Average delete time = "
+		          << delete_timer.get_total() / n_batches << std::endl;
+		std::cout << "Average graph update delete time = "
+		          << graph_update_time_on_delete.get_total() / n_batches
+		          << std::endl;
+		std::cout << "Average walk update delete time = "
+		          << walk_update_time_on_delete.get_total() / n_batches
+		          << ", average walk affected = "
+		          << total_delete_walks_affected / n_batches << std::endl;
+
+		// MAV time
+//		std::cout << "Average MAV (we are not deleting obsolete parts) = "
+//		          << MAV_time.get_total() / n_batches
+//		          << std::endl;
+//
+//		// --- profiling ---
+//		std::cout << "{ total profiling for insert and delete" << std::endl;
+//		std::cout << "Initialization: "
+//		          << walk_insert_init.get_total() / n_batches << " ("
+//		          << (walk_insert_init.get_total() * 100) /
+//		             (walk_insert_init.get_total() +
+//		              walk_insert_2jobs.get_total() +
+//		              walk_insert_2accs.get_total()) << "%)" << std::endl;
+//		std::cout << "Insert/Delete Jobs: "
+//		          << walk_insert_2jobs.get_total() / n_batches << " ("
+//		          << (walk_insert_2jobs.get_total() * 100) /
+//		             (walk_insert_init.get_total() +
+//		              walk_insert_2jobs.get_total() +
+//		              walk_insert_2accs.get_total()) << "%)" << std::endl;
+//		std::cout << "InsertJob: " << ij.get_total() / n_batches
+//		          << " | DeleteJob: " << dj.get_total() / n_batches << std::endl;
+//		std::cout << "FindInVertexTree in DeleteJob total: "
+//		          << walk_find_in_vertex_tree.get_total() / n_batches
+//		          << std::endl;
+//		std::cout << "FindNext in DeleteJob total: "
+//		          << walk_find_next_tree.get_total() / n_batches << std::endl;
+//		std::cout << "FindNext (search of the tree): "
+//		          << fnir_tree_search.get_total() / n_batches << std::endl;
+//		std::cout << "Sudzik total: " << szudzik_hash.get_total() / n_batches
+//		          << std::endl;
+//
+//		std::cout << "Accumulators: "
+//		          << walk_insert_2accs.get_total() / n_batches << " ("
+//		          << (walk_insert_2accs.get_total() * 100) /
+//		             (walk_insert_init.get_total() +
+//		              walk_insert_2jobs.get_total() +
+//		              walk_insert_2accs.get_total()) << "%)" << std::endl;
+//		std::cout << "}" << std::endl;
+//		// --- profiling ---
+
+		// latencies
+		std::cout << "Average walk insert latency = { ";
+		for (int i = 0; i < n_batches; i++) {
+			std::cout << latency_insert[i] << " ";
+		}
+		std::cout << "}" << std::endl;
+
+		std::cout << "Average walk update latency = { ";
+		for (int i = 0; i < n_batches; i++) {
+			std::cout << latency[i] << " ";
+		}
+		std::cout << "}" << std::endl;
+	}
+
+//	auto flat_graph = malin.flatten_vertex_tree();
+//	for (auto i = 0; i < malin.number_of_vertices(); i++)
+//	{
+//		cout << "vertex " << i << endl;
+////		flat_graph[i].compressed_edges.iter_elms(i, [&](auto edge){
+////			cout << edge << " ";
+////		});
+////		cout << endl;
+//
+//		cout << "size of walk-tree vector " << flat_graph[i].compressed_walks.size() << endl;
+//		int inc = 0;
+//		for (auto wt = flat_graph[i].compressed_walks.begin(); wt != flat_graph[i].compressed_walks.end(); wt++) // print the walk-trees in chronological order
+//		{
+//			inc++;
+//			cout << "walk-tree " << inc << endl;
+//			wt->iter_elms(i, [&](auto enc_triplet){
+//			  auto pair = pairings::Szudzik<types::Vertex>::unpair(enc_triplet);
+//
+//			  auto walk_id  = pair.first / config::walk_length;                  // todo: needs floor?
+//			  auto position = pair.first - (walk_id * config::walk_length); // todo: position here starts from 0. verify this one!
+//			  auto next_vertex   = pair.second;
+////				cout << enc_triplet << " ";
+////			  cout << "{" << walk_id << ", " << position << ", " << next_vertex << "}" << " " << endl;
+//			});
+//			cout << endl;
+//		}
+//	}
 }
