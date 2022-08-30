@@ -43,7 +43,7 @@ for wpv in "${w[@]}"; do
         for graph in "${graphs[@]}"; do
             printf "\n"
             printf "Graph: ${graph}\n"
-            ./memory_footprint -s -f "data/${graph}.adj" -w "${w}" -l "${l}" -model "${model}" -p "${p}" -q "${q}" -init "${init}" -rs "${rs}" -d "${det}" -nb "${nb}" -bs "${bs}" -merge_freq "${merge_freq}$" -merge_mode "${merge_mode}"
+            ./memory-footprint -s -f "data/${graph}.adj" -w "${w}" -l "${l}" -model "${model}" -p "${p}" -q "${q}" -init "${init}" -rs "${rs}" -d "${det}" -nb "${nb}" -bs "${bs}" -merge_freq "${merge_freq}$" -merge_mode "${merge_mode}"
         done
     done
 done

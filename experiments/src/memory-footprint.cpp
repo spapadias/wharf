@@ -103,7 +103,7 @@ void memory_footprint(commandLine& command_line)
     std::tie(n, m, offsets, edges) = read_unweighted_graph(fname.c_str(), is_symmetric, mmap);
 
     // Assign the head frequency we read
-    cout << endl << "Head frequency is " << compressed_lists::head_frequency << ", and thus, chunk size is " << compressed_lists::head_mask << endl;
+	// cout << endl << "Head frequency is " << compressed_lists::head_frequency << ", and thus, chunk size is " << compressed_lists::head_mask << endl;
     // ---------------------------------
 
     dygrl::Wharf malin = dygrl::Wharf(n, m, offsets, edges);
@@ -114,7 +114,7 @@ void memory_footprint(commandLine& command_line)
 
 	// Call the function that measures the memory footprint
     malin.memory_footprint();
-    cout << "===> Time to produce the walk  corpus: " << walk_corpus_production_time << endl;
+//    cout << "===> Time to produce the walk  corpus: " << walk_corpus_production_time << endl;
 }
 
 
