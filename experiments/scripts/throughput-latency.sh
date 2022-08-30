@@ -4,19 +4,19 @@
 clean_build=True
 
 # execution options
-walk_model="deepwalk"             # deepwalk | node2vec
-paramP=0.5                        # node2vec paramP
-paramQ=2.0                        # node2vec paramQ
-sampler_init_strategy="weight"    # random | burnin | weight
-declare -a graphs=("flickr-graph")
-declare -a walks_per_node=(10)
-declare -a walk_length=(80)
-range_search="true"               # range search mode
-determinism="true"                # determinism
-num_of_batches=10                 # numbers of batches
-half_of_batch_size=3500           # batch_size / 2
-merge_wu_exec_mode="parallel"     # parallel | serial
-merge_frequency=10                # every how many batches to merge
+model="deepwalk"                 # deepwalk | node2vec
+p=0.5                            # node2vec's p parameter
+q=2.0                            # node2vec's q parameter
+init="random"                    # random | burnin | weight
+declare -a graphs=("cora-graph") # array of graphs (can intake more than one dataset)
+declare -a w=(10)                # walks per vertex to generate
+declare -a l=(80)                # length of one walk
+rs="true"                        # range search mode: ON | OFF
+det="true"                       # determinism in random walking via predefined seeds (for debugging)
+nb=1                             # numbers of batches
+bs=1000                          # half the size of the batch size
+mergemode="parallel"             # mode for conducting the merge operation of the walk-trees: parallel | serial
+mergefreq=1                      # every after "how many" batches to conduct the merging operation
 
 # 1. convert graphs in adjacency graph format if necessary
 for graph in "${graphs[@]}"; do
@@ -43,7 +43,7 @@ for wpv in "${walks_per_node[@]}"; do
         for graph in "${graphs[@]}"; do
             printf "\n"
             printf "Graph: ${graph} \n"
-            ./throughput-latency -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}" -rs "${range_search}" -d "${determinism}" -numbatch "${num_of_batches}" -sizebatch "${half_of_batch_size}" -mergefreq "${merge_frequency}$" -mergemode "${merge_wu_exec_mode}"
+            ./throughput-latency -s -f "data/${graph}.adj" -w "${w}" -l "${l}" -model "${model}" -p "${p}" -q "${q}" -init "${init}" -rs "${rs}" -det "${det}" -nb "${nb}" -bs "${bs}" -mergefreq "${mergefreq}$" -mergemode "${mergemode}"
         done
     done
 done

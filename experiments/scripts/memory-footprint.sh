@@ -15,8 +15,8 @@ rs="true"                        # range search mode: ON | OFF
 det="true"                       # determinism in random walking via predefined seeds (for debugging)
 nb=1                             # numbers of batches
 bs=1000                          # half the size of the batch size
-merge_mode="parallel"            # mode for conducting the merge operation of the walk-trees: parallel | serial
-merge_freq=1                     # every after "how many" batches to conduct the merging operation
+mergemode="parallel"             # mode for conducting the merge operation of the walk-trees: parallel | serial
+mergefreq=1                      # every after "how many" batches to conduct the merging operation
 
 # 1. convert graphs in adjacency graph format if necessary
 for graph in "${graphs[@]}"; do

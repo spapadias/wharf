@@ -8,12 +8,12 @@ void throughput(commandLine& command_line)
     bool compressed          = command_line.getOption("-c");
     size_t n_parts           = command_line.getOptionLongValue("-nparts", 1);
 
-    size_t walks_per_vertex = command_line.getOptionLongValue("-w", config::walks_per_vertex);
-    size_t length_of_walks  = command_line.getOptionLongValue("-l", config::walk_length);
+    size_t w = command_line.getOptionLongValue("-w", config::walks_per_vertex);
+    size_t l  = command_line.getOptionLongValue("-l", config::walk_length);
     string model            = string(command_line.getOptionValue("-model", "deepwalk"));
-    double paramP           = command_line.getOptionDoubleValue("-paramP", config::paramP);
-    double paramQ           = command_line.getOptionDoubleValue("-paramQ", config::paramQ);
-    string init_strategy    = string(command_line.getOptionValue("-init", "weight"));
+    double p           = command_line.getOptionDoubleValue("-paramP", config::paramP);
+    double q           = command_line.getOptionDoubleValue("-paramQ", config::paramQ);
+    string init    = string(command_line.getOptionValue("-init", "weight"));
     size_t n_trials         = command_line.getOptionLongValue("-trials",  5);
 
     string determinism      = string(command_line.getOptionValue("-d", "false"));
@@ -34,8 +34,8 @@ void throughput(commandLine& command_line)
 		std::cout << "Serial Merge and WU" << std::endl;
 	}
 
-	config::walks_per_vertex = walks_per_vertex;
-    config::walk_length      = length_of_walks;
+	config::walks_per_vertex = w;
+    config::walk_length      = l;
 
     std::cout << "Walks per vertex: " << (int) config::walks_per_vertex << std::endl;
     std::cout << "Walk length: " <<  (int) config::walk_length << std::endl;
@@ -48,8 +48,8 @@ void throughput(commandLine& command_line)
     else if (model == "node2vec")
     {
         config::random_walk_model = types::RandomWalkModelType::NODE2VEC;
-        config::paramP = paramP;
-        config::paramQ = paramQ;
+        config::paramP = p;
+        config::paramQ = q;
         std::cout << "Walking model: NODE2VEC | Params (p,q) = " << "(" << config::paramP << "," << config::paramQ << ")" << std::endl;
     }
     else
@@ -58,17 +58,17 @@ void throughput(commandLine& command_line)
         std::exit(1);
     }
 
-    if (init_strategy == "burnin")
+    if (init == "burnin")
     {
         config::sampler_init_strategy = types::SamplerInitStartegy::BURNIN;
         std::cout << "Sampler strategy: BURNIN" << std::endl;
     }
-    else if (init_strategy == "weight")
+    else if (init == "weight")
     {
         config::sampler_init_strategy = types::SamplerInitStartegy::WEIGHT;
         std::cout << "Sampler strategy: WEIGHT" << std::endl;
     }
-    else if (init_strategy == "random")
+    else if (init == "random")
     {
         config::sampler_init_strategy = types::SamplerInitStartegy::RANDOM;
         std::cout << "Sampler strategy: RANDOM" << std::endl;

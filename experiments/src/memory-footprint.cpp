@@ -19,9 +19,9 @@ void memory_footprint(commandLine& command_line)
     string rs          = string(command_line.getOptionValue("-rs", "true"));
 	size_t num_of_batches   = command_line.getOptionIntValue("-nb", 10);
 	size_t half_of_bsize    = command_line.getOptionIntValue("-bs", 5000);
-	size_t merge_freq       = command_line.getOptionIntValue("-merge_freq", 1);
+	size_t merge_freq       = command_line.getOptionIntValue("-mergefreq", 1);
 	config::merge_frequency = merge_freq;
-	string merge_mode       = string(command_line.getOptionValue("-merge_mode", "parallel"));
+	string merge_mode       = string(command_line.getOptionValue("-mergemode", "parallel"));
 	if (merge_mode == "parallel")
 	{
 		config::parallel_merge_wu = true;
