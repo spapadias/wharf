@@ -1455,6 +1455,10 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                     {
                         samplers_bytes += sizeof(entry.first) + sizeof(entry.second);
                     }
+
+	                // measure the size of all {min, max} bounds of range search
+	                vnext_min_bytes   += sizeof(flat_graph[i].compressed_walks.front().vnext_min);
+	                vnext_max_bytes   += sizeof(flat_graph[i].compressed_walks.front().vnext_max);
                 }
 
                 std::cout << "Graph: \n\t" << "Vertices: " << graph_vertices << ", Edges: " << graph_edges << std::endl;
@@ -1483,7 +1487,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                           << " MB = " << utility::GB(walks_bytes + walks_heads*c_tree_node_size)
                           << " GB" << std::endl;
 
-                // print out the size of bounds due to the range search
                 std::cout << "Range Search (" << ((config::range_search_mode) ? "ON" : "OFF") << "): \n\t"
                           << "Total {min,max} memory usage: " << utility::MB(((config::range_search_mode) ? (vnext_min_bytes + vnext_max_bytes) : 0))
                           << " MB = " << utility::GB(((config::range_search_mode) ? (vnext_min_bytes + vnext_max_bytes) : 0))

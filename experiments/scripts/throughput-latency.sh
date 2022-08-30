@@ -35,7 +35,7 @@ mkdir -p ../../build;
 cd ../../build;
 cmake -DCMAKE_BUILD_TYPE=Release ..;
 cd experiments;
-make memory-throughput-latency
+make throughput-latency
 
 # 3. execute experiments
 for wpv in "${walks_per_node[@]}"; do
@@ -43,7 +43,7 @@ for wpv in "${walks_per_node[@]}"; do
         for graph in "${graphs[@]}"; do
             printf "\n"
             printf "Graph: ${graph} \n"
-            ./memory-throughput-latency -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}" -rs "${range_search}" -d "${determinism}" -numbatch "${num_of_batches}" -sizebatch "${half_of_batch_size}" -mergefreq "${merge_frequency}$" -mergemode "${merge_wu_exec_mode}"
+            ./throughput-latency -s -f "data/${graph}.adj" -w "${wpv}" -l "${wl}" -model "${walk_model}" -paramP "${paramP}" -paramQ "${paramQ}" -init "${sampler_init_strategy}" -rs "${range_search}" -d "${determinism}" -numbatch "${num_of_batches}" -sizebatch "${half_of_batch_size}" -mergefreq "${merge_frequency}$" -mergemode "${merge_wu_exec_mode}"
         done
     done
 done

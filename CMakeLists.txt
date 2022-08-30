@@ -14,8 +14,8 @@ include_directories(utils)
 include_directories(config)
 
 # set up google tests
-enable_testing()
-add_subdirectory(tests)
+#enable_testing()
+#add_subdirectory(tests)
 
 # experiments
 add_subdirectory(experiments)
