@@ -241,7 +241,7 @@ The throughput and latency of Wharf's random walk updates when batches of insert
 The vertex classification experiment validates whether the random walks produced and maintained by Wharf are capable of producing graph embeddings of high quality that can be effectively used in a downstream vertex classification task. The experiment can be run using a script called `vertex-classification.sh` located in `experiments/scripts/`. Note that for the vertex classification experiment the user should checkout to the `vertex_classification_exp` branch and use that code. 
 
 The easiest way we can reproduce the vertex classification experimental results in Figure 11a of [1] is to open, select the appropriate parameters, and run the `vertex-classification.sh` script located in `experiments/scripts/` of the `vertex_classification_exp` branch. However, the same results can be obtained after running the executable `vertex-classification` located in `build/experiments/` for the corresponding datasets and set of parameters. 
-Note that because the vertex classification is a supervised task, i.e., requires the true labels of the vertices to be classified, we should also set the proper label file of the dataset used in the script `experiments/bin/vertex-classification.py` (line 11). Bellow we demonstrate the output on `Cora` dataset for a example set of parameters:
+Note that because the vertex classification is a supervised task, i.e., requires the true labels of the vertices to be classified, we should also set the proper label file of the dataset used in the script `experiments/bin/vertex-classification.py` (line 11). Bellow we demonstrate the output on `Cora` dataset for a example set of parameters that we run on our laptop:
 
 ```
 $ ./vertex-classification.sh  # run the script from the script/ folder
@@ -260,18 +260,39 @@ Initializing model... done
 Training incremental SGNS
 .. done (inf=27080/0 sent/sec)
 Initializing model... done
-Training incremental SGNS
- done (408.333333=2450/6 sent/sec)
-Initializing model... done
-Training incremental SGNS
- done (726.666667=4360/6 sent/sec)
-Initializing model... done
-Training incremental SGNS
+...
 ...
 Initializing model... done
 Training incremental SGNS
-.. done (2461.818182=27080/11 sent/sec)
-Initializing model...
+. done (736.000000=14720/20 sent/sec)
+IncrementalTimer: Total: 766.5944
+Static Learning
+Walks per vertex: 10
+Walk length: 80
+Vector dimension: 128
+Learning strategy: BATCH
+Walking model: DEEPWALK
+Sampler strategy: WEIGHT
+Vertices: 2708 Edges: 10556
+Learning initial embeddings
+Initializing model... done
+Training incremental SGNS
+.. done (inf=27080/0 sent/sec)
+Initializing model... done
+Training incremental SGNS
+.. done (4513.333333=27080/6 sent/sec)
+...
+...
+Initializing model... done
+Training incremental SGNS
+.. done (615.454545=27080/44 sent/sec)
+Initializing model... done
+Training incremental SGNS
+.. done (530.980392=27080/51 sent/sec)
+Initializing model... done
+Training incremental SGNS
+.. done (530.980392=27080/51 sent/sec)
+StaticTimer: Total: 875.8127
 ```
 
 # Unit Tests
