@@ -15,10 +15,7 @@ class WharfMHTest : public testing::Test
         uintE* offsets;
         bool mmap = false;
         bool is_symmetric = true;
-//        std::string default_file_path = "data/wiki-graph";
-        std::string default_file_path = "data/flickr-graph";
-//        std::string default_file_path = "data/aspen-paper-graph";
-
+        std::string default_file_path = "data/cora-graph";
 };
 
 void WharfMHTest::SetUp()
@@ -55,7 +52,7 @@ void WharfMHTest::TearDown()
 
 TEST_F(WharfMHTest, WharfMHConstructor)
 {
-    dygrl::WharfMH WharfMH = dygrl::WharfMH(total_vertices, total_edges, offsets, edges, false);
+    dygrl::Wharf WharfMH = dygrl::Wharf(total_vertices, total_edges, offsets, edges, false);
 
     // assert the number of vertices and edges in a graph
     ASSERT_EQ(WharfMH.number_of_vertices(), total_vertices);
@@ -100,7 +97,7 @@ TEST_F(WharfMHTest, WharfMHConstructor)
 
 TEST_F(WharfMHTest, WharfMHDestructor)
 {
-    dygrl::WharfMH WharfMH = dygrl::WharfMH(total_vertices, total_edges, offsets, edges);
+    dygrl::Wharf WharfMH = dygrl::Wharf(total_vertices, total_edges, offsets, edges);
 
     WharfMH.print_memory_pool_stats();
     WharfMH.destroy();
@@ -119,7 +116,7 @@ TEST_F(WharfMHTest, WharfMHDestructor)
 
 TEST_F(WharfMHTest, WharfMHDestroyIndex)
 {
-    dygrl::WharfMH WharfMH = dygrl::WharfMH(total_vertices, total_edges, offsets, edges);
+    dygrl::Wharf WharfMH = dygrl::Wharf(total_vertices, total_edges, offsets, edges);
     WharfMH.generate_initial_random_walks();
 
     WharfMH.print_memory_pool_stats();
@@ -142,7 +139,7 @@ TEST_F(WharfMHTest, WharfMHDestroyIndex)
 TEST_F(WharfMHTest, InsertBatchOfEdges)
 {
     // create wharf instance (vertices & edges)
-    dygrl::WharfMH WharfMH = dygrl::WharfMH(total_vertices, total_edges, offsets, edges);
+    dygrl::Wharf WharfMH = dygrl::Wharf(total_vertices, total_edges, offsets, edges);
     auto start_edges = WharfMH.number_of_edges();
 
 //    // print random walks
@@ -169,7 +166,7 @@ TEST_F(WharfMHTest, InsertBatchOfEdges)
 TEST_F(WharfMHTest, DeleteBatchOfEdges)
 {
     // create wharf instance (vertices & edges)
-    dygrl::WharfMH WharfMH = dygrl::WharfMH(total_vertices, total_edges, offsets, edges);
+    dygrl::Wharf WharfMH = dygrl::Wharf(total_vertices, total_edges, offsets, edges);
     auto start_edges = WharfMH.number_of_edges();
 
     // geneate edges
@@ -188,7 +185,7 @@ TEST_F(WharfMHTest, DeleteBatchOfEdges)
 TEST_F(WharfMHTest, UpdateRandomWalksOnInsertEdges)
 {
     // create graph and walks
-    dygrl::WharfMH WharfMH = dygrl::WharfMH(total_vertices, total_edges, offsets, edges);
+    dygrl::Wharf WharfMH = dygrl::Wharf(total_vertices, total_edges, offsets, edges);
     WharfMH.generate_initial_random_walks();
 
     // print random walks
@@ -213,7 +210,7 @@ TEST_F(WharfMHTest, UpdateRandomWalksOnInsertEdges)
 TEST_F(WharfMHTest, UpdateRandomWalksOnDeleteEdges)
 {
     // create graph and walks
-    dygrl::WharfMH WharfMH = dygrl::WharfMH(total_vertices, total_edges, offsets, edges);
+    dygrl::Wharf WharfMH = dygrl::Wharf(total_vertices, total_edges, offsets, edges);
     WharfMH.generate_initial_random_walks();
 
     // print random walks
@@ -238,7 +235,7 @@ TEST_F(WharfMHTest, UpdateRandomWalksOnDeleteEdges)
 TEST_F(WharfMHTest, UpdateRandomWalks)
 {
     // create graph and walks
-    dygrl::WharfMH WharfMH = dygrl::WharfMH(total_vertices, total_edges, offsets, edges);
+    dygrl::Wharf WharfMH = dygrl::Wharf(total_vertices, total_edges, offsets, edges);
     WharfMH.generate_initial_random_walks();
 
     // print random walks
@@ -265,14 +262,14 @@ TEST_F(WharfMHTest, UpdateRandomWalks)
 
 TEST_F(WharfMHTest, WharfMHMemoryFootprint)
 {
-    dygrl::WharfMH WharfMH = dygrl::WharfMH(total_vertices, total_edges, offsets, edges);
+    dygrl::Wharf WharfMH = dygrl::Wharf(total_vertices, total_edges, offsets, edges);
     WharfMH.generate_initial_random_walks();
     WharfMH.memory_footprint();
 }
 
 TEST_F(WharfMHTest, WharfMHThroughputLatency)
 {
-    dygrl::WharfMH WharfMH = dygrl::WharfMH(total_vertices, total_edges, offsets, edges);
+    dygrl::Wharf WharfMH = dygrl::Wharf(total_vertices, total_edges, offsets, edges);
     WharfMH.generate_initial_random_walks();
     int n_trials = 3;
 
@@ -395,7 +392,7 @@ TEST_F(WharfMHTest, WharfMHThroughputLatency)
 
 TEST_F(WharfMHTest, WharfMHThroughputLatency2)
 {
-	dygrl::WharfMH WharfMH = dygrl::WharfMH(total_vertices, total_edges, offsets, edges);
+	dygrl::Wharf WharfMH = dygrl::Wharf(total_vertices, total_edges, offsets, edges);
 	WharfMH.generate_initial_random_walks();
 	int n_trials = 1; //3;
 
@@ -536,7 +533,7 @@ TEST_F(WharfMHTest, WharfMHThroughputLatency2)
 // ----------------------------
 
 TEST_F(WharfMHTest, WharfInsertOnlyWorkload) {
-	dygrl::WharfMH malin = dygrl::WharfMH(total_vertices, total_edges, offsets, edges);
+	dygrl::Wharf malin = dygrl::Wharf(total_vertices, total_edges, offsets, edges);
 	malin.generate_initial_random_walks();
 	int n_batches = 1; // todo: how many batches per batch size?
 

@@ -1,3 +1,3 @@
-# WharfMH: Unified Streaming Graph Representation Learning with Metropolis-Hastings
+# Wharf: Unified Streaming Graph Representation Learning with Metropolis-Hastings
 
 

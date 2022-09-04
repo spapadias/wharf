@@ -39,17 +39,17 @@ void create_edge_stream(commandLine& command_line, std::vector<std::pair<Edge*, 
 
 void vertex_classification_incremental(commandLine& command_line, const std::vector<std::pair<Edge*, uintV>>& stream)
 {
-    size_t walks_per_vertex  = command_line.getOptionLongValue("-w", config::walks_per_vertex);
-    size_t length_of_walks   = command_line.getOptionLongValue("-l", config::walk_length);
+    size_t w                 = command_line.getOptionLongValue("-w", config::walks_per_vertex);
+    size_t l                 = command_line.getOptionLongValue("-l", config::walk_length);
     string model             = string(command_line.getOptionValue("-model", "deepwalk"));
-    double paramP            = command_line.getOptionDoubleValue("-paramP", config::paramP);
-    double paramQ            = command_line.getOptionDoubleValue("-paramQ", config::paramQ);
-    string init_strategy     = string(command_line.getOptionValue("-init", "random"));
+    double p                 = command_line.getOptionDoubleValue("-p", config::paramP);
+    double q                 = command_line.getOptionDoubleValue("-q", config::paramQ);
+    string init              = string(command_line.getOptionValue("-init", "random"));
     size_t vector_dimension  = command_line.getOptionLongValue("-d", 128);
     size_t learning_strategy = command_line.getOptionLongValue("-le", 1);
 
-    config::walks_per_vertex = walks_per_vertex;
-    config::walk_length      = length_of_walks;
+    config::walks_per_vertex = w;
+    config::walk_length      = l;
 
     std::cout << "Incremental Learning" << std::endl;
     std::cout << "Walks per vertex: " << (int) config::walks_per_vertex << std::endl;
@@ -80,8 +80,8 @@ void vertex_classification_incremental(commandLine& command_line, const std::vec
     else if (model == "node2vec")
     {
         config::random_walk_model = types::RandomWalkModelType::NODE2VEC;
-        config::paramP = paramP;
-        config::paramQ = paramQ;
+        config::paramP = p;
+        config::paramQ = q;
 
         std::cout << "Walking model: NODE2VEC | Params (p,q) = " << "(" << config::paramP << "," << config::paramQ << ")" << std::endl;
     }
@@ -91,19 +91,19 @@ void vertex_classification_incremental(commandLine& command_line, const std::vec
         std::exit(1);
     }
 
-    if (init_strategy == "burnin")
+    if (init == "burnin")
     {
         config::sampler_init_strategy = types::SamplerInitStartegy::BURNIN;
 
         std::cout << "Sampler strategy: BURNIN" << std::endl;
     }
-    else if (init_strategy == "weight")
+    else if (init == "weight")
     {
         config::sampler_init_strategy = types::SamplerInitStartegy::WEIGHT;
 
         std::cout << "Sampler strategy: WEIGHT" << std::endl;
     }
-    else if (init_strategy == "random")
+    else if (init == "random")
     {
         config::sampler_init_strategy = types::SamplerInitStartegy::RANDOM;
 
@@ -133,7 +133,7 @@ void vertex_classification_incremental(commandLine& command_line, const std::vec
 
     // 1. load all vertices in isolation (every vertex has a degree of 0)
     incremental_timer.start();
-    dygrl::WharfMH WharfMH = dygrl::WharfMH(n, m);
+    dygrl::Wharf WharfMH = dygrl::Wharf(n, m);
     WharfMH.generate_initial_random_walks();
     incremental_timer.stop();
 
@@ -199,17 +199,17 @@ void vertex_classification_incremental(commandLine& command_line, const std::vec
 
 void vertex_classification_static(commandLine& command_line, const std::vector<std::pair<Edge*, uintV>>& stream)
 {
-    size_t walks_per_vertex  = command_line.getOptionLongValue("-w", config::walks_per_vertex);
-    size_t length_of_walks   = command_line.getOptionLongValue("-l", config::walk_length);
+    size_t w                 = command_line.getOptionLongValue("-w", config::walks_per_vertex);
+    size_t l                 = command_line.getOptionLongValue("-l", config::walk_length);
     string model             = string(command_line.getOptionValue("-model", "deepwalk"));
-    double paramP            = command_line.getOptionDoubleValue("-paramP", config::paramP);
-    double paramQ            = command_line.getOptionDoubleValue("-paramQ", config::paramQ);
-    string init_strategy     = string(command_line.getOptionValue("-init", "random"));
+    double p                 = command_line.getOptionDoubleValue("-p", config::paramP);
+    double q                 = command_line.getOptionDoubleValue("-p", config::paramQ);
+    string init              = string(command_line.getOptionValue("-init", "random"));
     size_t vector_dimension  = command_line.getOptionLongValue("-d", 128);
     size_t learning_strategy = 0;
 
-    config::walks_per_vertex = walks_per_vertex;
-    config::walk_length      = length_of_walks;
+    config::walks_per_vertex = w;
+    config::walk_length      = l;
 
     std::cout << "Static Learning" << std::endl;
     std::cout << "Walks per vertex: " << (int) config::walks_per_vertex << std::endl;
@@ -244,8 +244,8 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
     else if (model == "node2vec")
     {
         config::random_walk_model = types::RandomWalkModelType::NODE2VEC;
-        config::paramP = paramP;
-        config::paramQ = paramQ;
+        config::paramP = p;
+        config::paramQ = q;
 
         std::cout << "Walking model: NODE2VEC | Params (p,q) = " << "(" << config::paramP << "," << config::paramQ << ")" << std::endl;
     }
@@ -255,19 +255,19 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
         std::exit(1);
     }
 
-    if (init_strategy == "burnin")
+    if (init == "burnin")
     {
         config::sampler_init_strategy = types::SamplerInitStartegy::BURNIN;
 
         std::cout << "Sampler strategy: BURNIN" << std::endl;
     }
-    else if (init_strategy == "weight")
+    else if (init == "weight")
     {
         config::sampler_init_strategy = types::SamplerInitStartegy::WEIGHT;
 
         std::cout << "Sampler strategy: WEIGHT" << std::endl;
     }
-    else if (init_strategy == "random")
+    else if (init == "random")
     {
         config::sampler_init_strategy = types::SamplerInitStartegy::RANDOM;
 
@@ -297,7 +297,7 @@ void vertex_classification_static(commandLine& command_line, const std::vector<s
 
     // 1. load all vertices in isolation (every vertex has a degree of 0)
     static_timer.start();
-    dygrl::WharfMH WharfMH = dygrl::WharfMH(n, m);
+    dygrl::Wharf WharfMH = dygrl::Wharf(n, m);
     WharfMH.generate_initial_random_walks();
     static_timer.stop();
 

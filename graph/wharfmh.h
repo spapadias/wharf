@@ -18,15 +18,15 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
      * @brief WharfMH represents a structure that stores a graph as an augmented parallel balanced binary tree.
      * Keys in this tree are graph vertices and values are compressed edges, parallel inverted index, and metropolis hastings samplers.
      */
-    class WharfMH
+    class Wharf
     {
         public:
             using Graph = aug_map<dygrl::Vertex>;
 
-            WharfMH(long graph_vertices, long graph_edges)
+            Wharf(long graph_vertices, long graph_edges)
             {
                 // 1. Initialize memory pools
-                WharfMH::init_memory_pools(graph_vertices, graph_edges);
+                Wharf::init_memory_pools(graph_vertices, graph_edges);
 
                 // 2. Create an empty vertex sequence
                 using VertexStruct = std::pair<types::Vertex, VertexEntry>;
@@ -55,14 +55,14 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
              * @param edges          - edges
              * @param free_memory    - free memory excess after graph is loaded
              */
-            WharfMH(long graph_vertices, long graph_edges, uintE* offsets, uintV* edges, bool free_memory = true)
+            Wharf(long graph_vertices, long graph_edges, uintE* offsets, uintV* edges, bool free_memory = true)
             {
                 #ifdef WharfMH_TIMER
                     timer timer("WharfMH::Constructor");
                 #endif
 
                 // 1. Initialize memory pools
-                WharfMH::init_memory_pools(graph_vertices, graph_edges);
+                Wharf::init_memory_pools(graph_vertices, graph_edges);
 
                 // 2. Create an empty vertex sequence
                 using VertexStruct = std::pair<types::Vertex, VertexEntry>;
@@ -300,7 +300,6 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
 
                         auto new_state = graph[state.first].samplers->find(state.second).sample(state, model);
                         // ---------------------------------------------------------------
-                        // todo: added for deterministic walks ----------------------
                         if (config::deterministic_mode)
                         {
 //                            new_state = model->new_state(state,graph[state.first].neighbors[0]); // fix this for determinism
@@ -449,7 +448,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 // 2. Sort the edges in the batch (by source)
                 if (!sorted)
                 {
-                    WharfMH::sort_edge_batch_by_source(edges, m, nn);
+                    Wharf::sort_edge_batch_by_source(edges, m, nn);
                 }
 
                 // 3. Remove duplicate edges
@@ -598,7 +597,7 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                 // 2. Sort the edges in the batch (by source)
                 if (!sorted)
                 {
-                    WharfMH::sort_edge_batch_by_source(edges, m, nn);
+                    Wharf::sort_edge_batch_by_source(edges, m, nn);
                 }
 
                 // 3. Remove duplicate edges
@@ -829,12 +828,10 @@ namespace dynamic_graph_representation_learning_with_metropolis_hastings
                                 graph[state.first].samplers->insert(state.second, MetropolisHastingsSampler(state, model));
                             }
 
-//                            state = graph[state.first].samplers->find(state.second).sample(state, model); //todo: quick fix! modify it properly
                             auto temp_state = graph[state.first].samplers->find(state.second).sample(state, model);
                             // --------------------------------------------
-                            // todo: this is for deterministic walks ------
                             if (config::deterministic_mode)
-//                                state = model->new_state(state, graph[state.first].neighbors[0]); // todo: do not use this one
+//                                state = model->new_state(state, graph[state.first].neighbors[0]);
                                 state = model->new_state(state, graph[state.first].neighbors[random.irand(graph[state.first].degree)]);
                             else
                                 state = temp_state;
