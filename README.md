@@ -261,7 +261,6 @@ Training incremental SGNS
 .. done (inf=27080/0 sent/sec)
 Initializing model... done
 ...
-...
 Initializing model... done
 Training incremental SGNS
 . done (736.000000=14720/20 sent/sec)
@@ -281,7 +280,6 @@ Training incremental SGNS
 Initializing model... done
 Training incremental SGNS
 .. done (4513.333333=27080/6 sent/sec)
-...
 ...
 Initializing model... done
 Training incremental SGNS
