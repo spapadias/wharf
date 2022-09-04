@@ -197,7 +197,7 @@ After the build, all the executables, namely, `memory-footprint`, `throughput-la
 
 The memory usage of our codes can be measured using a tool called `memory-footprint.sh`, which loads a graph using the C-tree data structure and outputs the number of bytes used by the C-tree representation. Specifically, it separately measures the size for the vertex-tree, for the edge-tree, and for the walk-tree (in MBs and GBs). Furthermore, it calculates the size for storing the min and max id of the next vertex in each walk-tree of the hybrid-tree (Figure 4 in our paper), as well as the size to store all the Metropolis-Hastings samplers, which are both negligible compared to the size of the random walk corpus that is maintained and indexed in main memory. Note that in our experiments we set the probability of a node being selected as a head to p = 1/256, so the expected number of nodes in the edges tree is p*m.
 
-The easiest way we can reproduce the memory footprint experimental results in Figure 8 of [1] is to open, select the appropriate parameters, and run the `memory-footprint.sh` script located in `experiments/scripts/`. However the same results can be obtained after running the executable `memory-footprint` located in `build/experiments/` for the corresponding datasets and set of parameters. Bellow we demonstrate the output on `Cora` dataset for a example set of parameters:
+The easiest way we can reproduce the memory footprint experimental results in Figure 8 of [1] is to open, select the appropriate parameters, and run the `memory-footprint.sh` script located in `experiments/scripts/`. However, the same results can be obtained after running the executable `memory-footprint` located in `build/experiments/` for the corresponding datasets and set of parameters. Bellow we demonstrate the output on `Cora` dataset for a example set of parameters:
 
 ```
 $ ./memory-footprint.sh  # run the script from the script/ folder
@@ -232,79 +232,47 @@ Total memory used:
 
 The throughput and latency of Wharf's random walk updates when batches of insertions and/or deletions arrive can be measured using a tool called `throughput-memory.sh`, which loads a graph into edge-trees, produces a walk corpus and loads it into the walk-trees of the hybrid-tree. Subsequently, it inserts a number of batches of certain number of edge insertions or deletions (we also have an experiment with mixed workload containing both insertions and deletions), and applies both the graph updates and the appropriate random walk updates such that the walk corpus always remains stastistically indistinguishable.
 
-The easiest way we can reproduce the throughput and latency experimental results in Figure 6, 7, and 9-12 of [1] is to open, select the appropriate parameters, and run the `throughput-latency.sh` script located in `experiments/scripts/`. However the same results can be obtained after running the executable `throughput-latency` located in `build/experiments/` for the corresponding datasets and set of parameters. Bellow we demonstrate the output on `Cora` dataset for a example set of parameters:
-```
-$ ./throughput-latency.sh  # run the script from the script/ folder
-Running with 144 threads
-n = 4847571 m = 85702474
-Running bs: 10
-Avg insert: 0.000213703
-Avg delete: 0.000209332
-
-Running bs: 100
-Avg insert: 0.000360648
-Avg delete: 0.000368357
-
-...
-
-Running bs: 1000000000
-Avg insert: 2.6432
-Avg delete: 1.81675
-
-Running bs: 2000000000
-Avg insert: 4.92558
-Avg delete: 3.24599
-```
-
-We have provided a script to run the batch update algorithm on all of our inputs in `experiments/scripts/run_batch_updates.sh`. In this script one may set various parameters such as:
-**The following command will run the same experiments used to generate the results from Table 5 in [1]: Make the scripts like in Aspen to run all the graphs blah blah**
-```
-./scripts/throughput-latency.sh
-```
-The data for each graph will be written to `data/batch_updates/graph.dat`.
-
-
-
+**blah blah**
 
 
 
 ## Vertex Classification with Wharf's walks
 
-The vertex classification experiment validates whether the random walks produced and maintained by Wharf are capable of producing graph embeddings of high quality that can be effectively used in a downstream vertex classification task. The experiment can be run using a tool called `vertex-classification.sh`.
+The vertex classification experiment validates whether the random walks produced and maintained by Wharf are capable of producing graph embeddings of high quality that can be effectively used in a downstream vertex classification task. The experiment can be run using a script called `vertex-classification.sh` located in `experiments/scripts/`. Note that for the vertex classification experiment the user should checkout to the `vertex_classification_exp` branch and use that code. 
 
-random walk updates when batches of insertions and/or deletions arrive can be measured using a tool called `throughput-memory.sh`, which loads a graph into edge-trees, produces a walk corpus and loads it into the walk-trees of the hybrid-tree. Subsequently, it inserts a number of batches of certain number of edge insertions or deletions (we also have an experiment with mixed workload containing both insertions and deletions), and applies both the graph updates and the appropriate random walk updates such that the walk corpus always remains stastistically indistinguishable.
+The easiest way we can reproduce the vertex classification experimental results in Figure 11a of [1] is to open, select the appropriate parameters, and run the `vertex-classification.sh` script located in `experiments/scripts/` of the `vertex_classification_exp` branch. However, the same results can be obtained after running the executable `vertex-classification` located in `build/experiments/` for the corresponding datasets and set of parameters. 
+Note that because the vertex classification is a supervised task, i.e., requires the true labels of the vertices to be classified, we should also set the proper label file that corresponds to the dataset used in the python script `experiments/bin/vertex-classification.py` (line 11). Bellow we demonstrate the output on `Cora` dataset for a example set of parameters:
 
-Using
 ```
-make vertex-classification
-```
-will give the executable file `vertex-classification`.
+$ ./vertex-classification.sh  # run the script from the script/ folder
+cora-graph - Running vertex classification with 8 threads.
 
-It can be used as follows:
+Incremental Learning
+Walks per vertex: 10
+Walk length: 80
+Vector dimension: 128
+Learning strategy: ONLINE
+Walking model: DEEPWALK
+Sampler strategy: WEIGHT
+Vertices: 2708 Edges: 10556
+Learning initial embeddings
+Initializing model... done
+Training incremental SGNS
+.. done (inf=27080/0 sent/sec)
+Initializing model... done
+Training incremental SGNS
+ done (408.333333=2450/6 sent/sec)
+Initializing model... done
+Training incremental SGNS
+ done (726.666667=4360/6 sent/sec)
+Initializing model... done
+Training incremental SGNS
+...
+Initializing model... done
+Training incremental SGNS
+.. done (2461.818182=27080/11 sent/sec)
+Initializing model...
 ```
-# ./vertex-classification [-f graph_file]
-$ numactl -i all ./vertex-classification **-queryiters 200 -m -s -f inputs/soc-LiveJournal_sym.adj**
-Running with 144 threads
-n = 4847571 m = 85702474
-Shuffling updates
-SeqUpdateParQuery:
-Started updates
-Started queries
-Update throughput = 101011
-Average_latency = 9.89992e-06
-Average query time : 0.0535617
-```
-
-We have provided a script to run the batch update algorithm on all of our inputs in `experiments/scripts/vertex-classification.sh`. In this script one may set various parameters such as:
-
-We have provided a script to run the batch update algorithm on all of our inputs
-in `scripts/run_vertex-classification.sh`.
-
-**The following command will run the same experiments used to generate the results from Table 5 in [1]:**
-```
-./scripts/run_vertex-classification.sh
-```
-The data for each graph will be written to `data/vertex-classification/graph.dat`.
 
 # Unit Tests
 
