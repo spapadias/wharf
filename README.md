@@ -1,6 +1,6 @@
 # Wharf: Space-Efficient Random Walks on Streaming Graphs
 
-This repository provides the code, unit tests, scripts, and instructions for reproducing the experiments in our paper, Space-Efficient Random Walks on Streaming Graphs [1]. Our paper introduces Wharf, a main-memory streaming random walk system capable of updating, indexing, and compressing a maintained random walk corpus efficiently over streaming (i.e., highly dynamic) graphs that are evolving.
+This repository provides the code, scripts, and instructions for reproducing the experiments in our paper, Space-Efficient Random Walks on Streaming Graphs [1]. Our paper introduces Wharf, a main-memory streaming random walk system capable of updating, indexing, and compressing a maintained random walk corpus efficiently over streaming (i.e., highly dynamic) graphs that are evolving.
 
 Wharf is designed for maintaining a dynamic graph that is subject to updates by a single writer, while supporting multiple concurrent readers by utilizing the C-tree structure introduced in [2]. Wharf represents the random walks in the form of triplets, which encodes as unique integers, and stores them in C-trees for achieving both high throughput and low memory footprint.
 
