@@ -7,16 +7,16 @@ clean_build=True
 model="deepwalk"                 # deepwalk | node2vec
 p=0.5                            # node2vec's p parameter
 q=2.0                            # node2vec's q parameter
-init="random"                    # random | burnin | weight
+init="weight"                    # random | burnin | weight
 declare -a graphs=("cora-graph") # array of graphs (can intake more than one dataset)
 declare -a w=(10)                # walks per vertex to generate
 declare -a l=(80)                # length of one walk
 rs="true"                        # range search mode: ON | OFF
 det="true"                       # determinism in random walking via predefined seeds (for debugging)
-nb=1                             # numbers of batches
-bs=1000                          # half the size of the batch size
+nb=5                             # numbers of batches
+bs=100                           # half the size of the batch size
 mergemode="parallel"             # mode for conducting the merge operation of the walk-trees: parallel | serial
-mergefreq=1                      # every after "how many" batches to conduct the merging operation
+mergefreq=5                      # every after "how many" batches to conduct the merging operation
 
 # 1. convert graphs in adjacency graph format if necessary
 for graph in "${graphs[@]}"; do
@@ -52,5 +52,5 @@ done
 if [ "$clean_build" = True ] ; then
     cd ../../;
     rm -rf build;
-#    rm experiments/data/*.adj
+    rm experiments/data/*.adj
 fi
