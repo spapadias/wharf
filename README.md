@@ -139,7 +139,7 @@ All the real graph workloads we used in our experiments can be obtained from the
 
 For the synthetic datasets we used the [TrillionG](https://chan150.github.io/TrillionG/) which is the state of the art graph generator published in SIGMOD 2017. TrillionG uses the RMAT model to generate the a graph and has essentially four parameters a,b,c, and d. For producing each of the synthetic graphs please check the `Datasets` description in our paper.
 
-Note that currently in our repo we only provide Cora dataset (along with its label for the vertex classification experiment) for the sake of space.
+Note that currently in our repo we only provide cora dataset (along with its label for the vertex classification experiment) for the sake of space.
 
 # Experiment Workflow
 
@@ -197,7 +197,7 @@ After the build, all the executables, namely, `memory-footprint`, `throughput-la
 
 The memory usage of our codes can be measured using a tool called `memory-footprint.sh`, which loads a graph using the C-tree data structure and outputs the number of bytes used by the C-tree representation. Specifically, it separately measures the size for the vertex-tree, for the edge-tree, and for the walk-tree (in MBs and GBs). Furthermore, it calculates the size for storing the min and max id of the next vertex in each walk-tree of the hybrid-tree (Figure 4 in our paper), as well as the size to store all the Metropolis-Hastings samplers, which are both negligible compared to the size of the random walk corpus that is maintained and indexed in main memory. Note that in our experiments we set the probability of a node being selected as a head to p = 1/256, so the expected number of nodes in the edges tree is p*m.
 
-The easiest way we can reproduce the memory footprint experimental results in Figure 8 of [1] is to open, select the appropriate parameters, and run the `memory-footprint.sh` script located in `experiments/scripts/`. However, the same results can be obtained after running the executable `memory-footprint` located in `build/experiments/` for the corresponding datasets and set of parameters. Bellow we demonstrate the output on `Cora` dataset for a example set of parameters:
+The easiest way we can reproduce the memory footprint experimental results in Figure 8 of [1] is to open, select the appropriate parameters, and run the `memory-footprint.sh` script located in `experiments/scripts/`. However, the same results can be obtained after running the executable `memory-footprint` located in `build/experiments/` for the corresponding datasets and set of parameters. Bellow we demonstrate the output on `cora` dataset for a example set of parameters:
 
 ```
 $ ./memory-footprint.sh  # run the script from the script/ folder
@@ -232,7 +232,10 @@ Total memory used:
 
 The throughput and latency of Wharf's random walk updates when batches of insertions and/or deletions arrive can be measured using a tool called `throughput-memory.sh`, which loads a graph into edge-trees, produces a walk corpus and loads it into the walk-trees of the hybrid-tree. Subsequently, it inserts a number of batches of certain number of edge insertions or deletions (we also have an experiment with mixed workload containing both insertions and deletions), and applies both the graph updates and the appropriate random walk updates such that the walk corpus always remains stastistically indistinguishable.
 
+The easiest way we can reproduce the throughput and latency experimental results in Figure 6, and 9 of [1] is to open, select the appropriate parameters, and run the `throughput-latency.sh` script located in `experiments/scripts/`. However, the same results can be obtained after running the executable `throughput-latency` located in `build/experiments/` for the corresponding datasets and set of parameters. Bellow we demonstrate the output on `cora` dataset for a example set of parameters:
+
 ```
+$ ./throughput-latency.sh  # run the script from the script/ folder
 Graph: cora-graph 
 Running experiment with 8 threads
 Parallel Merge and WU
@@ -335,7 +338,7 @@ Average walk insert latency = { 0.000022 0.000024 0.000046 0.000050 0.000069 0.0
 The vertex classification experiment validates whether the random walks produced and maintained by Wharf are capable of producing graph embeddings of high quality that can be effectively used in a downstream vertex classification task. The experiment can be run using a script called `vertex-classification.sh` located in `experiments/scripts/`. Note that for the vertex classification experiment the user should checkout to the `vertex_classification_exp` branch and use that code. 
 
 The easiest way we can reproduce the vertex classification experimental results in Figure 11a of [1] is to open, select the appropriate parameters, and run the `vertex-classification.sh` script located in `experiments/scripts/` of the `vertex_classification_exp` branch. However, the same results can be obtained after running the executable `vertex-classification` located in `build/experiments/` for the corresponding datasets and set of parameters. 
-Note that because the vertex classification is a supervised task, i.e., requires the true labels of the vertices to be classified, we should also set the proper label file of the dataset used in the script `experiments/bin/vertex-classification.py` (line 11). Bellow we demonstrate the output on `Cora` dataset for a example set of parameters that we run on our laptop:
+Note that because the vertex classification is a supervised task, i.e., requires the true labels of the vertices to be classified, we should also set the proper label file of the dataset used in the script `experiments/bin/vertex-classification.py` (line 11). Bellow we demonstrate the output on `cora` dataset for a example set of parameters that we run on our laptop:
 
 ```
 $ ./vertex-classification.sh  # run the script from the script/ folder
