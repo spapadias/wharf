@@ -24,7 +24,6 @@ This Getting Started Guide gives an overview of
 - Vertex Classification with Wharf's walks
 
 4. Miscellaneous
-- Unit Tests
 - Wharf++
 - References
 
@@ -389,12 +388,6 @@ Training incremental SGNS
 .. done (530.980392=27080/51 sent/sec)
 StaticTimer: Total: 875.8127
 ```
-
-# Unit Tests
-
-**Currently the units test are not included. Go to the main branch and fetch the clean unit tests in the final stage**
-
-Note that the repo contains unit tests under the `tests` folder, which we wrote during the development of Wharf. The ones interested for extending Wharf may consider using our tests or creating their one in a similar manner. Currently, we are using the [latest version](https://github.com/google/googletest/releases/tag/release-1.12.1) of [GoogleTest](https://github.com/google/googletest).
 
 # Wharf++
 
