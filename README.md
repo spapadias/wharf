@@ -391,7 +391,7 @@ StaticTimer: Total: 875.8127
 
 # Wharf++
 
-There are a few interesting directions to consider for extending Wharf further. If you are interested in helping us make the ship really "sail off into cool waters from the wharf" drop us an email. ;-)
+There are a few interesting directions to consider for extending Wharf further. If you are interested in helping us make the ship really "sail off into deep, cool waters and away from the wharf" drop us an email. ;-)
 
 # References
 
