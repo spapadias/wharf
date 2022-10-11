@@ -398,3 +398,27 @@ There are a few interesting directions to consider for extending Wharf further. 
 [1]: Space-Efficient Random Walks on Streaming Graphs, Serafeim Papadias, Zoi Kaoudi, Jorge Quiane, and Volker Markl
 
 [2]: Low-Latency Graph Streaming Using Compressed Purely-Functional Trees, Laxman Dhulipala, Guy Blelloch, and Julian Shun
+
+# Cite Us
+
+To cite our paper, add the following BibTeX snippet of the extended version to your bibliography:
+
+```
+@misc{https://doi.org/10.48550/arxiv.2209.06063,
+  doi = {10.48550/ARXIV.2209.06063},
+  
+  url = {https://arxiv.org/abs/2209.06063},
+  
+  author = {Papadias, Serafeim and Kaoudi, Zoi and Quiane-Ruiz, Jorge-Arnulfo and Markl, Volker},
+  
+  keywords = {Databases (cs.DB), FOS: Computer and information sciences, FOS: Computer and information sciences},
+  
+  title = {Space-Efficient Random Walks on Streaming Graphs},
+  
+  publisher = {arXiv},
+  
+  year = {2022},
+  
+  copyright = {arXiv.org perpetual, non-exclusive license}
+}
+```
