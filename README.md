@@ -404,21 +404,20 @@ There are a few interesting directions to consider for extending Wharf further. 
 To cite our paper, add the following BibTeX snippet of the extended version to your bibliography:
 
 ```
-@misc{https://doi.org/10.48550/arxiv.2209.06063,
-  doi = {10.48550/ARXIV.2209.06063},
-  
-  url = {https://arxiv.org/abs/2209.06063},
-  
-  author = {Papadias, Serafeim and Kaoudi, Zoi and Quiane-Ruiz, Jorge-Arnulfo and Markl, Volker},
-  
-  keywords = {Databases (cs.DB), FOS: Computer and information sciences, FOS: Computer and information sciences},
-  
-  title = {Space-Efficient Random Walks on Streaming Graphs},
-  
-  publisher = {arXiv},
-  
-  year = {2022},
-  
-  copyright = {arXiv.org perpetual, non-exclusive license}
+@article{DBLP:journals/pvldb/PapadiasKQM22,
+  author       = {Serafeim Papadias and
+                  Zoi Kaoudi and
+                  Jorge{-}Arnulfo Quian{\'{e}}{-}Ruiz and
+                  Volker Markl},
+  title        = {Space-Efficient Random Walks on Streaming Graphs},
+  journal      = {Proc. {VLDB} Endow.},
+  volume       = {16},
+  number       = {2},
+  pages        = {356--368},
+  year         = {2022},
+  url          = {https://www.vldb.org/pvldb/vol16/p356-papadias.pdf},
+  timestamp    = {Mon, 26 Jun 2023 20:53:23 +0200},
+  biburl       = {https://dblp.org/rec/journals/pvldb/PapadiasKQM22.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
 }
 ```
