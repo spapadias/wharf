@@ -401,7 +401,7 @@ There are a few interesting directions to consider for extending Wharf further. 
 
 # Cite Us
 
-To cite our paper, add the following BibTeX snippet of the extended version to your bibliography:
+To cite our paper, add the following BibTeX snippet to your bibliography:
 
 ```
 @article{DBLP:journals/pvldb/PapadiasKQM22,
